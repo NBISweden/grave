@@ -1,0 +1,25 @@
+process MULTIQC {
+
+	// Directives
+
+	debug true
+	label 'process_single'
+	container 'oras://community.wave.seqera.io/library/multiqc:1.24.1--438afbfaf9badab9'
+
+	// I/O & script
+
+	input:
+	path fastp_jsons
+	path fastqc_reports
+
+	output:
+	path "multiqc_report.html"
+
+	script:
+	"""
+
+	multiqc --force .
+
+	"""
+
+}

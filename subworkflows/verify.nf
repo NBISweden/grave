@@ -15,13 +15,13 @@ workflow VERIFY {
 	// Apptainer executable
 
 	if (!"apptainer".execute().text.trim()) {
-        error "The Apptainer executable is not in your PATH."
+        error "This workflow requires the Apptainer executable to be available in your PATH."
 	}
 
 	// Inputs
 
 	if (!file("$params.input").exists()) {
-		error("Input file '$params.input' was not found. Either add it to the data directory, or specify the samplesheet file using the --input command line argument.")
+		error("Input file '$params.input' was not found. Either add it to the data directory, or specify the samplesheet file using the --input command line argument. See the README.md for formatting instructions.")
 	}
 
 }

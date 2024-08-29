@@ -8,7 +8,7 @@ Main workflow definition
 
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
-
+include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
@@ -30,8 +30,14 @@ def ch_samplesheet = Channel
 
 workflow PANADNA { 
 
-	//INDEXREF(    FIXME: reference    )
+	//REFSTATS (collect reference stats)
+
 	FASTP (ch_samplesheet)
-	//FASTQC (ch_samplesheet, ch_fastp_out)
+
+	FASTQC (ch_samplesheet, FASTP.out.ch_fastp_reads)
+
+	MULTIQC(FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())
+
+	//PANMAP(index ref if not done & map)
 
 }

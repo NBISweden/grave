@@ -1,3 +1,3 @@
 id,type,repeat,fastq_1,fastq_2
-ancientSimian,ancient,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s2.fq.gz
-modernHuman,modern,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/humadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/humadna_s2.fq.gz
+ancientSimian,ancient,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/data/reads/simadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/data/reads/simadna_s2.fq.gz
+modernHuman,modern,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/data/reads/humadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/data/reads/humadna_s2.fq.gz

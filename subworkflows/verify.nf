@@ -32,24 +32,22 @@ workflow VERIFY {
 
 	if (!file("$params.containerDir").isDirectory()) {
 		println("Container directory '$params.containerDir' does not exist. Creating directory & building cactus container...")
-			file(params.containerDir).mkdirs()
-			MAKECONTAINER(ch_cactus_definition)
-			println("Cactus container built.")
+		file(params.containerDir).mkdirs()
+		MAKECONTAINER(ch_cactus_definition)
 	} else {
 		println("Container directory '$params.containerDir' exists, checking for cactus container...")
 		if (!file("$params.containerDir/cactus.sif").exists()) {
 			println("Cactus container not found in '$params.containerDir', building it...")
 			MAKECONTAINER(ch_cactus_definition)
-			println("Cactus container built.")
 		} else {
-			println("Cactus container found in '$params.containerDir', proceeding.")
+			println("Cactus container found in '$params.containerDir', proceeding...")
 		}
 	}
 
 	// Input files
 
-	if (!file("$params.input").exists()) {
-		error("Input file '$params.input' was not found. Either add it to the data directory, or specify the samplesheet file using the --input command line argument. See the README.md for formatting instructions.")
+	if (!file("$params.samplesheet").exists()) {
+		error("Input file '$params.samplesheet' was not found. Either add it to the data directory, or specify the samplesheet file using the --samplesheet command line argument. See the README.md for formatting instructions.")
 	}
 
 }

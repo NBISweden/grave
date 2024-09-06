@@ -9,11 +9,12 @@ Main workflow definition
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
 include { MULTIQC } from '../modules/multiqc.nf'
+include { REFSTATS } from '../modules/refstats.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
 def ch_samplesheet = Channel
-	.fromPath(params.input)
+	.fromPath("./data/${params.samplesheet}")
 	.splitCsv(header: true)
 	.map { row ->
 		// Initialise metadata list to travel with the files
@@ -26,11 +27,22 @@ def ch_samplesheet = Channel
 		}
 	}
 
-// Workflow execution
+// Load pangenome reference files, allow for two upstream graph construction modes: "hapl" (current best practice) or "filter"
 
-workflow PANADNA { 
+if ("$params.referenceMode" == "hapl") {
+    ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+    ch_hapl_index = Channel.fromPath("./data/reference/*.hapl")
+} else if ("$params.referenceMode" == "filter") {
+    ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+    ch_dist_index = Channel.fromPath("./data/reference/*.dist")
+    ch_min_index = Channel.fromPath("./data/reference/*.min")
+}
 
-	//REFSTATS (collect reference stats)
+// Pangenome mapping workflow execution
+
+workflow PANADNA {
+
+	REFSTATS (ch_gbz_graph)
 
 	FASTP (ch_samplesheet)
 

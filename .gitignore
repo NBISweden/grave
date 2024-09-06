@@ -1,4 +1,7 @@
+data/reference/*
+!data/reference/README.md
 output
 work
 .nextflow*
 trace-*
+

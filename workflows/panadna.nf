@@ -27,9 +27,9 @@ def ch_samplesheet = Channel
 		}
 	}
 
-// Load pangenome reference files, allow for two upstream graph construction modes: "hapl" (current best practice) or "filter"
+// Load pangenome reference files, allow for two upstream graph construction modes: "haplo" (current best practice) or "filter"
 
-if ("$params.referenceMode" == "hapl") {
+if ("$params.referenceMode" == "haplo") {
     ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
     ch_hapl_index = Channel.fromPath("./data/reference/*.hapl")
 } else if ("$params.referenceMode" == "filter") {

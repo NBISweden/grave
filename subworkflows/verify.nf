@@ -4,7 +4,7 @@ Verify base dependencies & check for required inputs
 ----------------------------------------------------------------------------------------
 */
 
-// Workflow execution
+// Verification workflow execution
 
 workflow VERIFY {
 
@@ -33,8 +33,8 @@ workflow VERIFY {
 		error("Input file 'data/$params.samplesheet' was not found (please see docs).")
 	}
 
-	// Check for reference files (allow for different inputs depending on 'hapl' or 'filter' modes)
-	// Files will be checked for expected naming per mode, and the user will be prompted to limit files only to those required
+	// Check for reference files (different inputs depending on 'hapl' or 'filter' modes)
+	// Mode dependent: expected file naming is checked and user prompted to give only required files
 
 	if (!file("./data/reference").isDirectory()) {
 		println("Pangenome directory 'data/reference' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")

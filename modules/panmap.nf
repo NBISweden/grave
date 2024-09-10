@@ -21,6 +21,7 @@ process PANMAP {
 	"""
 
 	# TODO: aDNA settings = short and merged (single ended data)
+	echo $meta.type
 	echo $reads
 	echo $reference
 	echo $indexes
@@ -31,8 +32,9 @@ process PANMAP {
 	"""
 	# TODO: paired end mapping settings
 
+	echo $meta.type
+	echo ${reads[0]}
 	echo ${reads[1]}
-	echo ${reads[2]}
 	echo $reference
 	echo $indexes
 

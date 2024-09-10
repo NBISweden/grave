@@ -3,7 +3,7 @@ process REFSTATS {
 	// Directives
 	debug false
 	label 'process_single'
-	container 'oras://community.wave.seqera.io/library/vg:1.56.0--b6e929d535c346ca'
+	container 'oras://community.wave.seqera.io/library/vg:1.59.0--15a0439180ad1c60'
 
 	// I/O & script
 

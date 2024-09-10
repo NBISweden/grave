@@ -20,13 +20,6 @@ workflow VERIFY {
 		error ("This workflow requires the Apptainer executable available in PATH.")
 	}
 
-	// Check for Cactus container, if not found provide build instructions
-
-	if (!file("$params.cactusSifPath").exists()) {
-		error ("Cactus container image not found at '$params.cactusSifPath'. To build it from a definition file, run `cd env`, then `apptainer build cactus.sif cactus.def`")
-	}
-			//	TODO: cactus container might not be needed if vg bioconda version will suffice
-
 	// Check for input samplesheet
 
 	if (!file("./data/${params.samplesheet}").exists()) {

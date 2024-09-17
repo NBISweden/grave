@@ -26,56 +26,81 @@ workflow VERIFY {
 		error("Input file 'data/$params.samplesheet' was not found (please see docs).")
 	}
 
-	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
-	// Mode dependent: expected file naming is checked and user prompted to give only required files
+	// Check directory structure
 
 	if (!file("./data/reference").isDirectory()) {
 		println("Pangenome directory 'data/reference' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")
 		file("data/reference").mkdirs()
 		error("Created 'data/reference'. Exiting...")
-	} else if ("$params.referenceMode" == "haplo") {
+	}
+
+	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
+
+		// This section defines the expected reference file patterns
 		def refPath = new File ("data/reference")
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
+		def distPattern = ~/.*\.dist$/
+		def minPattern = ~/.*\.min$/
+		def gbzFilteredPattern = ~/.*\.d.*\.gbz$/
+		def distFilteredPattern = ~/.*\.d.*\.dist$/
+		def minFilteredPattern = ~/.*\.d.*\.min$/
 		def foundHapl = refPath.listFiles().findAll { it.isFile() && it.name =~ haplPattern }
 		def foundGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzPattern }
-		if (foundHapl.isEmpty()) {
-			error("Reference mode is 'haplo' but no '.hapl' index found (please see docs). Exiting...")
-		} else if (foundGbz.isEmpty()) {
-			error("Reference mode is 'haplo' but no '.gbz' file found (please see docs). Exiting...")
-		} else if (foundGbz.size() > 1) {
-			error("More than one '.gbz' file found in 'data/reference'. For 'haplo' mode use the unfiltered .gbz graph.")
-		} else {
-			def gbzFilteredPattern = ~/.*\.d.*\.gbz$/
-			def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
-			if (!foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/reference' looks like a filtered graph. For 'haplo' mode use the unfiltered .gbz graph.")
-			}
-		}
-	} else if ("$params.referenceMode" == "filter") {
-		def refPath = new File ("data/reference")
-		def distPattern = ~/.*\.d.*\.dist$/
-		def minPattern = ~/.*\.d.*\.min$/
-		def gbzPattern = ~/.*\.gbz$/
 		def foundDist = refPath.listFiles().findAll { it.isFile() && it.name =~ distPattern }
 		def foundMin = refPath.listFiles().findAll { it.isFile() && it.name =~ minPattern }
-		def foundGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzPattern }
-		if (foundDist.isEmpty()) {
-			error ("Reference mode is 'filter' but no filtered '.dist' index found (please see docs). Exiting...")
-		} else if (foundMin.isEmpty()) {
-			error ("Reference mode is 'filter' but no filtered '.min' index found (please see docs). Exiting...")
-		} else if (foundGbz.isEmpty()) {
-			error ("Reference mode is 'filter' but no '.gbz' file found (please see docs). Exiting...")
-		} else if (foundGbz.size() > 1) {
-			error ("More than one '.gbz' file found in 'data/reference'. For 'filter' mode use the filtered .gbz graph.")
-		} else {
-			gbzFilteredPattern = ~/.*\.d.*\.gbz$/
-			def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
-			if (foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/reference' does not look like a filtered graph. For 'filter' mode use the filtered .gbz graph.")
+		def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
+		def foundFilteredDist = refPath.listFiles().findAll { it.isFile() && it.name =~ distFilteredPattern }
+		def foundFilteredMin = refPath.listFiles().findAll { it.isFile() && it.name =~ minFilteredPattern }
+
+		// In haplo mode, we need four files with only the reference basename (i.e. no file patterns matching filtered graphs)
+		if ("$params.referenceMode" == "haplo") {
+			// Haplotype file is not present in filter mode, so we only check presence/absence
+			if (foundHapl.isEmpty()) {
+				error ("Reference mode is 'haplo' but no '.hapl' index found (please see docs). Exiting...")
+			// The next three files, check presence, count, and if they have filtered patterns
+			} else if (foundGbz.isEmpty()) {
+				error ("No '.gbz' file found (please see docs). Exiting...")
+			} else if (foundGbz.size() > 1) {
+				error ("More than one '.gbz' file found in 'data/reference'. For 'haplo' mode use the unfiltered .gbz graph.")
+			} else if (!foundFilteredGbz.isEmpty()) {
+				error ("The .gbz file found in 'data/reference' looks like a filtered graph. For 'haplo' mode use the unfiltered .gbz graph.")
+			} else if (foundDist.isEmpty()) {
+				error ("No '.dist' file found (please see docs). Exiting...")
+			} else if (foundDist.size() > 1) {
+				error ("More than one '.dist' file found in 'data/reference'. For 'haplo' mode use indexes for the unfiltered .gbz graph.")
+			} else if (!foundFilteredDist.isEmpty()) {
+				error ("The .dist file found in 'data/reference' looks like it was made for a filtered graph.")
+			} else if (foundMin.isEmpty()) {
+				error ("No '.min' file found (please see docs). Exiting...")
+			} else if (foundMin.size() > 1) {
+				error ("More than one '.min' file found in 'data/reference'. For 'haplo' mode use indexes for the unfiltered .gbz graph.")
+			} else if (!foundFilteredMin.isEmpty()) {
+				error ("The .min file found in 'data/reference' looks like it was made for a filtered graph.")
 			}
+		// In filter mode, we need three files, all matching filtered patterns
+		} else if ("$params.referenceMode" == "filter") {
+			if (foundGbz.isEmpty()) {
+				error ("No '.gbz' file found (please see docs). Exiting...")
+			} else if (foundGbz.size() > 1) {
+				error ("More than one '.gbz' file found in 'data/reference'. For 'filter' mode use the filtered .gbz graph.")
+			} else if (foundFilteredGbz.isEmpty()) {
+				error ("The .gbz file found in 'data/reference' does not look like a filtered graph. For 'filter' mode use the filtered .gbz graph.")
+			} else if (foundDist.isEmpty()) {
+				error ("No '.dist' file found (please see docs). Exiting...")
+			} else if (foundDist.size() > 1) {
+				error ("More than one '.dist' file found in 'data/reference'. For 'filter' mode use indexes for the filtered .gbz graph.")
+			} else if (foundFilteredDist.isEmpty()) {
+				error ("The .dist file found in 'data/reference' does not look like it was made for a filtered graph.")
+			} else if (foundMin.isEmpty()) {
+				error ("No '.min' file found (please see docs). Exiting...")
+			} else if (foundMin.size() > 1) {
+				error ("More than one '.min' file found in 'data/reference'. For 'filter' mode use indexes for the filtered .gbz graph.")
+			} else if (foundFilteredMin.isEmpty()) {
+				error ("The .min file found in 'data/reference' does not look like it was made for a filtered graph.")
+			}
+		// Prompt the user if there is a typo in the reference mode param
+		} else {
+			error ("Reference mode parameter '$params.referenceMode' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
-	} else {
-		error ("Reference mode parameter '$params.referenceMode' not recognised, accepts 'haplo' or 'filter' (please see docs).")
-	}
 }

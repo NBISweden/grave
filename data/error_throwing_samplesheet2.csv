@@ -1,4 +1,0 @@
-id,type,repeat,fastq_1,fastq_2
-ancientSample1,ancient,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s2.fq.gz
-modernSample1,modern,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s2.fq.gz
-modernSample1,mod,1,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s1.fq.gz,/home/cormac/work/NBIS-T_Gunther_2402/code/workflows/pan-adna/test-data/simadna_s2.fq.gz

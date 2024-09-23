@@ -6,7 +6,7 @@
 
 **pan-aDNA** is a Nextflow workflow for mapping and genotyping ancient/modern samples against a pangenome graph reference.
 
-As input it takes paired-end fastq files from one or more samples and an indexed pangenome graph.
+As input it takes an indexed pangenome graph and paired-end FASTQ data (from 1+ samples detailed in a csv samplesheet).
 
 ## Quick start
 
@@ -20,40 +20,41 @@ As input it takes paired-end fastq files from one or more samples and an indexed
 ### Reference graphs and indexes
 
 - The pangenome graph and indexes are made upstream with software such as [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
-- `pan-aDNA` uses `vg giraffe` for read mapping, but the input files differ  depending on how the graph was made, explained below
-- Graph and indexes should be placed or linked to in `data/reference`
+- `pan-aDNA` uses `vg giraffe` for read mapping
+- Reference files for `giraffe` differ depending on how the graph was made, explained below
+- Either way, graph and indexes should be placed or linked to in `data/reference`
 
 #### Haplotype sampling
 
-- Current best practice for read mapping with `vg giraffe` is to utilise haplotype sampling, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
-- The graph and indexes for this are made using the `MiniGraph-Cactus` options: `--haplo --giraffe clip`
-- The four required files are:
+- Best practice for mapping with `vg giraffe` is to use haplotype sampling, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
+- For graph and index building, use `MiniGraph-Cactus` option: `--haplo`  (`--giraffe` is not required)
+- The files needed for pan-aDNA in `haplo` mode are:
+
 ```
 myGraph.gbz
 myGraph.hapl
-myGraph.dist
-myGraph.min
 ```
-- By default `pan-aDNA` assumes the reference graph was made with haplotype sampling (equivalent to supplying `pan-aDNA` the parameter `--referenceMode haplo`)
+
+- This is the default input for `pan-aDNA` (equivalent to supplying `pan-aDNA` the parameter `--referenceMode haplo`)
 
 #### Filtered graphs
 
-- Before haplotype sampling was supported, `vg giraffe` was run on filtered graphs, in which nodes were removed if they weren't supported by a minimum number of haplotypes
-- The `MiniGraph-Cactus` option `--giraffe` generates a filtered graph (minimum 2 supporting haplotypes) and indexes. Minimum haplotype support is adjusted with `--filter` option, e.g.: `--giraffe --filter 10`
-- To use filtered graphs as input, the `pan-aDNA` parameter `--referenceMode filter` should be used 
-- The three required files are:
+- Prior to the introduction of haplotype sampling, `vg giraffe` was run on graphs filtered at a haplotype support threshold (i.e., nodes were removed from the graph if they weren't supported by the minimum number of haplotypes - which meant the rarest variants in a population would be lost)
+- The `MiniGraph-Cactus` option `--giraffe` generates a filtered graph by default. Haplotype support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
+- To use filtered graphs as input, the `pan-aDNA` parameter `--referenceMode filter` should be used
+- The files needed for pan-aDNA in `filter` mode are:
 ```
 myGraph.d2.gbz
 myGraph.d2.dist
 myGraph.d2.min
 
-# The number reflects the minimum haplotype support for each node
+# Where the `d2` reflects the haplotype depth support of 2 required for each node
 ```
 
 ### Samplesheet layout
 
 >[!TIP]
-> The samplesheet should be in `.csv` format
+> The samplesheet must be in `.csv` format
 
 | id            | type    | repeat | fastq1               | fastq2               |
 |---------------|---------|--------|----------------------|----------------------|

@@ -34,16 +34,12 @@ def ch_samplesheet = Channel
 if ("$params.referenceMode" == "haplo") {
 	ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
 	ch_hapl_index = Channel.fromPath("./data/reference/*.hapl")
-	ch_dist_index = Channel.fromPath("./data/reference/*.dist")
-    ch_min_index = Channel.fromPath("./data/reference/*.min")
-	// Put all indexes into the second tuple element
-	ch_reference_inputs = ch_gbz_graph.combine(ch_hapl_index.combine(ch_dist_index.combine(ch_min_index))).collect()
+	// Put index into the second tuple element
+	ch_reference_inputs = ch_gbz_graph.combine(ch_hapl_index).collect()
 		.map {element ->
 			def ref = element[0]
 			def hapl = element[1]
-			def dist = element[2]
-			def min = element[3]
-			return [ref: ref, indexes: [hapl, dist, min]]
+			return [ref: ref, indexes: [hapl]]
 		}
 } else if ("$params.referenceMode" == "filter") {
     ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")

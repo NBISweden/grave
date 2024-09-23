@@ -2,10 +2,10 @@ process PANMAP {
 
 	// Directives
 
-	debug true
+	debug false
 	tag "$meta.id"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/vg:1.59.0--15a0439180ad1c60'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:1f2db4fcec341609'
 
 	// I/O & script
 
@@ -16,28 +16,43 @@ process PANMAP {
 	// TODO: figure out which output format is most useful. Default is gam. What can that be used with? I think some of the other downstreams need bam?
 
 	script:
+	// Trim memory parameter (strip trailing units)
+	def memory = task.memory.toGiga()
+
 	if (meta.type == "ancient" && params.referenceMode == "haplo")
 	"""
 
-	# Single-ended (merged) reads with two named reference files
+	# Generate kff index
 
-	vg giraffe --fastq-in $reads --gbz-name $reference --haplotype-name ${indexes[0]} --dist-name ${indexes[1]} --minimizer-name ${indexes[2]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
+	kmc -k29 -t${task.cpus} -m$memory -sm -fq -okff $reads $meta.id .
+
+	# Map merged reads
+
+	vg giraffe --fastq-in $reads --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 	"""
 
 	else if (meta.type == "modern" && params.referenceMode == "haplo")
 	"""
 
-	# Paired-end reads with two named reference files
-	
-	vg giraffe --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --haplotype-name ${indexes[0]} --dist-name ${indexes[1]} --minimizer-name ${indexes[2]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
+	# Generate list of input read files
+
+	echo -e "./${reads[0]}\n./${reads[1]}" > readfiles
+
+	# Generate kff index
+
+	kmc -k29 -t${task.cpus} -m$memory -sm -fq -okff @readfiles $meta.id .
+
+	# Map paired-end reads
+
+	vg giraffe --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 	"""
 
 	else if (meta.type == "ancient" && params.referenceMode == "filter")
 	"""
 
-	# Single-ended (merged) reads with three named reference files
+	# Map merged reads
 
 	vg giraffe --fastq-in $reads --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
@@ -45,11 +60,11 @@ process PANMAP {
 
 	else if (meta.type == "modern" && params.referenceMode == "filter")
 	"""
-	
-	# Paired-end reads with three named reference files
+
+	# Map paired-end reads
 
 	vg giraffe --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
-	
+
 	"""
 
 }

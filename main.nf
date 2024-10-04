@@ -2,15 +2,18 @@
 
 /* 
 ----------------------------------------------------------------------------------------
-Central workflow
 
-pan-aDNA: pangenomic analysis of ancient DNA
+Main workflow
+
+pan-aDNA: Pangenomic analysis of ancient DNA
 
 GitHub: https://github.com/NBISweden/pan-adna
 
 Contributors:
 - Cormac Kinsella (cormac.kinsella@nbis.se)
-- FIXME:
+- Torsten Günther (torsten.guenther@ebc.uu.se)
+- Marianne Dehasque (marianne.dehasque@ebc.uu.se)
+
 ----------------------------------------------------------------------------------------
 */
 

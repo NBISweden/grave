@@ -5,7 +5,7 @@ process PANMAP {
 
 	// Directives
 
-	debug true
+	debug false
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:1f2db4fcec341609'
@@ -29,7 +29,7 @@ process PANMAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-		vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 250 --fastq-in $reads --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+		vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
 
 		# Remove sample specific indexes
 
@@ -50,7 +50,7 @@ process PANMAP {
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-		vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+		vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name $indexes --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
 
 		# Remove sample specific indexes
 
@@ -63,7 +63,7 @@ process PANMAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-		vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 250 --fastq-in $reads --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+		vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
 
 		"""
 
@@ -72,7 +72,7 @@ process PANMAP {
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-		vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+		vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
 
 		"""
 

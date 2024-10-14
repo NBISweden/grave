@@ -17,8 +17,9 @@ process MULTIQC {
 
 	script:
 	"""
+	# TODO: troubleshoot output - currently suggests it's treating the raw reads as the fastp processed output. May be fastp issue rather than multiqc
 
-	multiqc --force .
+	multiqc --force --fullnames --clean-up --no-version-check .
 
 	"""
 

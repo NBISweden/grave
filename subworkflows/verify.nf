@@ -1,6 +1,6 @@
 /* 
 ----------------------------------------------------------------------------------------
-Verify base dependencies & check for required inputs
+Verify base dependencies & check required inputs
 ----------------------------------------------------------------------------------------
 */
 
@@ -36,65 +36,49 @@ workflow VERIFY {
 
 	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
 
-		// This section defines the expected reference file patterns
+		// Defines the expected reference file patterns
 		def refPath = new File ("data/reference")
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
 		def distPattern = ~/.*\.dist$/
 		def minPattern = ~/.*\.min$/
 		def gbzFilteredPattern = ~/.*\.d.*\.gbz$/
-		def distFilteredPattern = ~/.*\.d.*\.dist$/
-		def minFilteredPattern = ~/.*\.d.*\.min$/
 		def foundHapl = refPath.listFiles().findAll { it.isFile() && it.name =~ haplPattern }
 		def foundGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzPattern }
 		def foundDist = refPath.listFiles().findAll { it.isFile() && it.name =~ distPattern }
 		def foundMin = refPath.listFiles().findAll { it.isFile() && it.name =~ minPattern }
 		def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
-		def foundFilteredDist = refPath.listFiles().findAll { it.isFile() && it.name =~ distFilteredPattern }
-		def foundFilteredMin = refPath.listFiles().findAll { it.isFile() && it.name =~ minFilteredPattern }
 
-		// In haplo mode, we need two files with only the reference basename (i.e. no file patterns matching filtered graphs)
+		// Haplo mode uses the clipped unfiltered graph (i.e. no file pattern matching a filtered graph)
 		if ("$params.referenceMode" == "haplo") {
-			// Haplotype file is not present in filter mode, so check for presence/absence and count
-			if (foundHapl.isEmpty()) {
-				error ("Reference mode is 'haplo' but no '.hapl' index found (please see docs). Exiting...")
-			} else if (foundHapl.size() > 1) {
-				error ("More than one '.hapl' file found in 'data/reference'.")
-			// Check for gbz file
+			if (!foundHapl.isEmpty()) {
+				println ("For your information: pan-aDNA will not use the '.hapl' file you provided in 'data/reference', but you don't need to take action (see docs).")
 			} else if (foundGbz.isEmpty()) {
 				error ("No '.gbz' file found (please see docs). Exiting...")
 			} else if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/reference'. For 'haplo' mode use the unfiltered .gbz graph.")
+				error ("More than one '.gbz' file found in 'data/reference'. For 'haplo' mode use the clipped unfiltered graph.")
 			} else if (!foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/reference' looks like a filtered graph. For 'haplo' mode use the unfiltered .gbz graph.")
+				error ("The '.gbz' file found in 'data/reference' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
 			// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
 			} else if (!foundDist.isEmpty()) {
-				error ("The '.dist' file in 'data/reference' is not required (please see docs). Exiting...")
+				error ("The '.dist' file in 'data/reference' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			} else if (!foundMin.isEmpty()) {
-				error ("The '.min' file in 'data/reference' is not required (please see docs). Exiting...")
+				error ("The '.min' file in 'data/reference' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			}
-		// In filter mode, we need three files, all matching filtered patterns
+		// Filter mode uses the clipped filtered graph
 		} else if ("$params.referenceMode" == "filter") {
 			if (!foundHapl.isEmpty()) {
-				error ("Reference mode is 'filter' but a '.hapl' index was found (please see docs). Exiting...")
+				error ("Reference mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			} else if (foundGbz.isEmpty()) {
 				error ("No '.gbz' file found (please see docs). Exiting...")
 			} else if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/reference'. For 'filter' mode use the filtered .gbz graph.")
+				error ("More than one '.gbz' file found in 'data/reference'. For 'filter' mode use the clipped filtered graph.")
 			} else if (foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/reference' does not look like a filtered graph. For 'filter' mode use the filtered .gbz graph.")
-			} else if (foundDist.isEmpty()) {
-				error ("No '.dist' file found (please see docs). Exiting...")
-			} else if (foundDist.size() > 1) {
-				error ("More than one '.dist' file found in 'data/reference'. For 'filter' mode use indexes for the filtered .gbz graph.")
-			} else if (foundFilteredDist.isEmpty()) {
-				error ("The .dist file found in 'data/reference' does not look like it was made for a filtered graph.")
-			} else if (foundMin.isEmpty()) {
-				error ("No '.min' file found (please see docs). Exiting...")
-			} else if (foundMin.size() > 1) {
-				error ("More than one '.min' file found in 'data/reference'. For 'filter' mode use indexes for the filtered .gbz graph.")
-			} else if (foundFilteredMin.isEmpty()) {
-				error ("The .min file found in 'data/reference' does not look like it was made for a filtered graph.")
+				error ("The .gbz file found in 'data/reference' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
+			} else if (!foundDist.isEmpty()) {
+				println ("For your information: pan-aDNA will not use the '.dist' file you provided in 'data/reference', but you don't need to take action (see docs).")
+			} else if (!foundMin.isEmpty()) {
+				println ("For your information: pan-aDNA will not use the '.min' file you provided in 'data/reference', but you don't need to take action (see docs).")
 			}
 		// Prompt the user if there is a typo in the reference mode param
 		} else {

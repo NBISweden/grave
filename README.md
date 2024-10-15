@@ -4,57 +4,45 @@
 
 ## Description
 
-**pan-aDNA** is a Nextflow workflow for mapping and genotyping ancient/modern samples against a pangenome graph reference.
+**pan-aDNA** is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference.
 
-As input it takes an indexed pangenome graph and paired-end FASTQ data (from 1+ samples detailed in a csv samplesheet).
+As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
 ## Quick start
 
-1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (requires DSL2, workflow was tested with v23.10.1)
+1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (uses DSL2, workflow was tested with v23.10.1)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
-4. In `data/reference`, add or link to the [reference graph and indexes](#reference-graphs-and-indexes)
+4. In `data/reference`, add or link to the [reference graph](#reference-graphs-and-indexes)
 5. Fill out the `.csv` samplesheet, [see layout description below](#samplesheet-layout)
 6. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
 ### Reference graphs and indexes
 
-- The pangenome graph and indexes are made upstream with software such as [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
-- `pan-aDNA` uses `vg giraffe` for read mapping
-- Reference files for `giraffe` differ depending on how the graph was made, explained below
-- Either way, graph and indexes should be placed or linked to in `data/reference`
+- pan-aDNA takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
+- There are two main methods for building the graph with `Minigraph-Cactus`:
+	1) haplotype sampling [best practice]
+	2) coverage filtering
+- The choice of method dictates whether to run pan-aDNA in `haplo` mode [default] or `filter` mode, described more below
+- Because pan-aDNA is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
 #### Haplotype sampling
 
-- Best practice for mapping with `vg giraffe` is to use haplotype sampling, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
-- For graph and index building, use `MiniGraph-Cactus` option: `--haplo`  (`--giraffe` is not required)
-- The files needed for pan-aDNA in `haplo` mode are:
-
-```
-myGraph.gbz
-myGraph.hapl
-```
-
-- This is the default input for `pan-aDNA` (equivalent to supplying `pan-aDNA` the parameter `--referenceMode haplo`)
+- Current best practice for mapping samples to pangenome graphs uses sample specific haplotype sampling, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
+- To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
+- The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `pan-aDNA`
 
 #### Filtered graphs
 
-- Prior to the introduction of haplotype sampling, `vg giraffe` was run on graphs filtered at a haplotype support threshold (i.e., nodes were removed from the graph if they weren't supported by the minimum number of haplotypes - which meant the rarest variants in a population would be lost)
-- The `MiniGraph-Cactus` option `--giraffe` generates a filtered graph by default. Haplotype support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
-- To use filtered graphs as input, the `pan-aDNA` parameter `--referenceMode filter` should be used
-- The files needed for pan-aDNA in `filter` mode are:
-```
-myGraph.d2.gbz
-myGraph.d2.dist
-myGraph.d2.min
-
-# Where the `d2` reflects the haplotype depth support of 2 required for each node
-```
+- The previous method of building pangenome graphs for read mapping used coverage filtering to remove nodes not found in `x` haplotypes
+- By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Haplotype support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
+- To use filtered graphs as input to `pan-aDNA`, the parameter `--referenceMode filter` should be set on the command line
+- The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `pan-aDNA`
 
 ### Samplesheet layout
 
 >[!TIP]
-> The samplesheet must be in `.csv` format
+> The samplesheet should be in `.csv` format
 
 | id            | type    | repeat | fastq1               | fastq2               |
 |---------------|---------|--------|----------------------|----------------------|

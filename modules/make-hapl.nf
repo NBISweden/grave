@@ -26,11 +26,11 @@ process MAKEHAPL {
 
 		vg index --threads ${task.cpus} --dist-name $distname $graph
 		vg gbwt --num-threads ${task.cpus} --r-index $rindexname --gbz-input $graph
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 21 --haplotype-output $ahaplname $graph
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 21 --window-length 11 --haplotype-output $ahaplname $graph
 
 	# Produce ".hapl" index appropriate for modern samples
 
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 29 --haplotype-output $mhaplname $graph
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 29 --window-length 11 --haplotype-output $mhaplname $graph
 
 	"""
 

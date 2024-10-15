@@ -28,7 +28,7 @@ process MAKEHAPL {
 		vg gbwt --num-threads ${task.cpus} --r-index $rindexname --gbz-input $graph
 		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 21 --window-length 11 --haplotype-output $ahaplname $graph
 
-	# Produce ".hapl" index appropriate for modern samples
+	# Produce ".hapl" index appropriate for modern samples (giraffe defaults)
 
 		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 29 --window-length 11 --haplotype-output $mhaplname $graph
 

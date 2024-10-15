@@ -6,11 +6,13 @@ Main workflow definition
 
 // Import modules
 
+include { MAKEHAPL } from '../modules/make-hapl.nf'
+include { MAKEFILTER } from '../modules/make-filter.nf'
+include { REFSTATS } from '../modules/refstats.nf'
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
-include { MULTIQC } from '../modules/multiqc.nf'
-include { REFSTATS } from '../modules/refstats.nf'
 include { PANMAP } from '../modules/panmap.nf'
+include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
@@ -28,36 +30,36 @@ def ch_samplesheet = Channel
 		}
 	}
 
-// Load pangenome reference files, allow for two upstream graph construction modes: "haplo" (current best practice) or "filter"
-// Put into value channels using collect operator (not consumed by processes)
-
-if ("$params.referenceMode" == "haplo") {
-	ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
-	ch_hapl_index = Channel.fromPath("./data/reference/*.hapl")
-	// Put index into the second tuple element
-	ch_reference_inputs = ch_gbz_graph.combine(ch_hapl_index).collect()
-		.map {element ->
-			def ref = element[0]
-			def hapl = element[1]
-			return [ref: ref, indexes: [hapl]]
-		}
-} else if ("$params.referenceMode" == "filter") {
-    ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
-    ch_dist_index = Channel.fromPath("./data/reference/*.dist")
-    ch_min_index = Channel.fromPath("./data/reference/*.min")
-	// Put all indexes into the second tuple element
-	ch_reference_inputs = ch_gbz_graph.combine(ch_dist_index.combine(ch_min_index)).collect()
-		.map {element ->
-			def ref = element[0]
-			def dist = element[1]
-			def min = element[2]
-			return [ref: ref, indexes: [dist, min]]
-		}
-}
-
 // Pangenome mapping workflow execution
 
 workflow PANADNA {
+
+	// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
+
+	if ("$params.referenceMode" == "haplo") {
+		ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+		// Remake hapl indexes
+		MAKEHAPL (ch_gbz_graph)
+		ch_reference_inputs = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
+			.map {element ->
+				def ref = element[0]
+				def adna_hapl = element[1]
+				def modern_hapl = element[2]
+				return [ref: ref, indexes: [adna_hapl, modern_hapl]]
+			}
+	} else if ("$params.referenceMode" == "filter") {
+		ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+		// Remake filter indexes
+		MAKEFILTER (ch_gbz_graph)
+		ch_reference_inputs = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
+			.map {element ->
+				def ref = element[0]
+				def dist = element[1]
+				def adna_min = element[2]
+				def modern_min = element[3]
+				return [ref: ref, indexes: [dist, adna_min, modern_min]]
+			}
+	}
 
 	// Report reference file summary statistics
 	REFSTATS (ch_gbz_graph)

@@ -1,0 +1,37 @@
+process MAKEHAPL {
+
+	// Directives
+
+	debug false
+	label 'process_medium'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:1f2db4fcec341609'
+
+	// I/O & script
+
+	input:
+	path (graph)
+
+	output:
+	tuple path ("*.adna.hapl"), path ("*.modern.hapl"), emit: ch_hapl_indexes
+
+	script:
+	def basename = graph.baseName - '.gbz'
+    def distname = "${basename}.dist"
+	def rindexname = "${basename}.ri"
+	def ahaplname = "${basename}.adna.hapl"
+	def mhaplname = "${basename}.modern.hapl"
+	"""
+
+	# Produce ".hapl" index appropriate for ancient samples
+
+		vg index --threads ${task.cpus} --dist-name $distname $graph
+		vg gbwt --num-threads ${task.cpus} --r-index $rindexname --gbz-input $graph
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 21 --haplotype-output $ahaplname $graph
+
+	# Produce ".hapl" index appropriate for modern samples
+
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length 29 --haplotype-output $mhaplname $graph
+
+	"""
+
+}

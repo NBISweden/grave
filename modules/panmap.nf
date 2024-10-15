@@ -2,7 +2,7 @@ process PANMAP {
 
 	// Directives
 
-	debug true
+	debug false
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:1f2db4fcec341609'

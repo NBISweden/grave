@@ -22,12 +22,12 @@ process FASTQC {
 
 	# Rename raw reads and capture in an output channel
 
-	mv ${raw_reads[0]} ${meta.id}_1.raw.fq.gz
-	mv ${raw_reads[1]} ${meta.id}_2.raw.fq.gz
+		mv ${raw_reads[0]} ${meta.id}_1.raw.fq.gz
+		mv ${raw_reads[1]} ${meta.id}_2.raw.fq.gz
 
 	# Run FastQC on raw and fastp processed reads
 
-	fastqc --format fastq --threads ${task.cpus} *.raw.fq.gz $fastp_reads
+		fastqc --format fastq --threads ${task.cpus} *.raw.fq.gz $fastp_reads
 
     """
 

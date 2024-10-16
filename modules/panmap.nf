@@ -13,6 +13,9 @@ process PANMAP {
 	tuple val(meta), path(reads)
 	tuple path(reference), path(indexes)
 
+	output:
+	tuple val(meta), path("*.bam")
+
 	script:
 	// Create a numeric variable with the available memory (i.e., strip off the trailing units)
 	def memory = task.memory.toGiga()
@@ -33,7 +36,7 @@ process PANMAP {
 
 		# Map merged reads to graph (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 		# Remove sample specific indexes
 
@@ -54,7 +57,7 @@ process PANMAP {
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name ${indexes[1]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name ${indexes[1]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 		# Remove sample specific indexes
 
@@ -67,7 +70,7 @@ process PANMAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in $reads --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 		"""
 
@@ -76,7 +79,7 @@ process PANMAP {
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name $reference --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format BAM --threads ${task.cpus} > ${meta.id}.bam
 
 		"""
 

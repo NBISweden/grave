@@ -23,14 +23,14 @@ process FASTP {
 		# merge reads, trim adapters, deduplicate, overlapping base correction, overrepresentation analysis, trim polyG
 		# Unmerged reads are discarded currently as these represent longer fragments, thus more likely contamination
 
-		fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.fastp.fq.gz --html ${meta.id}.fastp.html --json ${meta.id}.fastp.json --detect_adapter_for_pe --dedup --dup_calc_accuracy $params.dup_calc_accuracy --correction --overrepresentation_analysis --length_required $params.read_discard_length --thread ${task.cpus}
+		fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.fastp.fq.gz --html ${meta.id}.fastp.html --json ${meta.id}.fastp.json --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
 		"""
 
 	else if (meta.type == "modern")
 		"""
 	
-		fastp --in1 ${reads[0]} --in2 ${reads[1]} --out1 ${meta.id}.fastp.1.fq.gz --out2 ${meta.id}.fastp.2.fq.gz --html ${meta.id}.fastp.html --json ${meta.id}.fastp.json --detect_adapter_for_pe --dedup --dup_calc_accuracy $params.dup_calc_accuracy --correction --overrepresentation_analysis --length_required $params.read_discard_length --thread ${task.cpus}
+		fastp --in1 ${reads[0]} --in2 ${reads[1]} --out1 ${meta.id}.fastp.1.fq.gz --out2 ${meta.id}.fastp.2.fq.gz --html ${meta.id}.fastp.html --json ${meta.id}.fastp.json --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
 		"""
 

@@ -24,11 +24,11 @@ process MAKEFILTER {
 
 	# Produce minimizer index appropriate for ancient samples
 
-		vg minimizer --threads ${task.cpus} --kmer-length $params.aDNAkmerValue --window-length $params.aDNAminimiserValue --distance-index ${basename}.dist --output-name ${basename}.adna.min $graph
+		vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.adna.min $graph
 
 	# Produce minimizer index appropriate for modern samples
 
-		vg minimizer --threads ${task.cpus} --kmer-length 29 --window-length 11 --distance-index ${basename}.dist --output-name ${basename}.modern.min $graph
+		vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerMinimizer} --window-length ${params.modernWindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.modern.min $graph
 
 	"""
 

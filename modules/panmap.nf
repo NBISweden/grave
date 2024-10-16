@@ -23,13 +23,13 @@ process PANMAP {
 
 		# Generate kff index of the reads
 
-			kmc -k21 -ci${params.kffKmerMinimum} -t${task.cpus} -m$memory -sm -fq -okff $reads $meta.id .
+			kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m$memory -sm -fq -okff $reads $meta.id .
 
 		# Generate the subsampled graph and index it
 
 			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz $reference
 			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.dist ${basename}.${meta.id}.gbz
-			vg minimizer --threads ${task.cpus} --kmer-length $params.aDNAkmerValue --window-length $params.aDNAminimiserValue --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
+			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
 
 		# Map merged reads to graph (settings based on BWA aln)
 
@@ -50,9 +50,9 @@ process PANMAP {
 
 		# Generate kff index of the reads
 
-			kmc -k29 -ci${params.kffKmerMinimum} -t${task.cpus} -m$memory -sm -fq -okff @readfiles $meta.id .
+			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m$memory -sm -fq -okff @readfiles $meta.id .
 
-		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate, the mapping settings are equivalent to BWA mem)
+		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name $reference --haplotype-name ${indexes[1]} --output-format SAM --threads ${task.cpus} > ${meta.id}.sam
 

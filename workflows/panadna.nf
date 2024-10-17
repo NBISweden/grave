@@ -8,10 +8,11 @@ Main workflow definition
 
 include { MAKEHAPL } from '../modules/make-hapl.nf'
 include { MAKEFILTER } from '../modules/make-filter.nf'
-include { REFSTATS } from '../modules/refstats.nf'
+include { PROCESSREF } from '../modules/process-ref.nf'
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
 include { PANMAP } from '../modules/panmap.nf'
+include { MAPDAMAGE } from '../modules/mapdamage.nf'
 include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
@@ -61,8 +62,8 @@ workflow PANADNA {
 			}
 	}
 
-	// Report reference file summary statistics
-	REFSTATS (ch_gbz_graph)
+	// Report reference file summary statistics & pull reference path for mapdamage
+	PROCESSREF (ch_gbz_graph)
 
 	// Run quality filtering on input reads
 	FASTP (ch_samplesheet)
@@ -72,6 +73,9 @@ workflow PANADNA {
 
 	// Map reads to pangenome reference
 	PANMAP (FASTP.out.ch_fastp_reads, ch_reference_inputs)
+
+	// Post-mortem damage assessment of reads
+	MAPDAMAGE (PROCESSREF.out.ch_reference_fasta.collect(), ch_gbz_graph.collect(), PANMAP.out.ch_mapped_gam)
 
 	// Collate quality reports
 	MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())

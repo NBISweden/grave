@@ -27,7 +27,7 @@ process FASTQC {
 
 	# Run FastQC on raw and fastp processed reads
 
-		fastqc --format fastq --threads ${task.cpus} *.raw.fq.gz $fastp_reads
+		fastqc --format fastq --threads ${task.cpus} *.raw.fq.gz ${fastp_reads}
 
     """
 

@@ -24,13 +24,13 @@ process MAKEHAPL {
 
 	# Produce ".hapl" index appropriate for ancient samples
 
-		vg index --threads ${task.cpus} --dist-name $distname $graph
-		vg gbwt --num-threads ${task.cpus} --r-index $rindexname --gbz-input $graph
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output $ahaplname $graph
+		vg index --threads ${task.cpus} --dist-name ${distname} ${graph}
+		vg gbwt --num-threads ${task.cpus} --r-index ${rindexname} --gbz-input ${graph}
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
 
 	# Produce ".hapl" index appropriate for modern samples (giraffe defaults)
 
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output $mhaplname $graph
+		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
 
 	"""
 

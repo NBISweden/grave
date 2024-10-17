@@ -20,15 +20,15 @@ process MAKEFILTER {
 
 	# Produce distance index
 
-		vg index --threads ${task.cpus} --dist-name ${basename}.dist $graph
+		vg index --threads ${task.cpus} --dist-name ${basename}.dist ${graph}
 
 	# Produce minimizer index appropriate for ancient samples
 
-		vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.adna.min $graph
+		vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.adna.min ${graph}
 
 	# Produce minimizer index appropriate for modern samples
 
-		vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerMinimizer} --window-length ${params.modernWindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.modern.min $graph
+		vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerMinimizer} --window-length ${params.modernWindowMinimizer} --distance-index ${basename}.dist --output-name ${basename}.modern.min ${graph}
 
 	"""
 

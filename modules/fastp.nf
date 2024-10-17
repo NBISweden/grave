@@ -35,6 +35,6 @@ process FASTP {
 		"""
 
 	else
-		error ("Error: for '$meta.id' found the phrase '$meta.type' in the samplesheet type column, accepts 'ancient' or 'modern'.")
+		error ("Error: for '${meta.id}' found the phrase '${meta.type}' in the samplesheet type column, accepts 'ancient' or 'modern'.")
 
 }

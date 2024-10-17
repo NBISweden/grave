@@ -19,12 +19,12 @@ process PROCESSREF {
 
 	# Report reference file summary statistics
 
-		echo "Pangenome graph file: $graph" > pangenome-graph-stats.txt
-		vg stats -zlLHTA $graph >> pangenome-graph-stats.txt
+		echo "Pangenome graph file: ${graph}" > pangenome-graph-stats.txt
+		vg stats -zlLHTA ${graph} >> pangenome-graph-stats.txt
 
 	# Pull reference path as FASTA for mapdamage
 
-		vg paths --reference-paths --extract-fasta -x $graph > reference.fasta
+		vg paths --reference-paths --extract-fasta -x ${graph} > reference.fasta
 
 	"""
 

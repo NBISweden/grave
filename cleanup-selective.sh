@@ -1,6 +1,6 @@
 shopt -s extglob
 
-rm .nextflow.log*
+rm -rf .nextflow.log* output/
 
 cd work
 

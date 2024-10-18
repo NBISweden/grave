@@ -3,7 +3,7 @@ process PROCESSREF {
 	// Directives
 	debug false
 	label 'process_single'
-	container 'oras://community.wave.seqera.io/library/damageprofiler_kmc_vg:8b69f0006d7ee05d'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:d858a75dfe2e019e'
 
 	// I/O & script
 
@@ -12,7 +12,7 @@ process PROCESSREF {
 
 	output:
 	path 'pangenome-graph-stats.txt'
-	path ("reference.fasta"), emit: ch_reference_fasta
+	tuple path("reference.fasta"), path("reference.fasta.fai"), emit: ch_reference_fasta
 
 	script:
 	"""
@@ -25,6 +25,10 @@ process PROCESSREF {
 	# Pull reference path as FASTA for mapdamage
 
 		vg paths --reference-paths --extract-fasta -x ${graph} > reference.fasta
+
+	# Index reference genome
+
+		samtools faidx reference.fasta
 
 	"""
 

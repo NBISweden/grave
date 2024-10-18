@@ -12,7 +12,7 @@ include { PROCESSREF } from '../modules/process-ref.nf'
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
 include { PANMAP } from '../modules/panmap.nf'
-include { MAPDAMAGE } from '../modules/mapdamage.nf'
+include { PROFILEPMD } from '../modules/profile-pmd.nf'
 include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
@@ -75,7 +75,7 @@ workflow PANADNA {
 	PANMAP (FASTP.out.ch_fastp_reads, ch_reference_inputs)
 
 	// Post-mortem damage assessment of reads
-	MAPDAMAGE (PROCESSREF.out.ch_reference_fasta.collect(), ch_gbz_graph.collect(), PANMAP.out.ch_mapped_gam)
+	PROFILEPMD (ch_gbz_graph.collect(), PROCESSREF.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)
 
 	// Collate quality reports
 	MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())

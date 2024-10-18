@@ -6,6 +6,7 @@ process PROFILEPMD {
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:ee253f4846be614b'
+	publishDir path: 'output/pmd_profiles', mode: 'move'
 
 	// I/O & script
 
@@ -15,7 +16,7 @@ process PROFILEPMD {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	path ("${meta.id}_pmd"), optional: true
+	path ("${meta.id}_pmd")
 
 	when:
     meta.type == 'ancient'

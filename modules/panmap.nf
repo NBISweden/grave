@@ -5,7 +5,7 @@ process PANMAP {
 	debug false
 	tag "$meta.id"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/damageprofiler_kmc_vg:8b69f0006d7ee05d'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:53fac424120b24cd'
 
 	// I/O & script
 
@@ -17,7 +17,6 @@ process PANMAP {
 	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
 
 	script:
-	// Create a numeric variable with the available memory (i.e., strip off the trailing units)
 	def memory = task.memory.toGiga()
 	def basename = reference.baseName - '.gbz'
 

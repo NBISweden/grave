@@ -4,7 +4,7 @@ process MAKEHAPL {
 
 	debug false
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/damageprofiler_kmc_vg:8b69f0006d7ee05d'
+	container 'oras://community.wave.seqera.io/library/vg:1.59.0--92074ade48692ef2'
 
 	// I/O & script
 

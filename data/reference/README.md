@@ -1,16 +1,7 @@
-# Pangenome graph reference files
+# Reference graphs
 
-- If `Minigraph-Cactus` was run with `--giraffe --haplo`, run this workflow with `--referenceMode haplo` (the default setting), and place the input files here, e.g.:
+- This directory should contain the reference pangenome graph in `.gbz` format. You do not need to provide the index files, `pan-aDNA` will recreate these
 
-```
-my-graph.gbz
-my-graph.hapl
-```
+- To run with haplotype sampling (best practices), the graph is made using `Minigraph-Cactus` with the `--haplo` option. Provide the clipped, unfiltered graph, e.g.: `graph.gbz`
 
-- If `Minigraph-Cactus` was run with `--giraffe` alone (equivalent to `--giraffe --filter 2`), or with an explicit filter threshold (e.g.: `--giraffe --filter 10`), run this workflow with `--referenceMode filter` or edit the default setting in `conf/parameters.config` to `filter`, and place the input files here, e.g.:
-
-```
-my-graph.d10.dist
-my-graph.d10.gbz
-my-graph.d10.min
-```
+- To run on filtered graphs, the graph is made using `Minigraph-Cactus` with the `--giraffe` option, which filters to a default depth of 2. Provide the clipped, filtered graph, e.g.: `graph.d2.gbz`. Depth is adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`

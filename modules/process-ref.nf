@@ -1,9 +1,11 @@
 process PROCESSREF {
 
 	// Directives
+
 	debug false
 	label 'process_single'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:d858a75dfe2e019e'
+	publishDir path: 'output/graph_stats', mode: 'move', pattern: 'pangenome-graph-stats.txt'
 
 	// I/O & script
 

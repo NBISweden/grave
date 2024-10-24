@@ -16,7 +16,7 @@ process PROFILEPMD {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	path ("${meta.id}_pmd")
+	path "${meta.id}_pmd"
 
 	when:
     meta.type == 'ancient'
@@ -24,7 +24,7 @@ process PROFILEPMD {
 	script:
 	"""
 
-	# Surject gam to reference path
+	# Surject gam to reference path (by default)
 
 		vg surject -x ${graph} --bam-output ${mapped_gam} > ${meta.id}.ref.bam
 

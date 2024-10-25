@@ -13,6 +13,7 @@ include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
 include { PANMAP } from '../modules/panmap.nf'
 include { PROFILEPMD } from '../modules/profile-pmd.nf'
+include { DEEPVARIANT } from '../modules/deepvariant.nf'
 include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
@@ -76,6 +77,11 @@ workflow PANADNA {
 
 	// Post-mortem damage assessment of reads
 	PROFILEPMD (ch_gbz_graph.collect(), PROCESSREF.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)
+
+	// Graph based variant calling
+
+	// Mapping based variant calling
+	DEEPVARIANT()
 
 	// Collate quality reports
 	MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())

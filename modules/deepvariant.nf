@@ -17,7 +17,9 @@ process DEEPVARIANT {
 	script:
 	"""
 
-	/opt/deepvariant/bin/run_deepvariant --helpshort
+	echo "This will be a DeepVariant process"
+	
+		# /opt/deepvariant/bin/run_deepvariant --helpshort
 
 	"""
 

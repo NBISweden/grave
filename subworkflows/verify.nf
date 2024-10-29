@@ -11,7 +11,7 @@ workflow VERIFY {
 	// Nextflow version
 
 	if (!nextflow.version.matches('>=22.03')) {
-		error ("Oops! This workflow requires Nextflow version 22.03 or greater. You are running version $nextflow.version")
+		error ("Oops! This workflow requires Nextflow version 22.03 or greater. You are running version ${nextflow.version}")
 	}
 
 	// Apptainer executable
@@ -23,7 +23,7 @@ workflow VERIFY {
 	// Check for input samplesheet
 
 	if (!file("./data/${params.samplesheet}").exists()) {
-		error("Input file 'data/$params.samplesheet' was not found (please see docs).")
+		error ("Input file 'data/${params.samplesheet}' was not found (please see docs).")
 	}
 
 	// Check directory structure
@@ -31,7 +31,20 @@ workflow VERIFY {
 	if (!file("./data/reference").isDirectory()) {
 		println("Pangenome directory 'data/reference' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")
 		file("data/reference").mkdirs()
-		error("Created 'data/reference'. Exiting...")
+		error ("Created 'data/reference'. Exiting...")
+	}
+
+	// Warn about optional process settings
+
+	if (params.graphCall.toString().toLowerCase() in ["true", "false"]) {
+		// Convert string to actual boolean value
+		boolean graphCallEnabled = params.graphCall.toString().toLowerCase() == "true"
+
+		if (!graphCallEnabled) {
+			println ("USER NOTE: graph based variant calling is disabled.")
+		}
+	} else {
+		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false', case insensitive.")
 	}
 
 	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
@@ -50,7 +63,7 @@ workflow VERIFY {
 		def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
 
 		// Haplo mode uses the clipped unfiltered graph (i.e. no file pattern matching a filtered graph)
-		if ("$params.referenceMode" == "haplo") {
+		if ("${params.referenceMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
 				println ("For your information: pan-aDNA will not use the '.hapl' file you provided in 'data/reference', but you don't need to take action (see docs).")
@@ -106,6 +119,6 @@ workflow VERIFY {
 
 		// Prompt the user if there is a typo in the reference mode param
 		} else {
-			error ("Reference mode parameter '$params.referenceMode' not recognised, accepts 'haplo' or 'filter' (please see docs).")
+			error ("Reference mode parameter '${params.referenceMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
 }

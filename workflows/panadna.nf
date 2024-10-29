@@ -8,13 +8,15 @@ Main workflow definition
 
 include { MAKEHAPL } from '../modules/make-hapl.nf'
 include { MAKEFILTER } from '../modules/make-filter.nf'
-include { PROCESSREF } from '../modules/process-ref.nf'
+include { PROCESSGRAPH } from '../modules/process-graph.nf'
+include { COMPUTESNARLS } from '../modules/compute-snarls.nf'
 include { FASTP } from '../modules/fastp.nf'
 include { FASTQC } from '../modules/fastqc.nf'
 include { PANMAP } from '../modules/panmap.nf'
 include { PROFILEPMD } from '../modules/profile-pmd.nf'
-include { DEEPVARIANT } from '../modules/deepvariant.nf'
+include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
 include { VGGENOTYPE } from '../modules/vg-genotype.nf'
+include { DEEPVARIANT } from '../modules/deepvariant.nf'
 include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
@@ -65,7 +67,10 @@ workflow PANADNA {
 	}
 
 	// Report reference file summary statistics & pull reference path for mapdamage
-	PROCESSREF (ch_gbz_graph)
+	PROCESSGRAPH (ch_gbz_graph)
+
+	// Compute graph snarls for variant calling/genotyping tasks (separate from PROCESSGRAPH to allow multithreading)
+	COMPUTESNARLS (ch_gbz_graph)
 
 	// Run quality filtering on input reads
 	FASTP (ch_samplesheet)
@@ -77,16 +82,16 @@ workflow PANADNA {
 	PANMAP (FASTP.out.ch_fastp_reads, ch_reference_inputs)
 
 	// Post-mortem damage assessment of reads
-	PROFILEPMD (ch_gbz_graph.collect(), PROCESSREF.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)
+	PROFILEPMD (ch_gbz_graph.collect(), PROCESSGRAPH.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)
 
 	// Graph based variant calling
+	VGGRAPHCALL (ch_gbz_graph, PROCESSGRAPH.out.ch_reference_fasta, COMPUTESNARLS.out.ch_snarls)
 
 	// Mapping based variant calling
+	VGGENOTYPE (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), PANMAP.out.ch_mapped_gam)
+
+	// FIXME:
 	DEEPVARIANT()
-
-	// Genotype a mapped GAM against the graph
-
-	VGGENOTYPE (ch_gbz_graph.collect(), PANMAP.out.ch_mapped_gam)
 
 	// Collate quality reports
 	MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())

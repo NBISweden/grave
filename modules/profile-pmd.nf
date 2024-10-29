@@ -19,7 +19,7 @@ process PROFILEPMD {
 	path "${meta.id}_pmd"
 
 	when:
-    meta.type == 'ancient'
+	meta.type == 'ancient'
 
 	script:
 	"""

@@ -63,9 +63,9 @@ process PANMAP {
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${reference} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
-		# Report mapping statistics
+		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}.alignment-stats.txt
 
 		# Remove sample specific indexes
 

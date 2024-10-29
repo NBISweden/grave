@@ -6,6 +6,7 @@ process PANMAP {
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:53fac424120b24cd'
+	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: '*.alignment-stats.txt'
 
 	// I/O & script
 
@@ -37,6 +38,10 @@ process PANMAP {
 
 			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
+		# Report mapping statistics
+
+			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}.alignment-stats.txt
+
 		# Remove sample specific indexes
 
 			rm *.${meta.id}.* *.kff
@@ -58,6 +63,10 @@ process PANMAP {
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${reference} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
+		# Report mapping statistics
+
+			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
+
 		# Remove sample specific indexes
 
 			rm *.${meta.id}.* *.kff
@@ -71,6 +80,10 @@ process PANMAP {
 
 			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${reference} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
+		# Report mapping statistics
+
+			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
+
 		"""
 
 	else if (meta.type == "modern" && params.referenceMode == "filter")
@@ -79,6 +92,10 @@ process PANMAP {
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${reference} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+
+		# Report mapping statistics
+
+			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
 
 		"""
 

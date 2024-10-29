@@ -6,7 +6,7 @@ process PANMAP {
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:53fac424120b24cd'
-	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: '*.alignment-stats.txt'
+	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: "${meta.id}_alignment-stats.txt"
 
 	// I/O & script
 
@@ -16,6 +16,7 @@ process PANMAP {
 
 	output:
 	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
+	path "${meta.id}_alignment-stats.txt"
 
 	script:
 	def memory = task.memory.toGiga()
@@ -40,7 +41,7 @@ process PANMAP {
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}.alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
@@ -65,7 +66,7 @@ process PANMAP {
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}.alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
@@ -82,7 +83,7 @@ process PANMAP {
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}_alignment-stats.txt
 
 		"""
 
@@ -95,7 +96,7 @@ process PANMAP {
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}.alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}_alignment-stats.txt
 
 		"""
 

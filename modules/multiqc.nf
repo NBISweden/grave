@@ -2,7 +2,7 @@ process MULTIQC {
 
 	// Directives
 
-	debug true
+	debug false
 	label 'process_single'
 	container 'oras://community.wave.seqera.io/library/multiqc:1.24.1--438afbfaf9badab9'
 

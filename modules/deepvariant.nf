@@ -2,7 +2,7 @@ process DEEPVARIANT {
 
 	// Directives
 
-	debug true
+	debug false
 	//TODO: tag "$meta.id"
 	label 'process_high'
 	container 'docker://google/deepvariant:1.6.1'

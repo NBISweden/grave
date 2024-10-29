@@ -1,8 +1,7 @@
 process VGGENOTYPE {
 
-	// For a mapped sample, calls/genotypes the variants present in the graph
-	// Note, there is an experimental feature to also consider novel variants in the reads (vg augment)
-	// But not currently advised: "you will get more accurate results by surjecting to BAM and using a linear variant caller like DeepVariant"
+	// Genotypes the variants present in the graph for a mapped sample
+	// N.B.: an experimental feature can also consider novel variants in the reads (vg augment), however official advice is: "you will get more accurate results by surjecting to BAM and using a linear variant caller like DeepVariant"
 
 	// Directives
 
@@ -15,6 +14,7 @@ process VGGENOTYPE {
 
 	input:
 	path graph
+	path snarls
 	tuple val(meta), path(mapped_gam)
 
 	output:
@@ -23,17 +23,17 @@ process VGGENOTYPE {
 	script:
 	"""
 
+	# Pre-filter GAM file to remove unmapped reads, and TODO: currently defaults to MAPQ filter 0
+
+		vg filter -t ${task.cpus} -x ${graph} ${mapped_gam} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v > ${meta.id}.filtered.gam
+
 	# Compute read support
 
-		vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.pack --expected-cov ${params.expectedCoverage} -Q 5
-
-	# Compute snarls
-
-		vg snarls -t ${task.cpus} ${graph} > ${meta.id}.snarls
+		vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.filtered.gam -o ${meta.id}.pack --expected-cov ${params.expectedCoverage} -Q 5
 
 	# Genotype against the graph
 
-		vg call -t ${task.cpus} ${graph} -k ${meta.id}.pack -r ${meta.id}.snarls -s ${meta.id} --genotype-snarls --gbz --ploidy ${params.samplePloidy} > ${meta.id}.vg-genotype.vcf
+		vg call -t ${task.cpus} ${graph} -k ${meta.id}.pack -r ${snarls} -s ${meta.id} --genotype-snarls --all-snarls --gbz --ploidy ${params.samplePloidy} > ${meta.id}.vg-genotype.vcf
 
 	"""
 

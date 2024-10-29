@@ -2,7 +2,7 @@ process MAKEFILTER {
 
 	// Directives
 
-	debug true
+	debug false
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/vg:1.59.0--92074ade48692ef2'
 

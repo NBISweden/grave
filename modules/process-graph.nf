@@ -23,8 +23,9 @@ process PROCESSGRAPH {
 
 	# Report reference file summary statistics
 
-		echo "Pangenome graph file: ${graph}" > ${basename}_graph-stats.txt
-		vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt
+		echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+		echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+		echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
 
 	# Pull reference path as FASTA for mapdamage
 

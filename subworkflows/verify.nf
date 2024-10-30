@@ -37,14 +37,12 @@ workflow VERIFY {
 	// Warn about optional process settings
 
 	if (params.graphCall.toString().toLowerCase() in ["true", "false"]) {
-		// Convert string to actual boolean value
 		boolean graphCallEnabled = params.graphCall.toString().toLowerCase() == "true"
-
 		if (!graphCallEnabled) {
 			println ("USER NOTE: graph based variant calling is disabled.")
 		}
 	} else {
-		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false', case insensitive.")
+		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (not case sensitive).")
 	}
 
 	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)

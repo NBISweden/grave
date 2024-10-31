@@ -22,7 +22,7 @@ include { MULTIQC } from '../modules/multiqc.nf'
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
 def ch_samplesheet = Channel
-	.fromPath("./data/${params.samplesheet}")
+	.fromPath("./data/samplesheet.csv")
 	.splitCsv(header: true)
 	.map { row ->
 		// Initialise metadata list to travel with the files

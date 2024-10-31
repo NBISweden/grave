@@ -22,8 +22,8 @@ workflow VERIFY {
 
 	// Check for input samplesheet
 
-	if (!file("./data/${params.samplesheet}").exists()) {
-		error ("Input file 'data/${params.samplesheet}' was not found (please see docs).")
+	if (!file("./data/samplesheet.csv").exists()) {
+		error ("Input file 'data/samplesheet.csv' was not found (please see docs).")
 	}
 
 	// Check directory structure

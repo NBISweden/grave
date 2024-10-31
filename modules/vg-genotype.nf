@@ -23,13 +23,17 @@ process VGGENOTYPE {
 	script:
 	"""
 
-	# Pre-filter GAM file to remove unmapped reads, and TODO: currently defaults to MAPQ filter 0
+	# Pre-filter GAM file to remove unmapped reads, and FIXME: currently defaults to MAPQ filter 0
 
 		vg filter -t ${task.cpus} -x ${graph} ${mapped_gam} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v > ${meta.id}.filtered.gam
 
+	# Calculate depth
+
+		depth=`vg depth -t ${task.cpus} --gam ${meta.id}.filtered.gam ${graph} | cut -f1`
+
 	# Compute read support
 
-		vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.filtered.gam -o ${meta.id}.pack --expected-cov ${params.expectedCoverage} -Q 5
+		vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.filtered.gam -o ${meta.id}.pack --expected-cov \$depth -Q 5
 
 	# Genotype against the graph
 

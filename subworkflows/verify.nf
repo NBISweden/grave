@@ -45,6 +45,12 @@ workflow VERIFY {
 		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (not case sensitive).")
 	}
 
+	// Help message
+
+	if (params.help) {
+		error ("\npan-aDNA workflow\n\nBasic usage: nextflow main.nf [options]\n\nCommand line options:\n=====================\n\n--help [prints this message]")
+	}
+
 	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
 
 		// Defines the expected reference file patterns

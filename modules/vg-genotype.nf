@@ -23,7 +23,7 @@ process VGGENOTYPE {
 	script:
 	"""
 
-	# Pre-filter GAM file to remove unmapped reads, and FIXME: currently defaults to MAPQ filter 0
+	# Pre-filter GAM file to remove unmapped reads, apply MAPQ filter, minimum primary alignment score, and defray ambiguous alignment ends
 
 		vg filter -t ${task.cpus} -x ${graph} ${mapped_gam} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v > ${meta.id}.filtered.gam
 
@@ -33,11 +33,11 @@ process VGGENOTYPE {
 
 	# Compute read support
 
-		vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.filtered.gam -o ${meta.id}.pack --expected-cov \$depth -Q 5
+		vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.filtered.gam -o ${meta.id}.filtered.pack --expected-cov \$depth -Q 5
 
 	# Genotype against the graph
 
-		vg call -t ${task.cpus} ${graph} -k ${meta.id}.pack -r ${snarls} -s ${meta.id} --genotype-snarls --all-snarls --gbz --ploidy ${params.samplePloidy} > ${meta.id}.vg-genotype.vcf
+		vg call -t ${task.cpus} ${graph} -k ${meta.id}.filtered.pack -r ${snarls} -s ${meta.id} --genotype-snarls --all-snarls --gbz --ploidy ${params.samplePloidy} > ${meta.id}.vg-genotype.vcf
 
 	"""
 

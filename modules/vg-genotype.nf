@@ -29,7 +29,7 @@ process VGGENOTYPE {
 
 	# Calculate depth
 
-		depth=`vg depth -t ${task.cpus} --gam ${meta.id}.filtered.gam ${graph} | cut -f1`
+		depth=`vg depth -t ${task.cpus} --gam ${meta.id}.filtered.gam ${graph} | cut -f1 | sed 's/\\..*//'`
 
 	# Compute read support
 

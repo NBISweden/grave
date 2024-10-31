@@ -4,45 +4,47 @@
 
 ## Description
 
-**pan-aDNA** is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference.
+`pan-aDNA` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference.
 
 As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
+It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md).
+
 ## Quick start
 
-1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (uses DSL2, workflow was tested with v23.10.1)
+1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`pan-aDNA` uses DSL2 and was tested with `Nextflow v23.10.1`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
 4. In `data/reference`, add or link to the [reference graph](#reference-graphs-and-indexes)
-5. Fill out the `.csv` samplesheet, [see layout description below](#samplesheet-layout)
+5. Fill out `data/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
 6. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
 ### Reference graphs and indexes
 
-- pan-aDNA takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
+- `pan-aDNA` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
 - There are two main methods for building the graph with `Minigraph-Cactus`:
 	1) haplotype sampling [best practice]
 	2) coverage filtering
-- The choice of method dictates whether to run pan-aDNA in `haplo` mode [default] or `filter` mode, described more below
-- Because pan-aDNA is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
+- The choice of method impacts whether to run `pan-aDNA` in `haplo` mode [default] or `filter` mode, described more below
+- Because `pan-aDNA` is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
 #### Haplotype sampling
 
-- Current best practice for mapping samples to pangenome graphs uses sample specific haplotype sampling, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
+- Current best practice for mapping samples to pangenome graphs utilises sample specific haplotype sampling from the graph, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
 - To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
 - The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `pan-aDNA`
 
 #### Filtered graphs
 
-- The previous method of building pangenome graphs for read mapping used coverage filtering to remove nodes not found in `x` haplotypes
-- By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Haplotype support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
-- To use filtered graphs as input to `pan-aDNA`, the parameter `--referenceMode filter` should be set on the command line
+- The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in `x` haplotypes
+- By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
+- To use a filtered graph with `pan-aDNA`, the parameter `--referenceMode filter` should be set on the command line
 - The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `pan-aDNA`
 
 ### Samplesheet layout
 
 >[!TIP]
-> The samplesheet should be in `.csv` format
+> The table below is for example purposes - the samplesheet must be in `.csv` format
 
 | id            | type    | repeat | fastq1               | fastq2               |
 |---------------|---------|--------|----------------------|----------------------|
@@ -50,18 +52,30 @@ As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (
 | ancientHuman1 | ancient |   2    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
 | modernHuman7  | modern  |   1    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
 
-- `id`: is the sample name
-- `type`: is whether the sample is ancient or modern
-- `repeat`: allows metadata separation between repeat runs of the same sample
-- `fastq1`: relative or absolute path to the first fastq file
-- `fastq2`: relative or absolute path to the second fastq file
+- `id`: the sample name
+- `type`: whether the sample is ancient or modern - **Note:** _this affects how the sample will be processed_
+- `repeat`: metadata separation between repeat runs on the same sample
+- `fastq1`: relative or absolute path to the first FASTQ
+- `fastq2`: relative or absolute path to the second FASTQ
+
+## Pipeline description
+
+- TODO:
+
+
 
 ## Parameters
 
+User supplied parameters follow the main script execution, e.g.: `nextflow main.nf --referenceMode haplo`
 
------
-TODO:
+| Parameter                | Description                                                                                                                       | Default | Options           |
+|--------------------------|------------------------------------------------|--------------|------------------------------|
+| `--help`                 | Prints the help message                                                                                                           | null    | NA                |
+| `--referenceMode`        | Set mode of operation based on the type of input graph, clipped & unfiltered [`haplo`], or clipped & filtered [`filter`]          | `haplo` | `haplo`, `filter` |
+| `--graphCall`            | Control whether variants in the graph are called or not                                                                           | `true`  | `true`, `false`   |
 
---dup_calc_accuracy              accuracy level to calculate duplication with fastp (1~6), higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). Default 3.
 
-params.aDNA_discard_length = "30" - the length after trimming and merging that reads will need to pass to be retained by fastp (default 30) 
+
+FIXME: add more once pipeline more stable
+
+- --maxRefLength [read more here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#VCF-Normalization)

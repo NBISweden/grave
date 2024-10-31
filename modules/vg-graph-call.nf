@@ -1,6 +1,6 @@
 process VGGRAPHCALL {
 
-	// Call variants from paths in the graph
+	// Call variants from paths in the graph. Ref allele is the reference path, alt alleles are from all other paths
 
 	// Directives
 

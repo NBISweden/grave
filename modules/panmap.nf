@@ -12,7 +12,7 @@ process PANMAP {
 
 	input:
 	tuple val(meta), path(reads)
-	tuple path(reference), path(indexes)
+	tuple path(graph), path(indexes)
 
 	output:
 	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
@@ -20,9 +20,9 @@ process PANMAP {
 
 	script:
 	def memory = task.memory.toGiga()
-	def basename = reference.baseName - '.gbz'
+	def basename = graph.baseName - '.gbz'
 
-	if (meta.type == "ancient" && params.referenceMode == "haplo")
+	if (meta.type == "ancient" && params.graphMode == "haplo")
 		"""
 
 		# Generate kff index of the reads
@@ -31,7 +31,7 @@ process PANMAP {
 
 		# Generate the subsampled graph and index it
 
-			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${reference}
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${graph}
 			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.dist ${basename}.${meta.id}.gbz
 			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
 
@@ -49,7 +49,7 @@ process PANMAP {
 
 		"""
 
-	else if (meta.type == "modern" && params.referenceMode == "haplo")
+	else if (meta.type == "modern" && params.graphMode == "haplo")
 		"""
 
 		# Generate list of input read files
@@ -62,7 +62,7 @@ process PANMAP {
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${reference} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
@@ -74,29 +74,29 @@ process PANMAP {
 
 		"""
 
-	else if (meta.type == "ancient" && params.referenceMode == "filter")
+	else if (meta.type == "ancient" && params.graphMode == "filter")
 		"""
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${reference} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${graph} > ${meta.id}_alignment-stats.txt
 
 		"""
 
-	else if (meta.type == "modern" && params.referenceMode == "filter")
+	else if (meta.type == "modern" && params.graphMode == "filter")
 		"""
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${reference} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${reference} > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.gam ${graph} > ${meta.id}_alignment-stats.txt
 
 		"""
 

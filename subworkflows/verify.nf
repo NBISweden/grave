@@ -28,10 +28,10 @@ workflow VERIFY {
 
 	// Check directory structure
 
-	if (!file("./data/reference").isDirectory()) {
-		println("Pangenome directory 'data/reference' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")
-		file("data/reference").mkdirs()
-		error ("Created 'data/reference'. Exiting...")
+	if (!file("./data/graph").isDirectory()) {
+		println("Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")
+		file("data/graph").mkdirs()
+		error ("Created 'data/graph'. Exiting...")
 	}
 
 	// Warn about optional process settings
@@ -54,7 +54,7 @@ workflow VERIFY {
 	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
 
 		// Defines the expected reference file patterns
-		def refPath = new File ("data/reference")
+		def refPath = new File ("data/graph")
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
 		def distPattern = ~/.*\.dist$/
@@ -67,10 +67,10 @@ workflow VERIFY {
 		def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
 
 		// Haplo mode uses the clipped unfiltered graph (i.e. no file pattern matching a filtered graph)
-		if ("${params.referenceMode}" == "haplo") {
+		if ("${params.graphMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.hapl' file you provided in 'data/reference', but you don't need to take action (see docs).")
+				println ("For your information: pan-aDNA will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -78,24 +78,24 @@ workflow VERIFY {
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/reference'. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("More than one '.gbz' file found in 'data/graph'. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			if (!foundFilteredGbz.isEmpty()) {
-				error ("The '.gbz' file found in 'data/reference' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("The '.gbz' file found in 'data/graph' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
 			if (!foundDist.isEmpty()) {
-				error ("The '.dist' file in 'data/reference' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("The '.dist' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			}
 
 			if (!foundMin.isEmpty()) {
-				error ("The '.min' file in 'data/reference' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("The '.min' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			}
 
 		// Filter mode uses the clipped filtered graph
-		} else if ("$params.referenceMode" == "filter") {
+		} else if ("$params.graphMode" == "filter") {
 
 			if (!foundHapl.isEmpty()) {
 				error ("Reference mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs). Exiting...")
@@ -106,23 +106,23 @@ workflow VERIFY {
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/reference'. For 'filter' mode use the clipped filtered graph.")
+				error ("More than one '.gbz' file found in 'data/graph'. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/reference' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
+				error ("The .gbz file found in 'data/graph' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (!foundDist.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.dist' file you provided in 'data/reference', but you don't need to take action (see docs).")
+				println ("For your information: pan-aDNA will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.min' file you provided in 'data/reference', but you don't need to take action (see docs).")
+				println ("For your information: pan-aDNA will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 		// Prompt the user if there is a typo in the reference mode param
 		} else {
-			error ("Reference mode parameter '${params.referenceMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
+			error ("Reference mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
 }

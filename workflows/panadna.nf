@@ -41,22 +41,22 @@ workflow PANADNA {
 
 	// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
 
-	if ("$params.referenceMode" == "haplo") {
-		ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+	if ("$params.graphMode" == "haplo") {
+		ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 		// Remake hapl indexes
 		MAKEHAPL (ch_gbz_graph)
-		ch_reference_inputs = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
+		ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
 			.map {element ->
 				def ref = element[0]
 				def adna_hapl = element[1]
 				def modern_hapl = element[2]
 				return [ref: ref, indexes: [adna_hapl, modern_hapl]]
 			}
-	} else if ("$params.referenceMode" == "filter") {
-		ch_gbz_graph = Channel.fromPath("./data/reference/*.gbz")
+	} else if ("$params.graphMode" == "filter") {
+		ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 		// Remake filter indexes
 		MAKEFILTER (ch_gbz_graph)
-		ch_reference_inputs = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
+		ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
 			.map {element ->
 				def ref = element[0]
 				def dist = element[1]
@@ -79,7 +79,7 @@ workflow PANADNA {
 	FASTQC (ch_samplesheet, FASTP.out.ch_fastp_reads)
 
 	// Map reads to pangenome reference
-	PANMAP (FASTP.out.ch_fastp_reads, ch_reference_inputs)
+	PANMAP (FASTP.out.ch_fastp_reads, ch_indexed_graph)
 
 	// Post-mortem damage assessment of reads
 	PROFILEPMD (ch_gbz_graph.collect(), PROCESSGRAPH.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)

@@ -15,7 +15,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`pan-aDNA` uses DSL2 and was tested with `Nextflow v23.10.1`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
-4. In `data/reference`, add or link to the [reference graph](#reference-graphs-and-indexes)
+4. In `data/graph`, add or link to the [reference graph](#reference-graphs-and-indexes)
 5. Fill out `data/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
 6. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
@@ -38,7 +38,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in `x` haplotypes
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
-- To use a filtered graph with `pan-aDNA`, the parameter `--referenceMode filter` should be set on the command line
+- To use a filtered graph with `pan-aDNA`, the parameter `--graphMode filter` should be set on the command line
 - The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `pan-aDNA`
 
 ### Samplesheet layout
@@ -66,12 +66,12 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ## Parameters
 
-User supplied parameters follow the main script execution, e.g.: `nextflow main.nf --referenceMode haplo`
+User supplied parameters follow the main script execution, e.g.: `nextflow main.nf --graphMode haplo`
 
 | Parameter                | Description                                                                                                                       | Default | Options           |
 |--------------------------|------------------------------------------------|--------------|------------------------------|
 | `--help`                 | Prints the help message                                                                                                           | null    | NA                |
-| `--referenceMode`        | Set mode of operation based on the type of input graph, clipped & unfiltered [`haplo`], or clipped & filtered [`filter`]          | `haplo` | `haplo`, `filter` |
+| `--graphMode`            | Set mode of operation based on the type of input graph, clipped & unfiltered [`haplo`], or clipped & filtered [`filter`]          | `haplo` | `haplo`, `filter` |
 | `--graphCall`            | Control whether variants in the graph are called or not                                                                           | `true`  | `true`, `false`   |
 
 

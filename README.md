@@ -4,7 +4,7 @@
 
 ## Description
 
-`pan-aDNA` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference.
+`pan-aDNA` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference. The steps are described in a [later section](#pipeline-steps).
 
 As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
@@ -58,7 +58,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - `fastq1`: relative or absolute path to the first FASTQ
 - `fastq2`: relative or absolute path to the second FASTQ
 
-## Pipeline description
+## Pipeline steps
 
 - TODO:
 

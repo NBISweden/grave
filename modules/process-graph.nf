@@ -3,6 +3,7 @@ process PROCESSGRAPH {
 	// Directives
 
 	debug false
+	tag "${graph.baseName}_graph"
 	label 'process_single'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:d858a75dfe2e019e'
 	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph-stats.txt"

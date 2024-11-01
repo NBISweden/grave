@@ -3,6 +3,7 @@ process MAKEHAPL {
 	// Directives
 
 	debug false
+	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/vg:1.59.0--92074ade48692ef2'
 
@@ -20,6 +21,7 @@ process MAKEHAPL {
 	def rindexname = "${basename}.ri"
 	def ahaplname = "${basename}.adna.hapl"
 	def mhaplname = "${basename}.modern.hapl"
+
 	"""
 
 	# Produce ".hapl" index appropriate for ancient samples

@@ -5,6 +5,7 @@ process VGGRAPHCALL {
 	// Directives
 
 	debug false
+	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:cf972158c867084b'
 	publishDir path: 'output/graph_calls', mode: 'move'

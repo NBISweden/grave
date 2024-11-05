@@ -5,7 +5,7 @@ process PROFILEPMD {
 	debug false
 	tag "$meta.id"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:ee253f4846be614b'
+	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:accb8ffcbab94b7a'
 	publishDir path: 'output/pmd_profiles', mode: 'move'
 
 	// I/O & script
@@ -17,6 +17,8 @@ process PROFILEPMD {
 
 	output:
 	path "${meta.id}_pmd"
+	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+	tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 
 	when:
 	meta.type == 'ancient'
@@ -25,8 +27,9 @@ process PROFILEPMD {
 	"""
 
 	# Surject gam to reference path (by default)
+	# FIXME: probably remove this, as surjection is now done upstream
 
-		vg surject -x ${graph} --bam-output ${mapped_gam} > ${meta.id}.ref.bam
+		vg surject -t ${task.cpus} -x ${graph} --bam-output ${mapped_gam} > ${meta.id}.ref.bam
 
 	# Run PMD profiling
 

@@ -16,6 +16,7 @@ process FASTQC {
 	output:
 	tuple val(meta), path("*_?.raw.fq.gz"), emit: ch_renamed_raw
 	path "*fastqc.zip", emit: ch_fastqc_report
+	tuple val(task.process), val('fastqc'), eval('fastqc --version | sed "s/.* v//"'), topic: versions
 
 	script:
 	"""

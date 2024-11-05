@@ -5,7 +5,7 @@ process PROCESSGRAPH {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_single'
-	container 'oras://community.wave.seqera.io/library/samtools_vg:d858a75dfe2e019e'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:765866d937aa49c6'
 	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph-stats.txt"
 
 	// I/O & script
@@ -16,6 +16,8 @@ process PROCESSGRAPH {
 	output:
 	path "*_graph-stats.txt"
 	tuple path("reference.fasta"), path("reference.fasta.fai"), emit: ch_reference_fasta
+	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
 	script:
 	def basename = graph.baseName - '.gbz'

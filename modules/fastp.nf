@@ -15,6 +15,7 @@ process FASTP {
 	output:
 	tuple val(meta), path("*.fastp*fq.gz"), emit: ch_fastp_reads
 	path "*.fastp.json", emit: ch_fastp_report
+	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
 	if (meta.type == "ancient")

@@ -5,7 +5,7 @@ process PANMAP {
 	debug false
 	tag "$meta.id"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/kmc_vg:53fac424120b24cd'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
 	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: "${meta.id}_alignment-stats.txt"
 
 	// I/O & script
@@ -17,6 +17,8 @@ process PANMAP {
 	output:
 	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
 	path "${meta.id}_alignment-stats.txt"
+	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
+	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
 	def memory = task.memory.toGiga()

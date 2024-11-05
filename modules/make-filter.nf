@@ -5,7 +5,7 @@ process MAKEFILTER {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/vg:1.59.0--92074ade48692ef2'
+	container 'oras://community.wave.seqera.io/library/vg:1.60.0--e90f97d844d42049'
 
 	// I/O & script
 
@@ -14,6 +14,7 @@ process MAKEFILTER {
 
 	output:
 	tuple path ("*.dist"), path ("*.adna.min"), path ("*.modern.min"), emit: ch_filter_indexes
+	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
 	def basename = graph.baseName - '.gbz'

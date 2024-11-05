@@ -7,7 +7,7 @@ process VGGRAPHCALL {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:cf972158c867084b'
+	container 'oras://community.wave.seqera.io/library/bcftools_vcfbub_htslib_vg:51f916c955092403'
 	publishDir path: 'output/graph_calls', mode: 'move'
 
 	// I/O & script
@@ -20,6 +20,10 @@ process VGGRAPHCALL {
 	output:
 	path "*.vcf.gz"
 	path "vcf_information.txt"
+	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
+	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions
+	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 
 	when:
 	params.graphCall == true

@@ -12,7 +12,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ## Quick start
 
-1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`pan-aDNA` uses DSL2 and was tested with `Nextflow v23.10.1`)
+1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`pan-aDNA` uses DSL2 & features introduced in `Nextflow 24.02.0-edge`. It was tested with `Nextflow v24.10.0`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
 4. In `data/graph`, add or link to the [reference graph](#reference-graphs-and-indexes)

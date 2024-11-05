@@ -10,8 +10,8 @@ workflow VERIFY {
 
 	// Nextflow version
 
-	if (!nextflow.version.matches('>=22.03')) {
-		error ("Oops! This workflow requires Nextflow version 22.03 or greater. You are running version ${nextflow.version}")
+	if (!nextflow.version.matches('>=24.02.0')) {
+		error ("Oops! This workflow requires Nextflow version '24.02.0-edge' or later. You are running '${nextflow.version}'. Update with 'nextflow self-update'.")
 	}
 
 	// Apptainer executable

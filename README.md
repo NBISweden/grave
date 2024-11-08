@@ -4,7 +4,7 @@
 
 ## Description
 
-`pan-aDNA` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph reference. The steps are described in a [later section](#pipeline-steps).
+`pan-aDNA` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are described in a [later section](#pipeline-steps).
 
 As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
@@ -15,11 +15,11 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`pan-aDNA` uses DSL2 & features introduced in `Nextflow 24.02.0-edge`. It was tested with `Nextflow v24.10.0`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
-4. In `data/graph`, add or link to the [reference graph](#reference-graphs-and-indexes)
-5. Fill out `data/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
+4. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
+5. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
 6. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
-### Reference graphs and indexes
+### Graphs and indexes
 
 - `pan-aDNA` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
 - There are two main methods for building the graph with `Minigraph-Cactus`:

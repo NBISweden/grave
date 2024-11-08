@@ -22,14 +22,14 @@ workflow VERIFY {
 
 	// Check for input samplesheet
 
-	if (!file("./data/samplesheet.csv").exists()) {
-		error ("Input file 'data/samplesheet.csv' was not found (please see docs).")
+	if (!file("./data/samplesheet/samplesheet.csv").exists()) {
+		error ("Input file 'data/samplesheet/samplesheet.csv' was not found (please see docs).")
 	}
 
 	// Check directory structure
 
 	if (!file("./data/graph").isDirectory()) {
-		println("Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to reference files there (see docs).")
+		println("Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
 		file("data/graph").mkdirs()
 		error ("Created 'data/graph'. Exiting...")
 	}
@@ -42,7 +42,7 @@ workflow VERIFY {
 			println ("USER NOTE: graph based variant calling is disabled.")
 		}
 	} else {
-		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (not case sensitive).")
+		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
 	}
 
 	// Help message
@@ -51,26 +51,26 @@ workflow VERIFY {
 		error ("\npan-aDNA workflow\n\nBasic usage: nextflow main.nf [options]\n\nCommand line options:\n=====================\n\n--help [prints this message]")
 	}
 
-	// Check for reference files (different inputs depending on 'haplo' or 'filter' modes)
+	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
 
-		// Defines the expected reference file patterns
-		def refPath = new File ("data/graph")
+		// Defines the expected graph file patterns
+		def graphDir = new File ("data/graph")
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
 		def distPattern = ~/.*\.dist$/
 		def minPattern = ~/.*\.min$/
 		def gbzFilteredPattern = ~/.*\.d.*\.gbz$/
-		def foundHapl = refPath.listFiles().findAll { it.isFile() && it.name =~ haplPattern }
-		def foundGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzPattern }
-		def foundDist = refPath.listFiles().findAll { it.isFile() && it.name =~ distPattern }
-		def foundMin = refPath.listFiles().findAll { it.isFile() && it.name =~ minPattern }
-		def foundFilteredGbz = refPath.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
+		def foundHapl = graphDir.listFiles().findAll { it.isFile() && it.name =~ haplPattern }
+		def foundGbz = graphDir.listFiles().findAll { it.isFile() && it.name =~ gbzPattern }
+		def foundDist = graphDir.listFiles().findAll { it.isFile() && it.name =~ distPattern }
+		def foundMin = graphDir.listFiles().findAll { it.isFile() && it.name =~ minPattern }
+		def foundFilteredGbz = graphDir.listFiles().findAll { it.isFile() && it.name =~ gbzFilteredPattern }
 
 		// Haplo mode uses the clipped unfiltered graph (i.e. no file pattern matching a filtered graph)
 		if ("${params.graphMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: pan-aDNA will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -98,7 +98,7 @@ workflow VERIFY {
 		} else if ("$params.graphMode" == "filter") {
 
 			if (!foundHapl.isEmpty()) {
-				error ("Reference mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("Graph mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs). Exiting...")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -114,15 +114,30 @@ workflow VERIFY {
 			}
 
 			if (!foundDist.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: pan-aDNA will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				println ("For your information: pan-aDNA will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: pan-aDNA will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
-		// Prompt the user if there is a typo in the reference mode param
+		// Prompt the user if there is a typo in the graph mode param
 		} else {
-			error ("Reference mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
+			error ("Graph mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
+
+	// Check for a file specifying reference paths
+
+		def pathsDir = new File ("data/paths")
+		def pathsPattern = ~/.*\.paths$/
+		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
+
+		if (foundPaths.isEmpty()) {
+			println ("USER NOTE: no reference path file was specified, pan-aDNA will run with defaults (appropriate for graphs with a single reference path).")
+		}
+
+		if (foundPaths.size() > 1) {
+			error ("More than one '.paths' file found in 'data/paths', please specify one, or none (see docs).")
+		}
+
 }

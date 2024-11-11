@@ -17,7 +17,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
 4. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
 5. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
-6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? If no, **go to step 7**. If yes, [read this section first](#multiple-reference-samples).
+6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, go to step 7**. If yes, [read this section first](#multiple-reference-samples).
 7. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
 ### Graphs and indexes

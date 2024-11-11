@@ -137,7 +137,7 @@ workflow VERIFY {
 		}
 
 		if (!foundPaths.isEmpty() && !params.providePathsFiles) {
-			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them.")
+			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to use them set '--providePathsFiles true').")
 		}
 
 }

@@ -133,7 +133,7 @@ workflow VERIFY {
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
 		if (foundPaths.isEmpty() && params.providePathsFiles) {
-			error ("ERROR: The workflow was expecting user provided reference path files, but none were found in 'data/paths/*.paths'.")
+			error ("ERROR: The workflow was expecting user provided '.paths' files, but none were found in 'data/paths/*.paths'.")
 		}
 
 		if (!foundPaths.isEmpty() && !params.providePathsFiles) {

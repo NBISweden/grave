@@ -126,18 +126,18 @@ workflow VERIFY {
 			error ("Graph mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
 
-	// Check for a file specifying reference paths
+	// Check for files specifying reference paths
 
 		def pathsDir = new File ("data/paths")
 		def pathsPattern = ~/.*\.paths$/
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
-		if (foundPaths.isEmpty()) {
-			println ("USER NOTE: no reference path file was specified, pan-aDNA will run with defaults (appropriate for graphs with a single reference path).")
+		if (foundPaths.isEmpty() && params.providePathsFiles) {
+			error ("The workflow is configured to receive user provided reference path files, but none were found in 'data/paths/*.paths'.")
 		}
 
-		if (foundPaths.size() > 1) {
-			error ("More than one '.paths' file found in 'data/paths', please specify one, or none (see docs).")
+		if (!foundPaths.isEmpty() && !params.providePathsFiles) {
+			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them.")
 		}
 
 }

@@ -17,7 +17,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/pan-adna.git`
 4. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
 5. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
-6. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
+6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? If no, **go to step 7**. If yes, [read this section first](#multiple-reference-samples).
+7. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
 ### Graphs and indexes
 
@@ -58,10 +59,28 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - `fastq1`: relative or absolute path to the first FASTQ
 - `fastq2`: relative or absolute path to the second FASTQ
 
+### Multiple reference samples
+
+- `Minigraph-Cactus` requires at least one reference sample, which is usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
+
+- Paths through the reference sample are _reference paths_. Unless configured otherwise, `pan-aDNA` will assume a single reference sample, and use rational `vg` defaults which assume the same, for example `surject` transforms GAM alignments to linear BAM, relative to **all reference paths** in the graph. If there is more than one reference sample in the graph, this will produce an undesirable outcome
+
+- If your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference sample1 sample2 sampleN`, it is recommended to run `pan-aDNA` with `--providePathsFiles true`, and provide one or more `.paths` files in the `data/paths` directory
+
+- Each `.paths` file should contain a list of related reference paths, one path per line, and the file prefix should be the reference sample name, e.g.: `GRCh38.paths`
+
+- For each `.paths` file provided, `pan-aDNA` will surject reads to that set of reference paths and make a separate `.bam` file. For example surjecting `unknownSimian.gam` to `chimp.paths` and `gorilla.paths` will produce:
+
+```
+unknownSimian.chimp.bam
+unknownSimian.gorilla.bam
+```
+
+- Another use case for this configuration option is surjecting to a subset of reference paths found in one reference sample, for example only the autosomes (one `.paths` file); similarly, this could be extended to independent reference samples, such as only chr1 paths from three reference samples (three `.paths` files)
+
 ## Pipeline steps
 
 - TODO:
-
 
 
 ## Parameters
@@ -79,3 +98,8 @@ User supplied parameters follow the main script execution, e.g.: `nextflow main.
 FIXME: add more once pipeline more stable
 
 - --maxRefLength [read more here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#VCF-Normalization)
+
+
+--providePathsFiles -> if user graphs have more than one reference, they need to consider setting this. Otherwise surject will use all reference paths in the graph. No need to set it if graph has only one reference path.
+explain the two main use cases (only a subset of paths of the sinlge reference genome, or some/all paths from different reference genomes)
+

@@ -11,27 +11,27 @@ workflow VERIFY {
 	// Nextflow version
 
 	if (!nextflow.version.matches('>=24.02.0')) {
-		error ("Oops! This workflow requires Nextflow version '24.02.0-edge' or later. You are running '${nextflow.version}'. Update with 'nextflow self-update'.")
+		error ("ERROR: This workflow requires Nextflow version '24.02.0-edge' or later. You are running '${nextflow.version}'. Update with 'nextflow self-update'.")
 	}
 
 	// Apptainer executable
 
 	if (!"apptainer".execute().text.trim()) {
-		error ("This workflow requires the Apptainer executable available in PATH.")
+		error ("ERROR: This workflow requires the Apptainer executable available in PATH.")
 	}
 
 	// Check for input samplesheet
 
 	if (!file("./data/samplesheet/samplesheet.csv").exists()) {
-		error ("Input file 'data/samplesheet/samplesheet.csv' was not found (please see docs).")
+		error ("ERROR: Input file 'data/samplesheet/samplesheet.csv' was not found (please see docs).")
 	}
 
 	// Check directory structure
 
 	if (!file("./data/graph").isDirectory()) {
-		println("Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
+		println("ERROR: Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
 		file("data/graph").mkdirs()
-		error ("Created 'data/graph'. Exiting...")
+		error ("Created 'data/graph'.")
 	}
 
 	// Warn about optional process settings
@@ -42,7 +42,7 @@ workflow VERIFY {
 			println ("USER NOTE: graph based variant calling is disabled.")
 		}
 	} else {
-		error ("Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
+		error ("ERROR: Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
 	}
 
 	// Help message
@@ -74,43 +74,43 @@ workflow VERIFY {
 			}
 
 			if (foundGbz.isEmpty()) {
-				error ("No '.gbz' file found (please see docs). Exiting...")
+				error ("ERROR: No '.gbz' file found (please see docs).")
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/graph'. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("ERROR: More than one '.gbz' file found in 'data/graph'. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			if (!foundFilteredGbz.isEmpty()) {
-				error ("The '.gbz' file found in 'data/graph' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("ERROR: The '.gbz' file found in 'data/graph' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
 			if (!foundDist.isEmpty()) {
-				error ("The '.dist' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("ERROR: The '.dist' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				error ("The '.min' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("ERROR: The '.min' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
 			}
 
 		// Filter mode uses the clipped filtered graph
 		} else if ("$params.graphMode" == "filter") {
 
 			if (!foundHapl.isEmpty()) {
-				error ("Graph mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs). Exiting...")
+				error ("ERROR: Graph mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
-				error ("No '.gbz' file found (please see docs). Exiting...")
+				error ("ERROR: No '.gbz' file found (please see docs).")
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("More than one '.gbz' file found in 'data/graph'. For 'filter' mode use the clipped filtered graph.")
+				error ("ERROR: More than one '.gbz' file found in 'data/graph'. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (foundFilteredGbz.isEmpty()) {
-				error ("The .gbz file found in 'data/graph' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
+				error ("ERROR: The .gbz file found in 'data/graph' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (!foundDist.isEmpty()) {
@@ -123,7 +123,7 @@ workflow VERIFY {
 
 		// Prompt the user if there is a typo in the graph mode param
 		} else {
-			error ("Graph mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
+			error ("ERROR: Graph mode parameter '${params.graphMode}' not recognised, accepts 'haplo' or 'filter' (please see docs).")
 		}
 
 	// Check for files specifying reference paths
@@ -133,7 +133,7 @@ workflow VERIFY {
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
 		if (foundPaths.isEmpty() && params.providePathsFiles) {
-			error ("The workflow is configured to receive user provided reference path files, but none were found in 'data/paths/*.paths'.")
+			error ("ERROR: The workflow was expecting user provided reference path files, but none were found in 'data/paths/*.paths'.")
 		}
 
 		if (!foundPaths.isEmpty() && !params.providePathsFiles) {

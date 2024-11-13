@@ -61,22 +61,22 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ### Multiple reference samples
 
-- `Minigraph-Cactus` requires at least one reference sample, which is usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
+- `Minigraph-Cactus` requires at least one reference sample, usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
 
-- Paths through the reference sample are _reference paths_. Unless configured otherwise, `pan-aDNA` will assume a single reference sample, and use rational `vg` defaults which assume the same, for example `surject` transforms GAM alignments to linear BAM, relative to **all reference paths** in the graph. If there is more than one reference sample in the graph, this will produce an undesirable outcome
+- Paths through the reference sample are _reference paths_. Unless configured otherwise, `pan-aDNA` will assume a single reference sample, and use rational `vg` defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to **all reference paths** in the graph. If there is more than one reference sample in the graph, this will produce undesirable output
 
-- If your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is recommended to run `pan-aDNA` with `--providePathsFiles true`, and provide one or more `.paths` files in the `data/paths` directory
+- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is recommended to run `pan-aDNA` with `--refPaths true`, and provide one or more `.paths` files in the `data/paths` directory
 
-- Each `.paths` file should contain a list of related reference paths, one path per line, and the file prefix should be the reference sample name, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
+- Each `.paths` file should contain a list of related reference paths (e.g., all paths from one reference sample), one path per line, and the file prefix should ideally be the reference sample name, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
 
-- For each `.paths` file provided, `pan-aDNA` will surject reads to that set of reference paths and make a separate `.bam` file. For example surjecting `unknownSimian.gam` to `chimp.paths` and `gorilla.paths` will produce:
+- For each `.paths` file provided, `pan-aDNA` will run pipeline steps relative to that list independently, e.g., `surject` will produce a separate `.bam` file per list, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:
 
 ```
-unknownSimian.chimp.bam
-unknownSimian.gorilla.bam
+unknownSimian.1.chimp.bam
+unknownSimian.1.gorilla.bam
 ```
 
-- Another use case for the `--providePathsFiles` option is surjecting to a subset of the reference paths found in a single reference sample, for example only the autosomes (provide one `.paths` file); similarly, this could be extended to independent reference samples, such as only chr1 paths from three reference samples (provide three `.paths` files)
+- Another use case for the `--refPaths` option is targeting a subset of reference paths found in one (one `.paths` file) or more reference samples (multiple `.paths` files), for example only the autosomes, or only chr1
 
 ## Pipeline steps
 
@@ -100,6 +100,6 @@ FIXME: add more once pipeline more stable
 - --maxRefLength [read more here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#VCF-Normalization)
 
 
---providePathsFiles -> if user graphs have more than one reference, they need to consider setting this. Otherwise surject will use all reference paths in the graph. No need to set it if graph has only one reference path.
+--refPaths -> if user graphs have more than one reference, they need to consider setting this. Otherwise surject will use all reference paths in the graph. No need to set it if graph has only one reference path.
 explain the two main use cases (only a subset of paths of the sinlge reference genome, or some/all paths from different reference genomes)
 

@@ -12,32 +12,60 @@ process PROCESSGRAPH {
 
 	input:
 	path graph
+	path ref_path_files
 
 	output:
 	path "*_graph-stats.txt"
-	tuple path("reference.fasta"), path("reference.fasta.fai"), emit: ch_reference_fasta
+	tuple path("*.fasta"), path("*.fasta.fai"), emit: ch_reference_fastas
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
 	script:
 	def basename = graph.baseName - '.gbz'
 
-	"""
+	if (!params.refPaths)	// Assume single reference sample, extract all reference paths
+		"""
 
-	# Report reference file summary statistics
+		# Report graph summary statistics
 
-		echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
-		echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
-		echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
 
-	# Pull reference path as FASTA for mapdamage
+		# Extract reference sample paths as FASTA
 
-		vg paths --reference-paths --extract-fasta -x ${graph} > reference.fasta
+			vg paths --reference-paths --extract-fasta -x ${graph} > reference.fasta
 
-	# Index reference genome
+		# Index reference FASTA
 
-		samtools faidx reference.fasta
+			samtools faidx reference.fasta
 
-	"""
+		"""
+
+	else if (params.refPaths)	// Assume multiple reference samples, extract provided reference paths for each sample
+		"""
+
+		# Report graph summary statistics
+
+			echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+
+		# Extract provided reference paths as FASTA
+
+			for i in *.paths
+				do
+					basename=`echo \$i | sed 's/\\.paths//'`
+					vg paths --paths-file \$i --extract-fasta -x ${graph} > \$basename.fasta
+				done
+
+		# Index reference FASTAs
+
+			for i in *.fasta
+				do
+					samtools faidx \$i
+				done
+
+		"""
 
 }

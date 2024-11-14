@@ -17,29 +17,29 @@ process VGSURJECT {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	// TODO: BAMS
+	tuple val(meta), path("*.bam"), emit: ch_surjected_bams
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
-	if (!params.providePathsFiles && meta.type == "ancient")	// Default paths, GAM not interleaved
+	if (!params.refPaths && meta.type == "ancient")	// Default reference paths, GAM not interleaved
 		"""
 
 		# Surject GAM to all reference paths
 
-			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id} --bam-output ${mapped_gam} > ${meta.id}.all_paths.bam
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.all_paths.bam
 
 		"""
 
-	else if (!params.providePathsFiles && meta.type == "modern")	// Default paths, GAM interleaved
+	else if (!params.refPaths && meta.type == "modern")	// Default reference paths, GAM interleaved
 		"""
 
 		# Surject GAM to all reference paths, interleave
 
-			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id} --interleaved --bam-output ${mapped_gam} > ${meta.id}.all_paths.bam
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.all_paths.bam
 
 		"""
 
-	else if (params.providePathsFiles && meta.type == "ancient" )	// User provided paths, GAM not interleaved
+	else if (params.refPaths && meta.type == "ancient" )	// User provided reference paths, GAM not interleaved
 		"""
 
 		# Surject GAM to each user provided list of reference paths
@@ -47,12 +47,12 @@ process VGSURJECT {
 			for i in *.paths
 				do
 					basename=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --bam-output ${mapped_gam} > ${meta.id}.\$basename.bam
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.\$basename.bam
 				done
 
 		"""
 
-	else if  (params.providePathsFiles && meta.type == "modern")	// User provided paths, GAM interleaved
+	else if  (params.refPaths && meta.type == "modern")	// User provided reference paths, GAM interleaved
 		"""
 
 		# Surject GAM to each user provided list of reference paths, interleave
@@ -60,7 +60,7 @@ process VGSURJECT {
 			for i in *.paths
 				do
 					basename=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --interleaved --bam-output ${mapped_gam} > ${meta.id}.\$basename.bam
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.\$basename.bam
 				done
 
 		"""

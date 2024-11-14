@@ -1,6 +1,6 @@
 process VGGRAPHCALL {
 
-	// Call variants from paths in the graph. Ref allele is the reference path, alt alleles are from all other paths
+	// Output variants in the graph as VCF, relative to selected paths
 
 	// Directives
 
@@ -14,12 +14,12 @@ process VGGRAPHCALL {
 
 	input:
 	path graph
-	tuple path(reference_fasta), path(index)
 	path snarls
+	path ref_path_files
+	tuple path(reference_fasta), path(index)
 
 	output:
 	path "*.vcf.gz"
-	path "vcf_information.txt"
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions
@@ -31,55 +31,54 @@ process VGGRAPHCALL {
 	script:
 	def basename = graph.baseName - '.gbz'
 
-	if (params.referencePath == null)  // If user doesn't provide a reference path, use all reference paths by default
+	if (!params.refPaths)  // Default reference paths
 		"""
 
-		# Get list of reference paths in graph
+		# Make raw VCF of graph snarls relative to all reference paths
 
-			references=`vg paths -x ${graph} --reference-paths --list`
-
-		# Output raw VCF of graph Snarls (i.e., bubbles/superbubbles), relative to the given paths. Note: there is an experimental feature to write a nested VCF '--nested', but this isn't done in Minigraph-Cactus vcf pipeline
-
-			vg deconstruct -t ${task.cpus} ${graph} -r ${snarls} --all-snarls --gbz-translation -p \$references | bgzip --threads ${task.cpus} > ${basename}.raw.vcf.gz
+			vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.raw.vcf.gz
 
 		# Index raw VCF
 
 			tabix -p vcf ${basename}.raw.vcf.gz
 
-		# Pop bubbles, i.e., remove nested variants at nesting level 'maxNestLevel', plus those over 'maxRefLength' in length, then normalise the VCF
+		# Pop bubbles (remove nested variants with nest level over 'maxNestLevel', plus any over 'maxRefLength' in length, then normalise VCF
 
 			vcfbub --input ${basename}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f ${reference_fasta} | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.filtered.vcf.gz
 
-		# Report user settings
-
-			echo "VCF records are relative to the following reference paths:" > vcf_information.txt
-			echo "\$references" >> vcf_information.txt
-			echo "Graph call settings: maxNestLevel=${params.maxNestLevel}, maxRefLength=${params.maxRefLength}" >> vcf_information.txt
-
 		"""
 
-	else  // If the user provides a reference path, use only that path
+	else if (params.refPaths)  // User reference paths
 		"""
 
-		# Output raw VCF of graph Snarls (i.e., bubbles/superbubbles), relative to the given paths. Note: there is an experimental feature to write a nested VCF '--nested', but this isn't done in Minigraph-Cactus vcf pipeline
+		# Get reference sample prefixes from '.paths' files
 
-			vg deconstruct -t ${task.cpus} ${graph} -r ${snarls} --all-snarls --gbz-translation -p ${params.referencePath} | bgzip --threads ${task.cpus} > ${basename}.raw.vcf.gz
+			for i in *.paths
+				do
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					echo \$prefix >> referenceSamplePrefixes.txt
+				done
 
-		# Index raw VCF
+		# Make raw VCFs relative to each provided reference sample
 
-			tabix -p vcf ${basename}.raw.vcf.gz
+			while read prefix
+				do
+					vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --path-prefix \$prefix --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.\$prefix.raw.vcf.gz
+				done < referenceSamplePrefixes.txt
 
-		# Pop bubbles, i.e., remove nested variants at nesting level 'maxNestLevel', plus those over 'maxRefLength' in length, then normalise the VCF
+		# Index raw VCFs
 
-			vcfbub --input ${basename}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f ${reference_fasta} | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.filtered.vcf.gz
+			for i in *.raw.vcf.gz
+				do
+					tabix -p vcf \$i
+				done
 
-		# Report user settings
+		# Pop bubbles
 
-			echo "VCF records are relative to the following reference paths:" > vcf_information.txt
-			echo "${params.referencePath}" >> vcf_information.txt
-			echo "In the case of troubleshooting empty vcf output, note that these are the reference paths in your graph:" >> vcf_information.txt
-			vg paths -x ${graph} --reference-paths --list >> vcf_information.txt
-			echo "Graph call settings: maxNestLevel=${params.maxNestLevel}, maxRefLength=${params.maxRefLength}" >> vcf_information.txt
+			while read prefix
+				do
+					vcfbub --input ${basename}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.\$prefix.filtered.vcf.gz
+				done < referenceSamplePrefixes.txt
 
 		"""
 

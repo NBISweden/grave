@@ -6,7 +6,7 @@ process PANMAP {
 	tag "$meta.id"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
-	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: "${meta.id}_alignment-stats.txt"
+	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
 
@@ -16,7 +16,7 @@ process PANMAP {
 
 	output:
 	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
-	path "${meta.id}_alignment-stats.txt"
+	path "*_alignment-stats.txt"
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
@@ -39,11 +39,11 @@ process PANMAP {
 
 		# Map merged reads to graph (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
@@ -64,11 +64,11 @@ process PANMAP {
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
@@ -81,11 +81,11 @@ process PANMAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${graph} > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		"""
 
@@ -94,11 +94,11 @@ process PANMAP {
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.gam ${graph} > ${meta.id}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		"""
 

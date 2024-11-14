@@ -63,20 +63,25 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - `Minigraph-Cactus` requires at least one reference sample, usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
 
-- Paths through the reference sample are _reference paths_. Unless configured otherwise, `pan-aDNA` will assume a single reference sample, and use rational `vg` defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to **all reference paths** in the graph. If there is more than one reference sample in the graph, this will produce undesirable output
+- Paths through the reference sample are _reference paths_. Unless configured otherwise, `pan-aDNA` will assume __a single reference sample__, and use rational `vg` defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will likely produce an undesirable output
 
 - Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is recommended to run `pan-aDNA` with `--refPaths true`, and provide one or more `.paths` files in the `data/paths` directory
 
-- Each `.paths` file should contain a list of related reference paths (e.g., all paths from one reference sample), one path per line, and the file prefix should ideally be the reference sample name, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
+- Each `.paths` file contains a list of related reference paths (e.g., all paths from a given reference sample), with one path name per line
 
-- For each `.paths` file provided, `pan-aDNA` will run pipeline steps relative to that list independently, e.g., `surject` will produce a separate `.bam` file per list, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:
+- __The name of the file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
+
+>[!TIP]
+> You can remind yourself of the reference samples in your graph using vg: `vg paths --reference-paths --metadata -x <graph>.gbz | cut -f3 | tail -n+2 | sort | uniq`
+
+- For each `.paths` file provided, `pan-aDNA` will run pipeline steps relative to that sample separately from others, e.g., `surject` will produce a separate `.bam` file per reference sample, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:
 
 ```
 unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
 
-- Another use case for the `--refPaths` option is targeting a subset of reference paths found in one (one `.paths` file) or more reference samples (multiple `.paths` files), for example only the autosomes, or only chr1
+- Another use case for the `--refPaths` option is targeting a subset of reference paths found in one reference sample (one `.paths` file required) or multiple reference samples (multiple `.paths` files required), for example only the autosomes, or only chr1
 
 ## Pipeline steps
 

@@ -55,8 +55,8 @@ process PROCESSGRAPH {
 
 			for i in *.paths
 				do
-					basename=`echo \$i | sed 's/\\.paths//'`
-					vg paths --paths-file \$i --extract-fasta -x ${graph} > \$basename.fasta
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					vg paths --paths-file \$i --extract-fasta -x ${graph} > \$prefix.fasta
 				done
 
 		# Index reference FASTAs

@@ -34,7 +34,7 @@ workflow VERIFY {
 		error ("Created 'data/graph'.")
 	}
 
-	// Warn about optional process settings
+	// Warn about process settings
 
 	if (params.graphCall.toString().toLowerCase() in ["true", "false"]) {
 		boolean graphCallEnabled = params.graphCall.toString().toLowerCase() == "true"
@@ -43,6 +43,10 @@ workflow VERIFY {
 		}
 	} else {
 		error ("ERROR: Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
+	}
+
+	if (!params.refPaths) {
+		println ("USER NOTE: As no reference paths were provided, pan-aDNA will assume a single reference sample is present in your graph.")
 	}
 
 	// Help message
@@ -132,12 +136,12 @@ workflow VERIFY {
 		def pathsPattern = ~/.*\.paths$/
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
-		if (foundPaths.isEmpty() && params.providePathsFiles) {
+		if (foundPaths.isEmpty() && params.refPaths) {
 			error ("ERROR: The workflow was expecting user provided '.paths' files, but none were found in 'data/paths/*.paths'.")
 		}
 
-		if (!foundPaths.isEmpty() && !params.providePathsFiles) {
-			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to use them set '--providePathsFiles true').")
+		if (!foundPaths.isEmpty() && !params.refPaths) {
+			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so set '--refPaths true').")
 		}
 
 }

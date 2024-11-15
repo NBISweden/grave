@@ -40,8 +40,7 @@ process VGMAPCALL {
 			vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.${meta.repeat}.filtered.gam -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
 
 		# Genotype against all reference paths in the graph
-				# FIXME: Opened issue with `vgteam` -> vg call has different behaviour from `deconstruct` and strips the path/contig info. 
-				# The vcf can't be used/hacked back together if called against complex reference samples with >1 path (or does that change the behaviour?)
+				# FIXME: Opened issue with vgteam -> `call` behaviour differs to `deconstruct`: strips the path info, leaving just contig name. Precludes using PanSN format. Would need to do contig names only instead, so that the reference remains compatible with the vcfs.
 
 			vg call -t ${task.cpus} ${graph} --pack ${meta.id}.${meta.repeat}.filtered.pack --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id}.${meta.repeat} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.raw.vcf.gz
 
@@ -50,7 +49,7 @@ process VGMAPCALL {
 			tabix -p vcf ${meta.id}.${meta.repeat}.raw.vcf.gz
 
 		# Pop bubbles 
-						# FIXME: establish whether this is required here. Are there any nested variants in the vcf?
+				# FIXME: when above issue is fixed, establish whether this is required here. Are there any nested variants in the vcf?
 
 			vcfbub --input ${meta.id}.${meta.repeat}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f ${reference_fasta} | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.filtered.vcf.gz
 
@@ -59,15 +58,16 @@ process VGMAPCALL {
 	else if (params.refPaths)  // User reference paths
 		"""
 
-		# TODO: Currently fixing the default run, then port over and adapt to multiple references.
+		# pass test runs
 
+			touch PLACEHOLDER.vcf.gz
 
-	#meta.id}.meta.repeat}.\$prefix.raw.vcf.gz
-	#meta.id}.meta.repeat}.\$prefix.filtered.vcf.gz
+		# TODO: waiting for response to GitHub issue. Based on that, refactor the above to cycle through respective paths files
+			# Strip ref-sample name from *.paths
+				#meta.id}.meta.repeat}.\$prefix.raw.vcf.gz
+				#meta.id}.meta.repeat}.\$prefix.filtered.vcf.gz
 
-
-    # -S, --ref-sample NAME   Call on all paths with given sample name (cannot be used with -p)
-	# Strip ref-sample name from *.paths
+    		# -S, --ref-sample NAME   Call on all paths with given sample name (cannot be used with -p)
 
 		"""
 

@@ -5,7 +5,7 @@ process VGSURJECT {
 	// Directives
 
 	debug false
-	tag "$meta.id"
+	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/vg:1.60.0--e90f97d844d42049'
 

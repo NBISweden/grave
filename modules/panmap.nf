@@ -3,10 +3,10 @@ process PANMAP {
 	// Directives
 
 	debug false
-	tag "$meta.id"
+	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
-	publishDir path: 'output/statistics/mappings', mode: 'move', pattern: "*_alignment-stats.txt"
+	publishDir path: 'output/statistics/mapped_samples', mode: 'move', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
 

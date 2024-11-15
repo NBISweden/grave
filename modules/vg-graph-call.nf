@@ -8,7 +8,7 @@ process VGGRAPHCALL {
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_vcfbub_htslib_vg:51f916c955092403'
-	publishDir path: 'output/graph_calls', mode: 'move'
+	publishDir path: 'output/variant_calling/graph', mode: 'move'
 
 	// I/O & script
 

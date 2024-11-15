@@ -3,7 +3,7 @@ process FASTQC {
 	// Directives
 
 	debug false
-	tag "$meta.id"
+	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastqc:0.12.1--0827550dd72a3745'
 

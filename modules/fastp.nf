@@ -3,7 +3,7 @@ process FASTP {
 	// Directives
 
 	debug false
-	tag "$meta.id"
+	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/fastp:0.23.4--4ea6310369653ec7'
 

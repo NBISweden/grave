@@ -17,17 +17,17 @@ Main workflow definition
 	include { FASTP } from '../modules/fastp.nf'
 	include { FASTQC } from '../modules/fastqc.nf'
 	include { PANMAP } from '../modules/panmap.nf'
-	//include { VGSURJECT } from '../modules/vg-surject.nf'
+	include { VGSURJECT } from '../modules/vg-surject.nf'
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
-	include { VGGENOTYPE } from '../modules/vg-genotype.nf'
+	include { VGMAPCALL } from '../modules/vg-map-call.nf'
 	//include { DEEPVARIANT } from '../modules/deepvariant.nf'
-	include { MULTIQC } from '../modules/multiqc.nf'
+	//include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
 	def ch_samplesheet = Channel
-		.fromPath("./data/samplesheet.csv")
+		.fromPath("./data/samplesheet/samplesheet.csv")
 		.splitCsv(header: true)
 		.map { row ->
 			// Initialise metadata list to travel with the files
@@ -36,9 +36,13 @@ Main workflow definition
 			if (row.fastq_2) {
 				return [meta + [paired_end:true], [file(row.fastq_1), file(row.fastq_2)]]
 			} else {
-				error ("Error caused by sample: '$meta.id'. In the samplesheet it does not appear to be paired-end...")
+				error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet it does not appear to be paired-end...")
 			}
 		}
+
+// Process reference path files as an optional input
+
+	def ch_ref_path_files = params.refPaths ? Channel.fromPath("./data/paths/*.paths") : []
 
 // Pangenome mapping workflow execution
 
@@ -70,9 +74,9 @@ Main workflow definition
 				}
 		}
 
-		// Report reference file summary statistics & pull reference path for mapdamage
+		// Report graph summary statistics & pull FASTAs for mapdamage
 
-			PROCESSGRAPH (ch_gbz_graph)
+			PROCESSGRAPH (ch_gbz_graph, ch_ref_path_files.collect())
 
 		// Compute graph snarls for variant calling/genotyping tasks (separate from PROCESSGRAPH to allow multithreading)
 
@@ -86,33 +90,33 @@ Main workflow definition
 
 			FASTQC (ch_samplesheet, FASTP.out.ch_fastp_reads)
 
-		// Map reads to pangenome reference
+		// Map reads to pangenome graph
 
 			PANMAP (FASTP.out.ch_fastp_reads, ch_indexed_graph)
 
 		// Surject mapped reads to reference paths
 
-			//FIXME:VGSURJECT (ch_gbz_graph, PANMAP.out.ch_mapped_gam)
+			VGSURJECT (ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
-		// Post-mortem damage assessment of reads     //FIXME: figure out if I can recycle something from surject module, and how to get reference paths right
+		// Post-mortem damage assessment of reads
 
-			PROFILEPMD (ch_gbz_graph.collect(), PROCESSGRAPH.out.ch_reference_fasta.collect(), PANMAP.out.ch_mapped_gam)
+			PROFILEPMD (PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
 
 		// Graph based variant calling
 
-			VGGRAPHCALL (ch_gbz_graph, PROCESSGRAPH.out.ch_reference_fasta, COMPUTESNARLS.out.ch_snarls)
+			VGGRAPHCALL (ch_gbz_graph, COMPUTESNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas)
 
 		// Mapping based variant calling
 
-			VGGENOTYPE (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), PANMAP.out.ch_mapped_gam)
-
-		// FIXME:
+			VGMAPCALL (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
 			//DEEPVARIANT()
 
+			//FREEBAYES()
+
 		// Collate quality reports
 
-			MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())
+			//MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())
 
 		// Report package versions
 

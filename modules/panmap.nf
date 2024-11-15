@@ -29,25 +29,25 @@ process PANMAP {
 
 		# Generate kff index of the reads
 
-			kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id} .
+			kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id}.${meta.repeat} .
 
 		# Generate the subsampled graph and index it
 
-			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${graph}
-			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.dist ${basename}.${meta.id}.gbz
-			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.${meta.repeat}.kff --gbz-output ${basename}.${meta.id}.${meta.repeat}.gbz ${graph}
+			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.${meta.repeat}.dist ${basename}.${meta.id}.${meta.repeat}.gbz
+			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.${meta.repeat}.dist --output-name ${basename}.${meta.id}.${meta.repeat}.min ${basename}.${meta.id}.${meta.repeat}.gbz
 
 		# Map merged reads to graph (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.${meta.repeat}.gbz --dist-name ${basename}.${meta.id}.${meta.repeat}.dist --minimizer-name ${basename}.${meta.id}.${meta.repeat}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.* *.kff
+			rm *.${meta.id}.${meta.repeat}.* *.kff
 
 		"""
 
@@ -60,19 +60,19 @@ process PANMAP {
 
 		# Generate kff index of the reads
 
-			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.id} .
+			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.id}.${meta.repeat} .
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.${meta.repeat}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.* *.kff
+			#rm *.${meta.id}.${meta.repeat}.* *.kff
 
 		"""
 

@@ -8,6 +8,21 @@ Verify base dependencies & check required inputs
 
 workflow VERIFY {
 
+	// Help message
+
+	if (params.help) {
+		println (" ")
+		println ("pan-aDNA Nextflow workflow")
+		println ("To run with all defaults: nextflow main.nf")
+		println (" ")
+		println ("Command line parameters (default option):")
+		println (" ")
+		println ("--graphMode (haplo)/filter 					[use personal pangenomes, or filtered graphs]")
+		println ("--refPaths true/(false) 					[provide '.paths' files containing lists of reference sample paths, or use all reference sample paths]")
+		println ("--graphCall (true)/false 					[call variants from the graph, or skip]")
+		error ("--help 								[prints this message]")
+	}
+
 	// Nextflow version
 
 	if (!nextflow.version.matches('>=24.02.0')) {
@@ -47,12 +62,6 @@ workflow VERIFY {
 
 	if (!params.refPaths) {
 		println ("USER NOTE: As no reference paths were provided, pan-aDNA will assume a single reference sample is present in your graph.")
-	}
-
-	// Help message
-
-	if (params.help) {
-		error ("\npan-aDNA workflow\n\nBasic usage: nextflow main.nf [options]\n\nCommand line options:\n=====================\n\n--help [prints this message]")
 	}
 
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)

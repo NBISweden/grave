@@ -8,7 +8,7 @@
 
 As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
-It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md).
+It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#input-fasta-naming).
 
 ## Quick start
 
@@ -20,26 +20,49 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, go to step 7**. If yes, [read this section first](#multiple-reference-samples).
 7. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
 
+### Input fasta naming
+
+- When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names), for example:
+
+```
+>chr1
+AGCTACGTAACT
+>chr2
+TAGCTAGTTGCA
+```
+
+- Please avoid using [PanSN](https://github.com/pangenome/PanSN-spec) style naming
+
+- The reason for this, is currently `vg call` strips down PanSN style naming if it finds no ambiguity between different samples in the output VCF. It will therefore produce a VCF that is incompatible with downstream tools like `bcftools`. To avoid this, we recommend simply using "stipped down" contig names from the start
+
 ### Graphs and indexes
 
 - `pan-aDNA` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
+
 - There are two main methods for building the graph with `Minigraph-Cactus`:
 	1) haplotype sampling [best practice]
 	2) coverage filtering
+
 - The choice of method impacts whether to run `pan-aDNA` in `haplo` mode [default] or `filter` mode, described more below
+
 - Because `pan-aDNA` is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
 #### Haplotype sampling
 
 - Current best practice for mapping samples to pangenome graphs utilises sample specific haplotype sampling from the graph, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
+
 - To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
+
 - The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `pan-aDNA`
 
 #### Filtered graphs
 
 - The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in `x` haplotypes
+
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
+
 - To use a filtered graph with `pan-aDNA`, the parameter `--graphMode filter` should be set on the command line
+
 - The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `pan-aDNA`
 
 ### Samplesheet layout
@@ -54,9 +77,13 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 | modernHuman7  | modern  |   1    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
 
 - `id`: the sample name
+
 - `type`: whether the sample is ancient or modern - **Note:** _this affects how the sample will be processed_
+
 - `repeat`: metadata separation between repeat runs on the same sample
+
 - `fastq1`: relative or absolute path to the first FASTQ
+
 - `fastq2`: relative or absolute path to the second FASTQ
 
 ### Multiple reference samples

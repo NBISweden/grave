@@ -31,9 +31,7 @@ AGCTACGTAACT
 TAGCTAGTTGCA
 ```
 
-- Please avoid using [PanSN](https://github.com/pangenome/PanSN-spec) style naming
-
-- The reason for this, is currently `vg call` strips down PanSN style naming if it finds no ambiguity between different samples in the output VCF. It will therefore produce a VCF that is incompatible with downstream tools like `bcftools`. To avoid this, we recommend simply using "stipped down" contig names from the start
+- Please entirely avoid using any hash characters in contig names
 
 ### Graphs and indexes
 

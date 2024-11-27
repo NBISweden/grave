@@ -31,7 +31,8 @@ AGCTACGTAACT
 TAGCTAGTTGCA
 ```
 
-- Please entirely avoid using any hash characters in contig names
+>[!WARN]
+> Please entirely avoid using any hash characters in contig names
 
 ### Graphs and indexes
 

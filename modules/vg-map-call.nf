@@ -62,16 +62,51 @@ process VGMAPCALL {
 	else if (params.refPaths)  // User reference paths
 		"""
 
-		# pass test runs
+		# Get reference sample prefixes from '.paths' files
 
-			touch PLACEHOLDER.vcf.gz
+			for i in *.paths
+				do
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					echo \$prefix >> referenceSamplePrefixes.txt
+				done
 
-		# TODO: waiting for response to GitHub issue. Based on that, refactor the above to cycle through respective paths files
-			# Strip ref-sample name from *.paths
-				#meta.id}.meta.repeat}.\$prefix.raw.vcf.gz
-				#meta.id}.meta.repeat}.\$prefix.filtered.vcf.gz
+		# Calculate depth
 
-    		# -S, --ref-sample NAME   Call on all paths with given sample name (cannot be used with -p)
+			depth=`vg depth -t ${task.cpus} --gam ${mapped_gam} ${graph} | cut -f1 | sed 's/\\..*//'`
+
+		# Compute read support
+
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
+
+		# Loop through each reference sample
+
+			while read prefix
+
+				do
+
+					# References will have PanSN format, raw VCFs produced by vg call won't. Convert references to align with VCF naming & reindex
+
+						sed -i 's/.*#/>/g' \$prefix.fasta
+
+						rm \$prefix.fasta.fai && samtools faidx \$prefix.fasta
+
+					# Genotype against a specific reference sample in the graph
+
+						vg call -t ${task.cpus} ${graph} --pack ${meta.id}.${meta.repeat}.filtered.pack --ref-sample \$prefix --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id}.${meta.repeat} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
+
+					# Index raw VCF
+
+						tabix -p vcf ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
+
+					# Pop bubbles
+
+						vcfbub --input ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.filtered.vcf.gz
+
+					# Clean up
+
+						rm \$prefix.fasta
+
+				done < referenceSamplePrefixes.txt
 
 		"""
 

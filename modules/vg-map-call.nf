@@ -7,7 +7,7 @@ process VGMAPCALL {
 	debug false
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/bcftools_vcfbub_htslib_vg:51f916c955092403'
+	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
 	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'move'
 
 	// I/O & script
@@ -27,20 +27,21 @@ process VGMAPCALL {
 	if (!params.refPaths)  // Default reference paths
 		"""
 
-		# Pre-filter GAM file to remove unmapped reads, apply MAPQ filter, minimum primary alignment score, and defray ambiguous alignment ends
-
-			vg filter -t ${task.cpus} -x ${graph} ${mapped_gam} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v > ${meta.id}.${meta.repeat}.filtered.gam
-
 		# Calculate depth
 
-			depth=`vg depth -t ${task.cpus} --gam ${meta.id}.${meta.repeat}.filtered.gam ${graph} | cut -f1 | sed 's/\\..*//'`
+			depth=`vg depth -t ${task.cpus} --gam ${mapped_gam} ${graph} | cut -f1 | sed 's/\\..*//'`
 
 		# Compute read support
 
-			vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.${meta.repeat}.filtered.gam -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
+
+		# Reference will have PanSN format, raw VCF produced by vg call won't. Convert reference to align with VCF naming & reindex
+
+			sed -i 's/.*#/>/g' ${reference_fasta}
+
+			rm *.fai && samtools faidx reference.fasta
 
 		# Genotype against all reference paths in the graph
-				# FIXME: Opened issue with vgteam -> `call` behaviour differs to `deconstruct`: strips the path info, leaving just contig name. Precludes using PanSN format. Would need to do contig names only instead, so that the reference remains compatible with the vcfs.
 
 			vg call -t ${task.cpus} ${graph} --pack ${meta.id}.${meta.repeat}.filtered.pack --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id}.${meta.repeat} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.raw.vcf.gz
 
@@ -48,10 +49,13 @@ process VGMAPCALL {
 
 			tabix -p vcf ${meta.id}.${meta.repeat}.raw.vcf.gz
 
-		# Pop bubbles 
-				# FIXME: when above issue is fixed, establish whether this is required here. Are there any nested variants in the vcf?
+		# Pop bubbles
 
-			vcfbub --input ${meta.id}.${meta.repeat}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f ${reference_fasta} | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.filtered.vcf.gz
+			vcfbub --input ${meta.id}.${meta.repeat}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f reference.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.filtered.vcf.gz
+
+		# Clean up
+
+			rm reference.fasta
 
 		"""
 

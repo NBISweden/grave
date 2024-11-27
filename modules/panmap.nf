@@ -6,6 +6,7 @@ process PANMAP {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
+	publishDir path: 'output/mapped_files/gams', mode: 'copy', pattern: "*.gam"
 	publishDir path: 'output/statistics/mapped_samples', mode: 'move', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
@@ -15,7 +16,8 @@ process PANMAP {
 	tuple path(graph), path(indexes)
 
 	output:
-	tuple val(meta), path("*.gam"), emit: ch_mapped_gam
+	tuple val(meta), path("${meta.id}.${meta.repeat}.gam")
+	tuple val(meta), path("${meta.id}.${meta.repeat}.filtered.gam"), emit: ch_mapped_gam
 	path "*_alignment-stats.txt"
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
@@ -41,9 +43,13 @@ process PANMAP {
 
 			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.${meta.repeat}.gbz --dist-name ${basename}.${meta.id}.${meta.repeat}.dist --minimizer-name ${basename}.${meta.id}.${meta.repeat}.min --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
+		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
+
+			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
@@ -66,13 +72,17 @@ process PANMAP {
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.${meta.repeat}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
+		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
+
+			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			#rm *.${meta.id}.${meta.repeat}.* *.kff
+			rm *.${meta.id}.${meta.repeat}.* *.kff
 
 		"""
 
@@ -83,9 +93,13 @@ process PANMAP {
 
 			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
+		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
+
+			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		"""
 
@@ -96,9 +110,13 @@ process PANMAP {
 
 			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} > ${meta.id}.${meta.repeat}.gam
 
+		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
+
+			vg filter -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
 
 		"""
 

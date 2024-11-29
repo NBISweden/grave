@@ -15,12 +15,14 @@ workflow VERIFY {
 		println ("pan-aDNA Nextflow workflow")
 		println ("To run with all defaults: nextflow main.nf")
 		println (" ")
-		println ("Command line parameters (default option):")
+		println ("Command line parameters [default option]:")
 		println (" ")
-		println ("--graphMode (haplo)/filter 					[use personal pangenomes, or filtered graphs]")
-		println ("--refPaths true/(false) 					[provide '.paths' files containing lists of reference sample paths, or use all reference sample paths]")
-		println ("--graphCall (true)/false 					[call variants from the graph, or skip]")
-		error ("--help 								[prints this message]")
+		println ("--graphMode [haplo]/filter 					[Use personal pangenomes], or filtered graphs.")
+		println ("--refPaths true/[false] 					Provide '.paths' files containing lists of reference sample paths, or [use all reference sample paths (i.e. for graphs with only one reference sample)]")
+		println ("--graphCall [true]/false 					[Call variants from the graph], or skip.")
+		println ("--deepvariantModelType [WGS]/WES/PACBIO/ONT_R104/HYBRID_PACBIO_ILLUMINA")
+
+		error ("--help 								Print this message.")
 	}
 
 	// Nextflow version

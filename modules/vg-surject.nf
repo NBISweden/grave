@@ -7,7 +7,8 @@ process VGSURJECT {
 	debug false
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/vg:1.60.0--e90f97d844d42049'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
+	publishDir path: 'output/mapped_files/bams', mode: 'copy', pattern: "*.bam"
 
 	// I/O & script
 
@@ -17,7 +18,7 @@ process VGSURJECT {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	tuple val(meta), path("*.bam"), emit: ch_surjected_bams
+	tuple val(meta), path("${meta.id}.${meta.repeat}*.sort.bam"), path ("${meta.id}.${meta.repeat}*.sort.bam.bai"), emit: ch_surjected_bams
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
@@ -26,7 +27,11 @@ process VGSURJECT {
 
 		# Surject GAM to all reference paths
 
-			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.all_paths.bam
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
+
+		# Index BAM
+
+			samtools index ${meta.id}.${meta.repeat}.sort.bam
 
 		"""
 
@@ -35,7 +40,11 @@ process VGSURJECT {
 
 		# Surject GAM to all reference paths, interleave
 
-			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.all_paths.bam
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
+
+		# Index BAM
+
+			samtools index ${meta.id}.${meta.repeat}.sort.bam
 
 		"""
 
@@ -46,8 +55,9 @@ process VGSURJECT {
 
 			for i in *.paths
 				do
-					basename=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.\$basename.bam
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
+					samtools index ${meta.id}.${meta.repeat}.\$prefix.sort.bam
 				done
 
 		"""
@@ -59,8 +69,9 @@ process VGSURJECT {
 
 			for i in *.paths
 				do
-					basename=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} > ${meta.id}.${meta.repeat}.\$basename.bam
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
+					samtools index ${meta.id}.${meta.repeat}.\$prefix.sort.bam
 				done
 
 		"""

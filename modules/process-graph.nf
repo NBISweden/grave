@@ -5,7 +5,7 @@ process PROCESSGRAPH {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_single'
-	container 'oras://community.wave.seqera.io/library/samtools_vg:765866d937aa49c6'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
 	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph-stats.txt"
 
 	// I/O & script

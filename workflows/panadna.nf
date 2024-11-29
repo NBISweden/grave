@@ -21,7 +21,8 @@ Main workflow definition
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
 	include { VGMAPCALL } from '../modules/vg-map-call.nf'
-	//include { DEEPVARIANT } from '../modules/deepvariant.nf'
+	include { DEEPVARIANT } from '../modules/deepvariant.nf'
+	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
 	//include { MULTIQC } from '../modules/multiqc.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
@@ -110,9 +111,11 @@ Main workflow definition
 
 			VGMAPCALL (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
-			//DEEPVARIANT()
+			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
 
 			//FREEBAYES()
+
+			DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
 		// Collate quality reports
 

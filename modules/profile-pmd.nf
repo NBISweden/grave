@@ -12,7 +12,7 @@ process PROFILEPMD {
 
 	input:
 	tuple path(reference_fasta), path(index)
-	tuple val(meta), path(surjected_bams)
+	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
 	path "*_pmd"
@@ -28,7 +28,7 @@ process PROFILEPMD {
 
 		# Run PMD profiling
 
-			damageprofiler -i ${meta.id}.${meta.repeat}.all_paths.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -i ${meta.id}.${meta.repeat}.sort.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
@@ -43,11 +43,11 @@ process PROFILEPMD {
 					echo \$basename >> pathFileBaseNames.txt
 				done
 
-		# Use path file basenames as keys to pair surjected BAMs to relavant FASTAs
+		# Use path file basenames as keys to pair surjected BAMs to relevant FASTAs
 
 			while read line
 				do
-					damageprofiler -i ${meta.id}.${meta.repeat}.\$line.bam -r \$line.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${line}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+					damageprofiler -i ${meta.id}.${meta.repeat}.\$line.sort.bam -r \$line.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${line}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 				done < pathFileBaseNames.txt
 
 		# Cleanup

@@ -20,6 +20,9 @@ process DVPROCESSVCF {
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 
+	when:
+	params.deepVariant == true
+
 	script:
 	if (!params.refPaths)	// Assume single reference sample
 		"""

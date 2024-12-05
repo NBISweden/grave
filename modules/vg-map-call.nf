@@ -27,6 +27,9 @@ process VGMAPCALL {
 	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
+	when:
+	params.vgMapCall == true
+
 	script:
 	if (!params.refPaths)  // Default reference paths
 		"""

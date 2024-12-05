@@ -16,6 +16,9 @@ process COMPUTESNARLS {
 	path "${graph}.snarls", emit: ch_snarls
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
+	when:
+	params.graphCall == true || params.vgMapCall == true
+
 	script:
 	"""
 

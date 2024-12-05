@@ -20,6 +20,9 @@ process DEEPVARIANT {
 	tuple val(meta), path("*.html")
 	tuple val(task.process), val('deepvariant'), eval('/opt/deepvariant/bin/run_deepvariant --version 2>/dev/null | sed "s/.*version //"'), topic: versions
 
+	when:
+	params.deepVariant == true
+
 	script:
 	if (!params.refPaths)	// Assume single reference sample
 		"""

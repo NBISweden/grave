@@ -1,6 +1,6 @@
 # Reference graphs
 
-- This directory should contain the reference pangenome graph in `.gbz` format. You do not need to provide the index files, `pan-aDNA` will recreate these
+- This directory should contain the reference pangenome graph in `.gbz` format. You do not need to provide the index files, `grave` will recreate these
 
 - To run with haplotype sampling (best practices), the graph is made using `Minigraph-Cactus` with the `--haplo` option. Provide the clipped, unfiltered graph, e.g.: `graph.gbz`
 

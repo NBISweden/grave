@@ -12,7 +12,7 @@ workflow VERIFY {
 
 		if (params.help) {
 			println (" ")
-			println ("pan-aDNA Nextflow workflow")
+			println ("Grave Nextflow workflow")
 			println ("To run with all defaults: nextflow main.nf")
 			println (" ")
 			println ("Command line parameters [default option]:")
@@ -98,7 +98,7 @@ workflow VERIFY {
 	// Check for reference paths
 
 		if (!params.refPaths) {
-			println ("USER NOTE: As no reference paths were provided, pan-aDNA will assume a single reference sample is present in your graph.")
+			println ("USER NOTE: As no reference paths were provided, Grave will assume a single reference sample is present in your graph.")
 		}
 
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
@@ -120,7 +120,7 @@ workflow VERIFY {
 		if ("${params.graphMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
-				println ("USER NOTE: pan-aDNA will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: Grave will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -164,11 +164,11 @@ workflow VERIFY {
 			}
 
 			if (!foundDist.isEmpty()) {
-				println ("USER NOTE: pan-aDNA will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: Grave will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				println ("USER NOTE: pan-aDNA will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: Grave will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 		// Prompt the user if there is a typo in the graph mode param

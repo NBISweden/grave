@@ -5,9 +5,9 @@
 
 Main workflow
 
-pan-aDNA: Pangenomic analysis of ancient DNA
+Grave: Graph Variant Explorer
 
-GitHub: https://github.com/NBISweden/pan-adna
+GitHub: https://github.com/NBISweden/grave
 
 Contributors:
 - Cormac Kinsella (cormac.kinsella@nbis.se)
@@ -18,11 +18,11 @@ Contributors:
 */
 
 include { VERIFY } from './subworkflows/verify.nf'
-include { PANADNA } from './workflows/panadna.nf'
+include { GRAVE } from './workflows/grave.nf'
 
 workflow {
 
 	VERIFY ()
-	PANADNA ()
+	GRAVE ()
 
 }

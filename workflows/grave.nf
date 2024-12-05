@@ -45,9 +45,9 @@ Main workflow definition
 
 	def ch_ref_path_files = params.refPaths ? Channel.fromPath("./data/paths/*.paths") : []
 
-// Pangenome mapping workflow execution
+// Pangenome mapping & genotyping workflow execution
 
-	workflow PANADNA {
+	workflow GRAVE {
 
 		// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
 		if ("$params.graphMode" == "haplo") {

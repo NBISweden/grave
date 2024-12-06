@@ -15,13 +15,64 @@ workflow VERIFY {
 			println ("Grave Nextflow workflow")
 			println ("To run with all defaults: nextflow main.nf")
 			println (" ")
-			println ("Command line parameters [default option]:")
+			println ("Command line parameters [default option within square brackets]:")
 			println (" ")
-			println ("--graphMode [haplo]/filter 					[Use personal pangenomes], or filtered graphs.")
+			println ("Graph input parameters:")
+			println (" ")
+			println ("--graphMode [haplo]/filter 					[Use personal pangenomes], or filtered graphs. See main docs or Minigraph-Cactus docs for more info.")
 			println ("--refPaths true/[false] 					Provide '.paths' files containing lists of reference sample paths, or [use all reference sample paths (i.e. for graphs with only one reference sample)]")
+			println (" ")
+			println ("Turn on or off variant callers:")
+			println (" ")
 			println ("--graphCall [true]/false 					[Call variants from the graph], or skip.")
-			println ("--deepvariantModelType [WGS]/WES/PACBIO/ONT_R104/HYBRID_PACBIO_ILLUMINA")
-
+			println ("--vgMapCall [true]/false 					[Call graph variants in mapped samples with vg call], or skip.")
+			println ("--deepVariant true/[false] 					Call variants in mapped samples with DeepVariant, [or skip].")
+			println ("--freeBayes [true]/false 					[Call variants in mapped samples with FreeBayes], or skip.")
+			println (" ")
+			println ("Haplotype subsampling parameters:")
+			println (" ")
+			println ("--aDNAkmerHaplSubSam [21] 					K value when K-mer profiling ancient DNA samples for haplotype subsampling.")
+			println ("--aDNAwindowHaplSubSam [11] 					Window size when constructing '.hapl' index for ancient DNA samples.")
+			println ("--modernKmerHaplSubSam [29] 					K value when K-mer profiling modern samples for haplotype subsampling.")
+			println ("--modernWindowHaplSubSam [11] 					Window size when constructing '.hapl' index for modern samples.")
+			println (" ")
+			println ("Minimizer construction parameters:")
+			println (" ")
+			println ("--aDNAkmerMinimizer [17] 					K value when constructing minimizer indexes for ancient DNA samples.")
+			println ("--aDNAwindowMinimizer [11] 					Window size when constructing minimizer indexes for ancient DNA samples.")
+			println ("--modernKmerMinimizer [29] 					K value when constructing minimizer indexes for modern samples.")
+			println ("--modernWindowMinimizer [11] 					Window size when constructing minimizer indexes for modern samples.")
+			println (" ")
+			println ("FASTP parameters:")
+			println (" ")
+			println ("--dupCalcAccuracy [3] 						Accuracy level to calculate duplication (1~6), higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). 1 for no-dedup mode, 3 for dedup mode.")
+            println ("--readDiscardLength [30] 					Reads shorter than INT will be discarded.")
+			println (" ")
+			println ("Mapping parameters:")
+			println (" ")
+			println ("--kffKmerMinimum [2] 						Minimum occurences of a K-mer to be counted during haplotype subsampling.")
+			println ("--minimumScorePrimaryAlign [0.90] 				Minimum score to keep primary alignment during filtering.")
+			println ("--minimumMapQFilter [30] 					Filter alignments with mapping quality < INT.")
+			println (" ")
+			println ("General variant calling parameters:")
+			println (" ")
+			println ("--maxNestLevel [0]						During VCF processing (for graph based calling & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
+			println ("--maxRefLength [100000] 					During VCF processing (for graph based calling & vg call), remove variants over INT in length. Does not affect raw VCF output.")
+			println (" ")
+			println ("Vg call parameters:")
+			println (" ")
+			println ("--minimumAlleleSupport [2] 					Minimum allele support for a call.")
+			println ("--minimumSiteSupport [4] 					Minimum site support for a call.")
+			println ("--baselineErrorSmallVariants [0.005] 				Baseline error rates for Poisson model for small variants.")
+			println ("--baselineErrorLargeVariants [0.01] 				Baseline error rates for Poisson model for large variants.")
+			println ("--samplePloidy [2] 						Sample ploidy.")
+			println (" ")
+			println ("DeepVariant parameters:")
+			println (" ")
+			println ("--deepVariantModelType 						[WGS]/WES/PACBIO/ONT_R104/HYBRID_PACBIO_ILLUMINA")
+			println (" ")
+			println ("Help message:")
+			println (" ")
 			error ("--help 								Print this message.")
 		}
 
@@ -84,6 +135,17 @@ workflow VERIFY {
 			}
 		} else {
 			error ("ERROR: Invalid value '${params.deepVariant}' for '--deepVariant' parameter. Please specify either 'true' or 'false' (case insensitive).")
+		}
+
+	// FreeBayes
+
+		if (params.freeBayes.toString().toLowerCase() in ["true", "false"]) {
+			boolean freeBayesEnabled = params.freeBayes.toString().toLowerCase() == "true"
+			if (!freeBayesEnabled) {
+				println ("USER NOTE: Variant calling with FreeBayes is disabled.")
+			}
+		} else {
+			error ("ERROR: Invalid value '${params.freeBayes}' for '--freeBayes' parameter. Please specify either 'true' or 'false' (case insensitive).")
 		}
 
 	// Compute snarls (only if both graph calling and vg call are disabled)

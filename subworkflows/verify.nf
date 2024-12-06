@@ -12,68 +12,72 @@ workflow VERIFY {
 
 		if (params.help) {
 			println (" ")
-			println ("Grave Nextflow workflow")
+			println ("grave: Graph Variant Explorer")
 			println ("To run with all defaults: nextflow main.nf")
 			println (" ")
 			println ("Command line parameters [default option within square brackets]:")
 			println (" ")
 			println ("Graph input parameters:")
 			println (" ")
-			println ("--graphMode [haplo]/filter 					[Use personal pangenomes], or filtered graphs. See main docs or Minigraph-Cactus docs for more info.")
-			println ("--refPaths true/[false] 					Provide '.paths' files containing lists of reference sample paths, or [use all reference sample paths (i.e. for graphs with only one reference sample)]")
+			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
+			println ("--refPaths [${params.refPaths}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
 			println (" ")
 			println ("Turn on or off variant callers:")
 			println (" ")
-			println ("--graphCall [true]/false 					[Call variants from the graph], or skip.")
-			println ("--vgMapCall [true]/false 					[Call graph variants in mapped samples with vg call], or skip.")
-			println ("--deepVariant true/[false] 					Call variants in mapped samples with DeepVariant, [or skip].")
-			println ("--freeBayes [true]/false 					[Call variants in mapped samples with FreeBayes], or skip.")
+			println ("--graphCall [${params.graphCall}] 					Call variants from the graph, or skip (true/false).")
+			println ("--vgMapCall [${params.vgMapCall}] 					Call graph variants in mapped samples with vg call (true/false).")
+			println ("--deepVariant [${params.deepVariant}] 					Call variants in mapped samples with DeepVariant (true/false).")
+			println ("--freeBayes [${params.freeBayes}] 					Call variants in mapped samples with FreeBayes (true/false).")
 			println (" ")
 			println ("Haplotype subsampling parameters:")
 			println (" ")
-			println ("--aDNAkmerHaplSubSam [21] 					K value when K-mer profiling ancient DNA samples for haplotype subsampling.")
-			println ("--aDNAwindowHaplSubSam [11] 					Window size when constructing '.hapl' index for ancient DNA samples.")
-			println ("--modernKmerHaplSubSam [29] 					K value when K-mer profiling modern samples for haplotype subsampling.")
-			println ("--modernWindowHaplSubSam [11] 					Window size when constructing '.hapl' index for modern samples.")
+			println ("--aDNAkmerHaplSubSam [${params.aDNAkmerHaplSubSam}] 				K value when K-mer profiling ancient DNA samples for haplotype subsampling.")
+			println ("--aDNAwindowHaplSubSam [${params.aDNAwindowHaplSubSam}] 				Window size when constructing '.hapl' index for ancient DNA samples.")
+			println ("--modernKmerHaplSubSam [${params.modernKmerHaplSubSam}] 				K value when K-mer profiling modern samples for haplotype subsampling.")
+			println ("--modernWindowHaplSubSam [${params.modernWindowHaplSubSam}] 				Window size when constructing '.hapl' index for modern samples.")
 			println (" ")
 			println ("Minimizer construction parameters:")
 			println (" ")
-			println ("--aDNAkmerMinimizer [17] 					K value when constructing minimizer indexes for ancient DNA samples.")
-			println ("--aDNAwindowMinimizer [11] 					Window size when constructing minimizer indexes for ancient DNA samples.")
-			println ("--modernKmerMinimizer [29] 					K value when constructing minimizer indexes for modern samples.")
-			println ("--modernWindowMinimizer [11] 					Window size when constructing minimizer indexes for modern samples.")
+			println ("--aDNAkmerMinimizer [${params.aDNAkmerMinimizer}] 				K value when constructing minimizer indexes for ancient DNA samples.")
+			println ("--aDNAwindowMinimizer [${params.aDNAwindowMinimizer}] 				Window size when constructing minimizer indexes for ancient DNA samples.")
+			println ("--modernKmerMinimizer [${params.modernKmerMinimizer}] 				K value when constructing minimizer indexes for modern samples.")
+			println ("--modernWindowMinimizer [${params.modernWindowMinimizer}] 				Window size when constructing minimizer indexes for modern samples.")
 			println (" ")
 			println ("FASTP parameters:")
 			println (" ")
-			println ("--dupCalcAccuracy [3] 						Accuracy level to calculate duplication (1~6), higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). 1 for no-dedup mode, 3 for dedup mode.")
-            println ("--readDiscardLength [30] 					Reads shorter than INT will be discarded.")
+			println ("--dupCalcAccuracy [${params.dupCalcAccuracy}] 					Accuracy level to calculate duplication (1~6), higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). 1 for no-dedup mode, 3 for dedup mode.")
+            println ("--readDiscardLength [${params.readDiscardLength}] 				Reads shorter than INT will be discarded.")
 			println (" ")
 			println ("Mapping parameters:")
 			println (" ")
-			println ("--kffKmerMinimum [2] 						Minimum occurences of a K-mer to be counted during haplotype subsampling.")
-			println ("--minimumScorePrimaryAlign [0.90] 				Minimum score to keep primary alignment during filtering.")
-			println ("--minimumMapQFilter [30] 					Filter alignments with mapping quality < INT.")
+			println ("--kffKmerMinimum [${params.kffKmerMinimum}] 					Minimum occurences of a K-mer to be counted during haplotype subsampling.")
+			println ("--minimumScorePrimaryAlign [${params.minimumScorePrimaryAlign}] 			Minimum score to keep primary alignment during filtering.")
+			println ("--minimumMapQFilter [${params.minimumMapQFilter}] 				Filter alignments with mapping quality < INT.")
 			println (" ")
 			println ("General variant calling parameters:")
 			println (" ")
-			println ("--maxNestLevel [0]						During VCF processing (for graph based calling & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
-			println ("--maxRefLength [100000] 					During VCF processing (for graph based calling & vg call), remove variants over INT in length. Does not affect raw VCF output.")
+			println ("--maxNestLevel [${params.maxNestLevel}]					During VCF processing (for graph based calling & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
+			println ("--maxRefLength [${params.maxRefLength}] 				During VCF processing (for graph based calling & vg call), remove variants over INT in length. Does not affect raw VCF output.")
+			println ("--samplePloidy [${params.samplePloidy}] 					Sample ploidy.")
+			println ("--minimumAlleleSupport [${params.minimumAlleleSupport}] 				Minimum allele support for a call.")
 			println (" ")
-			println ("Vg call parameters:")
+			println ("vg call parameters:")
 			println (" ")
-			println ("--minimumAlleleSupport [2] 					Minimum allele support for a call.")
-			println ("--minimumSiteSupport [4] 					Minimum site support for a call.")
-			println ("--baselineErrorSmallVariants [0.005] 				Baseline error rates for Poisson model for small variants.")
-			println ("--baselineErrorLargeVariants [0.01] 				Baseline error rates for Poisson model for large variants.")
-			println ("--samplePloidy [2] 						Sample ploidy.")
+			println ("--minimumSiteSupport [${params.minimumSiteSupport}] 				Minimum site support for a call.")
+			println ("--baselineErrorSmallVariants [${params.baselineErrorSmallVariants}] 			Baseline error rates for Poisson model for small variants.")
+			println ("--baselineErrorLargeVariants [${params.baselineErrorLargeVariants}] 			Baseline error rates for Poisson model for large variants.")
 			println (" ")
 			println ("DeepVariant parameters:")
 			println (" ")
-			println ("--deepVariantModelType 						[WGS]/WES/PACBIO/ONT_R104/HYBRID_PACBIO_ILLUMINA")
+			println ("--deepVariantModelType [${params.deepVariantModelType}] 				WGS/WES/PACBIO/ONT_R104/HYBRID_PACBIO_ILLUMINA")
+			println (" ")
+			println ("FreeBayes parameters:")
+			println (" ")
+			println ("--maxComplexGap [${params.maxComplexGap}] 					Maximum distance between polymorphisms on the same read.")
 			println (" ")
 			println ("Help message:")
 			println (" ")
-			error ("--help 								Print this message.")
+			error ("--help 							Print this message.")
 		}
 
 	// Nextflow version
@@ -160,7 +164,7 @@ workflow VERIFY {
 	// Check for reference paths
 
 		if (!params.refPaths) {
-			println ("USER NOTE: As no reference paths were provided, Grave will assume a single reference sample is present in your graph.")
+			println ("USER NOTE: As no reference paths were provided, grave will assume a single reference sample is present in your graph.")
 		}
 
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
@@ -182,7 +186,7 @@ workflow VERIFY {
 		if ("${params.graphMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
-				println ("USER NOTE: Grave will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -226,11 +230,11 @@ workflow VERIFY {
 			}
 
 			if (!foundDist.isEmpty()) {
-				println ("USER NOTE: Grave will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				println ("USER NOTE: Grave will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
 			}
 
 		// Prompt the user if there is a typo in the graph mode param

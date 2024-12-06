@@ -23,7 +23,7 @@ Main workflow definition
 	include { VGMAPCALL } from '../modules/vg-map-call.nf'
 	include { DEEPVARIANT } from '../modules/deepvariant.nf'
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
-	//include { MULTIQC } from '../modules/multiqc.nf'
+	include { FREEBAYES } from '../modules/freebayes.nf'
 
 // Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
 
@@ -113,13 +113,9 @@ Main workflow definition
 
 			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
 
-			//FREEBAYES()
-
 			DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
-		// Collate quality reports
-
-			//MULTIQC (FASTP.out.ch_fastp_report.collect(), FASTQC.out.ch_fastqc_report.collect())
+			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
 
 		// Report package versions
 

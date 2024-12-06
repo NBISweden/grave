@@ -27,7 +27,7 @@ process DEEPVARIANT {
 	if (!params.refPaths)	// Assume single reference sample
 		"""
 
-		# Run deepvariant against the single reference sample
+		# Run DeepVariant against the single reference sample
 
 			/opt/deepvariant/bin/run_deepvariant \
 				--num_shards ${task.cpus} \
@@ -35,7 +35,7 @@ process DEEPVARIANT {
 				--ref ${reference_fasta} \
 				--reads ${surjected_bam} \
 				--output_vcf ${meta.id}.${meta.repeat}.raw.vcf \
-				--model_type ${params.deepvariantModelType}
+				--model_type ${params.deepVariantModelType}
 
 		"""
 
@@ -50,7 +50,7 @@ process DEEPVARIANT {
 					echo \$prefix >> referenceSamplePrefixes.txt
 				done
 
-		# Run deepvariant against each reference sample
+		# Run DeepVariant against each reference sample
 
 			while read prefix
 
@@ -62,7 +62,7 @@ process DEEPVARIANT {
 						--ref \$prefix.fasta \
 						--reads ${meta.id}.${meta.repeat}.\$prefix.sort.bam \
 						--output_vcf ${meta.id}.${meta.repeat}.\$prefix.raw.vcf \
-						--model_type ${params.deepvariantModelType}
+						--model_type ${params.deepVariantModelType}
 
 				done < referenceSamplePrefixes.txt
 

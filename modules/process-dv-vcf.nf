@@ -33,7 +33,7 @@ process DVPROCESSVCF {
 
 		# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-			bcftools norm -f reference.fasta ${meta.id}.${meta.repeat}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.norm.vcf.gz
+			bcftools norm -f ${reference_fasta} ${meta.id}.${meta.repeat}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.norm.vcf.gz
 
 		"""
 

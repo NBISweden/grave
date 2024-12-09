@@ -1,4 +1,4 @@
-id,type,repeat,fastq_1,fastq_2
-ancientSimian,ancient,1,./data/reads/test/ancientSimian_s1.fq.gz,./data/reads/test/ancientSimian_s2.fq.gz
-modernHuman,modern,1,./data/reads/test/modernHuman_s1.fq.gz,./data/reads/test/modernHuman_s2.fq.gz
-ancientApe,ancient,1,./data/reads/test/ancientApe_s1.fq.gz,./data/reads/test/ancientApe_s2.fq.gz
+id,type,repeat,read_group,fastq_1,fastq_2
+ancientSimian,ancient,1,FLOWCELL_ID.1,./data/reads/test/ancientSimian_s1.fq.gz,./data/reads/test/ancientSimian_s2.fq.gz
+modernHuman,modern,1,FLOWCELL_ID.1,./data/reads/test/modernHuman_s1.fq.gz,./data/reads/test/modernHuman_s2.fq.gz
+ancientApe,ancient,1,FLOWCELL_ID.1,./data/reads/test/ancientApe_s1.fq.gz,./data/reads/test/ancientApe_s2.fq.gz

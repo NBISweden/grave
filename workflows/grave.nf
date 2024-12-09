@@ -32,7 +32,7 @@ Main workflow definition
 		.splitCsv(header: true)
 		.map { row ->
 			// Initialise metadata list to travel with the files
-			meta = [id: row.id, type: row.type, repeat: row.repeat]
+			meta = [id: row.id, type: row.type, repeat: row.repeat, read_group: row.read_group]
 			// Return metadata and file lists as a tuple, convert filestrings to paths
 			if (row.fastq_2) {
 				return [meta + [paired_end:true], [file(row.fastq_1), file(row.fastq_2)]]

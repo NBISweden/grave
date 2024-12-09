@@ -66,17 +66,19 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
 
-| id            | type    | repeat | fastq1               | fastq2               |
-|---------------|---------|--------|----------------------|----------------------|
-| ancientHuman1 | ancient |   1    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
-| ancientHuman1 | ancient |   2    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
-| modernHuman7  | modern  |   1    | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
+| id            | type    | repeat | read_group             | fastq1               | fastq2               |
+|---------------|---------|--------|------------------------|----------------------|----------------------|
+| ancientHuman1 | ancient |   1    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
+| ancientHuman1 | ancient |   2    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
+| modernHuman7  | modern  |   1    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
 
 - `id`: the sample name
 
 - `type`: whether the sample is ancient or modern - **Note:** _this affects how the sample will be processed_
 
 - `repeat`: metadata separation between repeat runs on the same sample
+
+- `read_group`: the read group name, usually `FLOWCELL_ID.LANENUMBER`, [see here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
 
 - `fastq1`: relative or absolute path to the first FASTQ
 

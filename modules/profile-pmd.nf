@@ -11,7 +11,8 @@ process PROFILEPMD {
 	// I/O & script
 
 	input:
-	tuple path(reference_fasta), path(index)
+	path ref_path_files
+	tuple path(reference_fasta), path(fasta_index)
 	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
@@ -28,31 +29,27 @@ process PROFILEPMD {
 
 		# Run PMD profiling
 
-			damageprofiler -i ${meta.id}.${meta.repeat}.sort.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -i ${meta.id}.${meta.repeat}.sort.markdup.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
 	else if (params.refPaths)	// When multi ref samples, run damageprofiler on each specific pair
 		"""
 
-		# Extract path file basenames from the FASTA files
+		# Get reference sample prefixes from '.paths' files
 
-			for i in *.fasta
+			for i in *.paths
 				do
-					basename=`echo \$i | sed 's/\\.fasta//'`
-					echo \$basename >> pathFileBaseNames.txt
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					echo \$prefix >> referenceSamplePrefixes.txt
 				done
 
 		# Use path file basenames as keys to pair surjected BAMs to relevant FASTAs
 
-			while read line
+			while read prefix
 				do
-					damageprofiler -i ${meta.id}.${meta.repeat}.\$line.sort.bam -r \$line.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${line}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
-				done < pathFileBaseNames.txt
-
-		# Cleanup
-
-			rm pathFileBaseNames.txt
+					damageprofiler -i ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam -r \$prefix.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+				done < referenceSamplePrefixes.txt
 
 		"""
 

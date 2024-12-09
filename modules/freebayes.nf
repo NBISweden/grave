@@ -73,7 +73,7 @@ process FREEBAYES {
 
 					# Generate equal coverage regions for parallelization
 
-						bamtools coverage -in ${surjected_bam} | coverage_to_regions.py \$prefix.fasta.fai 500 > \$prefix.regions
+						bamtools coverage -in ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam | coverage_to_regions.py \$prefix.fasta.fai 500 > \$prefix.regions
 
 					# Run FreeBayes
 
@@ -86,7 +86,7 @@ process FREEBAYES {
 							--min-alternate-fraction ${params.minFraction} \
 							--ploidy ${params.samplePloidy} \
 							--max-complex-gap ${params.maxComplexGap} \
-							${surjected_bam} | \
+							${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam | \
 							bgzip --threads ${task.cpus} > \
 							${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
 

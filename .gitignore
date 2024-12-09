@@ -5,4 +5,3 @@ work
 .nextflow*
 trace-*
 pipeline-tasks.qmd
-*.png

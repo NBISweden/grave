@@ -7,8 +7,8 @@ process VGSURJECT {
 	debug false
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
-	publishDir path: 'output/mapped_files/bams', mode: 'copy', pattern: "*.bam"
+	container 'oras://community.wave.seqera.io/library/sambamba_samtools_vg:abc1a25a5c0cebba'
+	publishDir path: 'output/mapped_files/bams', mode: 'copy', pattern: "*.sort.markdup.bam"
 
 	// I/O & script
 
@@ -18,8 +18,10 @@ process VGSURJECT {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	tuple val(meta), path("${meta.id}.${meta.repeat}*.sort.bam"), path ("${meta.id}.${meta.repeat}*.sort.bam.bai"), emit: ch_surjected_bams
+	tuple val(meta), path("${meta.id}.${meta.repeat}*.sort.markdup.bam"), path ("${meta.id}.${meta.repeat}*.sort.markdup.bam.bai"), emit: ch_surjected_bams
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
+	tuple val(task.process), val('sambamba'), eval('sambamba --version 2>&1 | head -n 2 | tail -n 1 | sed "s/sambamba //"'), topic: versions
 
 	script:
 	if (!params.refPaths && meta.type == "ancient")	// Default reference paths, GAM not interleaved
@@ -29,9 +31,9 @@ process VGSURJECT {
 
 			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
 
-		# Index BAM
+		# Mark duplicates
 
-			samtools index ${meta.id}.${meta.repeat}.sort.bam
+			sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
 
 		"""
 
@@ -42,9 +44,9 @@ process VGSURJECT {
 
 			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
 
-		# Index BAM
+		# Mark duplicates
 
-			samtools index ${meta.id}.${meta.repeat}.sort.bam
+			sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
 
 		"""
 
@@ -57,7 +59,7 @@ process VGSURJECT {
 				do
 					prefix=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
-					samtools index ${meta.id}.${meta.repeat}.\$prefix.sort.bam
+					sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
 				done
 
 		"""
@@ -71,7 +73,7 @@ process VGSURJECT {
 				do
 					prefix=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
-					samtools index ${meta.id}.${meta.repeat}.\$prefix.sort.bam
+					sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
 				done
 
 		"""

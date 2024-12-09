@@ -6,7 +6,7 @@ process PROCESSGRAPH {
 	tag "${graph.baseName}_graph"
 	label 'process_single'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
-	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph-stats.txt"
+	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph*.txt"
 
 	// I/O & script
 
@@ -15,7 +15,7 @@ process PROCESSGRAPH {
 	path ref_path_files
 
 	output:
-	path "*_graph-stats.txt"
+	path "*_graph*.txt"
 	tuple path("*.fasta"), path("*.fasta.fai"), emit: ch_reference_fastas
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
@@ -30,7 +30,10 @@ process PROCESSGRAPH {
 
 			echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
 			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
-			echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+
+		# Report graph metadata to separate file
+
+			vg paths --metadata -x ${graph} > ${basename}_graph-metadata.txt
 
 		# Extract reference sample paths as FASTA
 
@@ -49,7 +52,10 @@ process PROCESSGRAPH {
 
 			echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
 			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
-			echo "Graph metadata:" >> ${basename}_graph-stats.txt && vg paths --metadata -x ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+
+		# Report graph metadata to separate file
+
+			vg paths --metadata -x ${graph} > ${basename}_graph-metadata.txt
 
 		# Extract provided reference paths as FASTA
 

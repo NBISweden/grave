@@ -101,7 +101,7 @@ Main workflow definition
 
 		// Post-mortem damage assessment of reads
 
-			PROFILEPMD (PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
+			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
 
 		// Graph based variant calling
 

@@ -14,7 +14,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 ## Quick start
 
 >[!TIP]
->For help with command line options: `nextflow main.nf --help`, or see [here](#parameters).
+>For help with command line options, run: `nextflow main.nf --help`
 
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`grave` uses DSL2 & features introduced in `Nextflow 24.02.0-edge`. It was tested with `Nextflow v24.10.0`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
@@ -22,7 +22,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 4. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
 5. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
 6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, go to step 7**. If yes, [read this section first](#multiple-reference-samples).
-7. Run the workflow with defaults: `nextflow main.nf`, or see the [parameters for more options](#parameters)
+7. Run the workflow with defaults: `nextflow main.nf`. To see extra command line options and default settings, run: `nextflow main.nf --help`
 
 ### Input fasta naming
 
@@ -110,18 +110,4 @@ unknownSimian.1.gorilla.bam
 
 ## Pipeline overview
 
-- TODO: ADD LATEST DAG
-
-
-## Parameters
-
-- TODO:
-
-User supplied parameters follow the main script execution, e.g.: `nextflow main.nf --graphMode haplo`
-
-| Parameter                | Description                                                                                                                       | Default | Options           |
-|--------------------------|------------------------------------------------|--------------|------------------------------|
-| `--help`                 | Prints the help message                                                                                                           | null    | NA                |
-| `--graphMode`            | Set mode of operation based on the type of input graph, clipped & unfiltered [`haplo`], or clipped & filtered [`filter`]          | `haplo` | `haplo`, `filter` |
-| `--graphCall`            | Control whether variants in the graph are called or not                                                                           | `true`  | `true`, `false`   |
-
+![Workflow](assets/workflow-dag.png)

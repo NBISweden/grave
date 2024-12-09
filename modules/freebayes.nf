@@ -94,6 +94,8 @@ process FREEBAYES {
 
 						bcftools norm -f \$prefix.fasta ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.norm.vcf.gz
 
+				done < referenceSamplePrefixes.txt
+
 		"""
 
 }

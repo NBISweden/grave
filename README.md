@@ -43,8 +43,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)
 
->[!WARN]
-> But crucially: entirely avoid hash characters in contig names
+>[!WARNING]
+>But crucially: entirely avoid hash characters in contig names
 
 #### Graphs and indexes
 

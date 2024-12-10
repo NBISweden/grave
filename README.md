@@ -4,34 +4,49 @@
 
 ## Description
 
-`grave` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are visually shown [here](#pipeline-overview).
+`grave` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).
 
 As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
 
 It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#input-fasta-naming).
 
-
 ## Quick start
+
+### Option 1 (recommended): use pixi
+
+1. [Install Pixi](https://pixi.sh/v0.17.1)
+2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
+3. [File setup](#file-setup)
+4. From the repo, run `pixi shell` to enter the environment, and run grave with `nextflow main.nf`
 
 >[!TIP]
 >For help with command line options, run: `nextflow main.nf --help`
 
+>[!TIP]
+>A SLURM jobscript example running grave via a pixi task or via pixi shell is provided in the repo
+
+### Option 2: install Nextflow + Apptainer
+
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`grave` uses DSL2 & features introduced in `Nextflow 24.02.0-edge`. It was tested with `Nextflow v24.10.0`)
 2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
 3. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-4. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
-5. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
-6. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, go to step 7**. If yes, [read this section first](#multiple-reference-samples).
-7. Run the workflow with defaults: `nextflow main.nf`. To see extra command line options and default settings, run: `nextflow main.nf --help`
+4. [File setup](#file-setup)
+5. Run the workflow: `nextflow main.nf`. To see extra command line options and default settings, run: `nextflow main.nf --help`
 
-### Input fasta naming
+### File setup
+
+1. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
+2. Fill out `data/samplesheet/samplesheet.csv` including paths to the reads, [see layout description below](#samplesheet-layout)
+3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples).
+
+#### Input fasta naming
 
 - When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)
 
 >[!WARN]
 > But crucially: entirely avoid hash characters in contig names
 
-### Graphs and indexes
+#### Graphs and indexes
 
 - `grave` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
 
@@ -43,7 +58,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - Because `grave` is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
-#### Haplotype sampling
+##### Haplotype sampling
 
 - Current best practice for mapping samples to pangenome graphs utilises sample specific haplotype sampling from the graph, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
 
@@ -51,7 +66,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `grave`
 
-#### Filtered graphs
+##### Filtered graphs
 
 - The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in `x` haplotypes
 
@@ -61,7 +76,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `grave`
 
-### Samplesheet layout
+#### Samplesheet layout
 
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
@@ -84,7 +99,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - `fastq2`: relative or absolute path to the second FASTQ
 
-### Multiple reference samples
+#### Multiple reference samples
 
 - `Minigraph-Cactus` requires at least one reference sample, usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
 

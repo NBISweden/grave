@@ -23,7 +23,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 >For help with command line options, run: `nextflow main.nf --help`
 
 >[!TIP]
->A SLURM jobscript example running `grave` via a pixi task or via pixi shell is provided in the repo
+>An example SLURM jobscript for running `grave` via a `pixi` task or `pixi shell` is provided in the repo
 
 ### Option 2: install Nextflow + Apptainer
 

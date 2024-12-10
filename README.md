@@ -17,13 +17,13 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 1. [Install Pixi](https://pixi.sh/v0.17.1)
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
 3. [File setup](#file-setup)
-4. From the repo, run `pixi shell` to enter the environment, and run grave with `nextflow main.nf`
+4. From the repo, run `pixi run nextflow main.nf`, or run `pixi shell` to enter the environment, and run `grave` with `nextflow main.nf`
 
 >[!TIP]
 >For help with command line options, run: `nextflow main.nf --help`
 
 >[!TIP]
->A SLURM jobscript example running grave via a pixi task or via pixi shell is provided in the repo
+>A SLURM jobscript example running `grave` via a pixi task or via pixi shell is provided in the repo
 
 ### Option 2: install Nextflow + Apptainer
 

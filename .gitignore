@@ -5,7 +5,7 @@ work
 .nextflow*
 trace-*
 pipeline-tasks.qmd
-
+slurm/*
 # pixi environments
 .pixi
 *.egg-info

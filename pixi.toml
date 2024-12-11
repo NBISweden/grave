@@ -4,7 +4,11 @@ channels = ["conda-forge", "bioconda"]
 description = "Pixi environment for Grave: Graph Variant Explorer (Nextflow workflow for mapping and genotyping against graphs)"
 name = "grave"
 platforms = ["linux-64"]
-version = "0.1.0"
+version = "0.1.1"
+
+[system-requirements]
+linux="4.10"
+libc="2.27"
 
 [tasks]
 grave-dardel-default = {cmd = "nextflow main.nf -profile dardelLocal"}

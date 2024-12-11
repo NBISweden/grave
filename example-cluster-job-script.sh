@@ -13,7 +13,6 @@
 
 cd /path/to/grave
 
-
 # Run grave using a predefined pixi task (see pixi.toml)
 
 pixi run grave-dardel-default
@@ -25,13 +24,12 @@ pixi run grave-dardel-default
 
 To run grave with other settings, either:
 
-- add a task definition to the pixi.toml, supplying more command line parameters
+- add a new task definition to the pixi.toml, supplying more command line parameters
 
-- use `pixi shell` (instead of pixi run above) & run nextflow directly:
+- or edit the pixi run command above to include the desired parameters, e.g.:
 
 ```
-pixi shell
-nextflow main.nf --graphMode filter --refPaths --deepVariant true -profile dardelLocal
+pixi run nextflow main.nf --graphMode filter --refPaths --deepVariant true -profile dardelLocal
 ```
 
 END

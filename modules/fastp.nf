@@ -20,7 +20,7 @@ process FASTP {
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
-	if (meta.type == "ancient")
+	if (meta.type == "ancient" && meta.merged == false)
 		"""
 
 		# Ancient DNA read QC, merge reads & discard unmerged
@@ -29,12 +29,21 @@ process FASTP {
 
 		"""
 
-	else if (meta.type == "modern")
+	else if (meta.type == "modern" && meta.merged == false)
 		"""
 
 		# Modern DNA read QC
 
 			fastp --in1 ${reads[0]} --in2 ${reads[1]} --out1 ${meta.id}.${meta.repeat}.fastp.1.fq.gz --out2 ${meta.id}.${meta.repeat}.fastp.2.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --json ${meta.id}.${meta.repeat}.fastp.json --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
+
+		"""
+
+	else if (meta.merged == true)
+		"""
+
+		# Reads are already merged
+
+			fastp --in1 ${reads[0]} --out1 ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --json ${meta.id}.${meta.repeat}.fastp.json --dedup --dup_calc_accuracy ${params.dupCalcAccuracy}  --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
 		"""
 

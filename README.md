@@ -6,7 +6,7 @@
 
 `grave` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).
 
-As input it takes a pangenome graph in `.gbz` format and paired-end FASTQ data (from samples listed in a `.csv` samplesheet).
+As input it takes a pangenome graph in `.gbz` format and either paired-end or merged FASTQ data (from samples listed in a `.csv` samplesheet).
 
 It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#input-fasta-naming).
 
@@ -81,11 +81,12 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
 
-| id            | type    | repeat | read_group             | fastq1               | fastq2               |
-|---------------|---------|--------|------------------------|----------------------|----------------------|
-| ancientHuman1 | ancient |   1    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
-| ancientHuman1 | ancient |   2    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
-| modernHuman7  | modern  |   1    | FLOWCELL_ID.LANENUMBER | /path/to/read1.fq.gz | /path/to/read2.fq.gz |
+| id            | type    | repeat | read_group             | merged     | fastq1                | fastq2               |
+|---------------|---------|--------|------------------------|------------|-----------------------|----------------------|
+| ancientHuman1 | ancient |   1    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| ancientHuman1 | ancient |   2    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| modernHuman7  | modern  |   1    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| mergedInput   | ancient |   1    | FLOWCELL_ID.LANENUMBER | true       | /path/to/merged.fq.gz |                      |
 
 - `id`: the sample name
 
@@ -94,6 +95,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - `repeat`: metadata separation between repeat runs on the same sample
 
 - `read_group`: the read group name, usually `FLOWCELL_ID.LANENUMBER`, [see here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
+
+- `merged`: whether the reads have already been merged (e.g., some ancient samples)
 
 - `fastq1`: relative or absolute path to the first FASTQ
 

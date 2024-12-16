@@ -31,13 +31,21 @@ Main workflow definition
 		.fromPath("./data/samplesheet/samplesheet.csv")
 		.splitCsv(header: true)
 		.map { row ->
-			// Initialise metadata list to travel with the files
-			meta = [id: row.id, type: row.type, repeat: row.repeat, read_group: row.read_group]
-			// Return metadata and file lists as a tuple, convert filestrings to paths
-			if (row.fastq_2) {
-				return [meta + [paired_end:true], [file(row.fastq_1), file(row.fastq_2)]]
-			} else {
-				error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet it does not appear to be paired-end...")
+			meta = [id: row.id, type: row.type, repeat: row.repeat, read_group: row.read_group, merged: row.merged.toBoolean()]
+			if (meta.merged) {
+				if (row.fastq_1 && !row.fastq_2) {
+					return [meta, [file(row.fastq_1)]]
+				} else if (!row.fastq_1) {
+					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. No path to the FASTQ file is provided.")
+				} else {
+					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. The 'merged' field is true, but a second FASTQ file was unexpectedly provided.")
+				}
+			} else if (!meta.merged) {
+				if (row.fastq_1 && row.fastq_2) {
+					return [meta, [file(row.fastq_1), file(row.fastq_2)]]
+				} else {
+					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet it does not appear to be paired-end or the second FASTQ file is missing.")
+				}
 			}
 		}
 
@@ -87,9 +95,11 @@ Main workflow definition
 
 			FASTP (ch_samplesheet)
 
-		// Report read quality before and after filtering
+		// Merge read channels for FASTQC, report read quality before and after filtering
 
-			FASTQC (ch_samplesheet, FASTP.out.ch_fastp_reads)
+			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0,2])
+
+			FASTQC (ch_fastqc_input)
 
 		// Map reads to pangenome graph
 

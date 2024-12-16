@@ -6,30 +6,24 @@ process FASTQC {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastqc:0.12.1--0827550dd72a3745'
+	publishDir path: 'output/quality_reports/fastqc', mode: 'move', pattern: "*.zip"
 
 	// I/O & script
 
-    input:
-    tuple val(meta), path(raw_reads)
-	tuple val(meta), path(fastp_reads)
+	input:
+	tuple val(meta), path(raw_reads), path(fastp_reads)
 
 	output:
-	tuple val(meta), path("*_?.raw.fq.gz"), emit: ch_renamed_raw
-	path "*fastqc.zip", emit: ch_fastqc_report
+	path "*fastqc.zip"
 	tuple val(task.process), val('fastqc'), eval('fastqc --version | sed "s/.* v//"'), topic: versions
 
 	script:
 	"""
 
-	# Rename raw reads and capture in an output channel
-
-		mv ${raw_reads[0]} ${meta.id}.${meta.repeat}_1.raw.fq.gz
-		mv ${raw_reads[1]} ${meta.id}.${meta.repeat}_2.raw.fq.gz
-
 	# Run FastQC on raw and fastp processed reads
 
-		fastqc --format fastq --threads ${task.cpus} *.raw.fq.gz ${fastp_reads}
+		fastqc --format fastq --threads ${task.cpus} ${raw_reads} ${fastp_reads}
 
-    """
+	"""
 
 }

@@ -18,7 +18,7 @@ process MAKEHAPL {
 
 	script:
 	def basename = graph.baseName - '.gbz'
-    def distname = "${basename}.dist"
+	def distname = "${basename}.dist"
 	def rindexname = "${basename}.ri"
 	def ahaplname = "${basename}.adna.hapl"
 	def mhaplname = "${basename}.modern.hapl"

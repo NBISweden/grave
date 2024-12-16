@@ -6,7 +6,7 @@ process FREEBAYES {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
-    publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'move'
+	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'move'
 
 	// I/O & script
 
@@ -31,7 +31,7 @@ process FREEBAYES {
 
 		# Generate equal coverage regions for parallelization
 
-    		bamtools coverage -in ${surjected_bam} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions
+			bamtools coverage -in ${surjected_bam} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions
 
 		# Run FreeBayes against the single reference sample
 

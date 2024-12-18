@@ -33,20 +33,7 @@ process VGSURJECT {
 
 		# Mark duplicates
 
-			sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
-
-		"""
-
-	else if (!params.refPaths && meta.type == "modern")	// Default reference paths, GAM interleaved
-		"""
-
-		# Surject GAM to all reference paths, interleave
-
-			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
-
-		# Mark duplicates
-
-			sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
+			sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
 
 		"""
 
@@ -59,12 +46,25 @@ process VGSURJECT {
 				do
 					prefix=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
-					sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
+					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
 				done
 
 		"""
 
-	else if  (params.refPaths && meta.type == "modern")	// User provided reference paths, GAM interleaved
+	else if (!params.refPaths && meta.type == "modern" && meta.merged == false)	// Default reference paths, GAM interleaved
+		"""
+
+		# Surject GAM to all reference paths, interleave
+
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
+
+		# Mark duplicates
+
+			sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
+
+		"""
+
+	else if  (params.refPaths && meta.type == "modern" && meta.merged == false)	// User provided reference paths, GAM interleaved
 		"""
 
 		# Surject GAM to each user provided list of reference paths, interleave
@@ -73,7 +73,34 @@ process VGSURJECT {
 				do
 					prefix=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
-					sambamba markdup -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
+					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
+				done
+
+		"""
+
+	else if (!params.refPaths && meta.type == "modern" && meta.merged == true)	// Default reference paths, GAM not interleaved
+		"""
+
+		# Surject GAM to all reference paths
+
+			vg surject -t ${task.cpus} -x ${graph} --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.sort.bam
+
+		# Mark duplicates
+
+			sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.sort.bam ${meta.id}.${meta.repeat}.sort.markdup.bam
+
+		"""
+
+	else if  (params.refPaths && meta.type == "modern" && meta.merged == true)	// User provided reference paths, GAM not interleaved
+		"""
+
+		# Surject GAM to each user provided list of reference paths
+
+			for i in *.paths
+				do
+					prefix=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id}.${meta.repeat} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.${meta.repeat}.\$prefix.sort.bam
+					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.sort.bam ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam
 				done
 
 		"""

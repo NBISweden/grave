@@ -29,7 +29,7 @@ process PROFILEPMD {
 
 		# Run PMD profiling
 
-			damageprofiler -i ${meta.id}.${meta.repeat}.sort.markdup.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -i ${meta.id}.${meta.repeat}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
@@ -48,7 +48,7 @@ process PROFILEPMD {
 
 			while read prefix
 				do
-					damageprofiler -i ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam -r \$prefix.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+					damageprofiler -i ${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam -r \$prefix.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 				done < referenceSamplePrefixes.txt
 
 		"""

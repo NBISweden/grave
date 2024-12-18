@@ -60,7 +60,7 @@ process DEEPVARIANT {
 						--num_shards ${task.cpus} \
 						--sample_name ${meta.id}.${meta.repeat} \
 						--ref \$prefix.fasta \
-						--reads ${meta.id}.${meta.repeat}.\$prefix.sort.markdup.bam \
+						--reads ${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam \
 						--output_vcf ${meta.id}.${meta.repeat}.\$prefix.raw.vcf \
 						--model_type ${params.deepVariantModelType}
 

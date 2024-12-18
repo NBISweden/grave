@@ -2,4 +2,5 @@ id,type,repeat,read_group,merged,fastq_1,fastq_2
 ancientSimian,ancient,1,FLOWCELL_ID.1,false,./data/reads/test/ancientSimian_s1.fq.gz,./data/reads/test/ancientSimian_s2.fq.gz
 modernHuman,modern,1,FLOWCELL_ID.1,false,./data/reads/test/modernHuman_s1.fq.gz,./data/reads/test/modernHuman_s2.fq.gz
 ancientApe,ancient,1,FLOWCELL_ID.1,false,./data/reads/test/ancientApe_s1.fq.gz,./data/reads/test/ancientApe_s2.fq.gz
+ancientApe,ancient,2,FLOWCELL_ID.1,false,./data/reads/test/ancientApe_lib2_s1.fq.gz,./data/reads/test/ancientApe_lib2_s2.fq.gz
 ancientMerged,ancient,1,FLOWCELL_ID.1,true,./data/reads/test/ancientMerged.fq.gz,

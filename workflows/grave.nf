@@ -18,6 +18,7 @@ Main workflow definition
 	include { FASTQC } from '../modules/fastqc.nf'
 	include { PANMAP } from '../modules/panmap.nf'
 	include { VGSURJECT } from '../modules/vg-surject.nf'
+	include { BAMMERGEDEDUP } from '../modules/bam-merge-dedup.nf'
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
 	include { VGMAPCALL } from '../modules/vg-map-call.nf'
@@ -51,7 +52,7 @@ Main workflow definition
 
 // Process reference path files as an optional input
 
-	def ch_ref_path_files = params.refPaths ? Channel.fromPath("./data/paths/*.paths") : []
+	def ch_ref_path_files = params.multiRef ? Channel.fromPath("./data/paths/*.paths") : []
 
 // Pangenome mapping & genotyping workflow execution
 
@@ -109,9 +110,17 @@ Main workflow definition
 
 			VGSURJECT (ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
+		// Merge and then deduplicate surjected BAMs per sample
+
+			if (!params.multiRef) {
+				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id'), surjected_bams] }.groupTuple())
+			} else if (params.multiRef) {
+				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
+			}
+
 		// Post-mortem damage assessment of reads
 
-			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
+			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
 
 		// Graph based variant calling
 
@@ -121,11 +130,11 @@ Main workflow definition
 
 			VGMAPCALL (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
-			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
+			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
 
 			DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
-			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), VGSURJECT.out.ch_surjected_bams)
+			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
 
 		// Report package versions
 

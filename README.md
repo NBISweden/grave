@@ -108,7 +108,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - Paths through the reference sample are _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others
 
-- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--refPaths true`, and to provide one or more `.paths` files in the `data/paths` directory
+- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files in the `data/paths` directory
 
 - Each `.paths` file contains a list reference paths from one reference sample (e.g., a subset or all paths), with one path name per line
 
@@ -124,7 +124,7 @@ unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
 
-- Another use case for the `--refPaths` option is targeting a subset of reference paths found in one reference sample (one `.paths` file required) or multiple reference samples (multiple `.paths` files required), for example only the autosomes, or only chr1
+- Another use case for the `--multiRef` option is targeting a subset of reference paths found in one reference sample (one `.paths` file required) or multiple reference samples (multiple `.paths` files required), for example only the autosomes, or only chr1
 
 ## Pipeline overview
 

@@ -29,7 +29,7 @@ To run grave with other settings, either:
 - or edit the pixi run command above to include the desired parameters, e.g.:
 
 ```
-pixi run nextflow main.nf --graphMode filter --refPaths --deepVariant true -profile dardelLocal
+pixi run nextflow main.nf --graphMode filter --multiRef --deepVariant true -profile dardelLocal
 ```
 
 END

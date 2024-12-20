@@ -12,7 +12,7 @@ libc="2.17"
 
 [tasks]
 grave-dardel-default = {cmd = "nextflow main.nf -profile dardelLocal"}
-grave-dardel-default_with-paths = {cmd = "nextflow main.nf --refPaths -profile dardelLocal"}
+grave-dardel-default_with-paths = {cmd = "nextflow main.nf --multiRef -profile dardelLocal"}
 
 [dependencies]
 nextflow="24.10.0"

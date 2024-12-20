@@ -20,7 +20,7 @@ workflow VERIFY {
 			println ("Graph input parameters:")
 			println (" ")
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
-			println ("--refPaths [${params.refPaths}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
+			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
 			println (" ")
 			println ("Turn on or off variant callers:")
 			println (" ")
@@ -164,7 +164,7 @@ workflow VERIFY {
 
 	// Check for reference paths
 
-		if (!params.refPaths) {
+		if (!params.multiRef) {
 			println ("USER NOTE: As no reference paths were provided, grave will assume a single reference sample is present in your graph.")
 		}
 
@@ -249,12 +249,12 @@ workflow VERIFY {
 		def pathsPattern = ~/.*\.paths$/
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
-		if (foundPaths.isEmpty() && params.refPaths) {
+		if (foundPaths.isEmpty() && params.multiRef) {
 			error ("ERROR: The workflow was expecting user provided '.paths' files, but none were found in 'data/paths/*.paths'.")
 		}
 
-		if (!foundPaths.isEmpty() && !params.refPaths) {
-			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so set '--refPaths true').")
+		if (!foundPaths.isEmpty() && !params.multiRef) {
+			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so provide: '--multiRef').")
 		}
 
 }

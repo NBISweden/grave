@@ -3,7 +3,7 @@ process DEEPVARIANT {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.id}"
 	label 'process_high'
 	container 'docker://google/deepvariant:1.6.1'
 	publishDir path: 'output/quality_reports/deepvariant', mode: 'move', pattern: "*.html"
@@ -24,22 +24,22 @@ process DEEPVARIANT {
 	params.deepVariant == true
 
 	script:
-	if (!params.refPaths)	// Assume single reference sample
+	if (!params.multiRef)	// Assume single reference sample
 		"""
 
 		# Run DeepVariant against the single reference sample
 
 			/opt/deepvariant/bin/run_deepvariant \
 				--num_shards ${task.cpus} \
-				--sample_name ${meta.id}.${meta.repeat} \
+				--sample_name ${meta.id} \
 				--ref ${reference_fasta} \
 				--reads ${surjected_bam} \
-				--output_vcf ${meta.id}.${meta.repeat}.raw.vcf \
+				--output_vcf ${meta.id}.raw.vcf \
 				--model_type ${params.deepVariantModelType}
 
 		"""
 
-	else if (params.refPaths)
+	else if (params.multiRef)
 		"""
 
 		# Get reference sample prefixes from '.paths' files
@@ -58,10 +58,10 @@ process DEEPVARIANT {
 
 					/opt/deepvariant/bin/run_deepvariant \
 						--num_shards ${task.cpus} \
-						--sample_name ${meta.id}.${meta.repeat} \
+						--sample_name ${meta.id} \
 						--ref \$prefix.fasta \
-						--reads ${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam \
-						--output_vcf ${meta.id}.${meta.repeat}.\$prefix.raw.vcf \
+						--reads ${meta.id}.\$prefix.sort.dedup.bam \
+						--output_vcf ${meta.id}.\$prefix.raw.vcf \
 						--model_type ${params.deepVariantModelType}
 
 				done < referenceSamplePrefixes.txt

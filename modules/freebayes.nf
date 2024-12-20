@@ -3,7 +3,7 @@ process FREEBAYES {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
 	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'move'
@@ -26,7 +26,7 @@ process FREEBAYES {
 	params.freeBayes == true
 
 	script:
-	if (!params.refPaths)	// Assume single reference sample
+	if (!params.multiRef)	// Assume single reference sample
 		"""
 
 		# Generate equal coverage regions for parallelization
@@ -46,15 +46,15 @@ process FREEBAYES {
 				--max-complex-gap ${params.maxComplexGap} \
 				${surjected_bam} | \
 				bgzip --threads ${task.cpus} > \
-				${meta.id}.${meta.repeat}.raw.vcf.gz
+				${meta.id}.raw.vcf.gz
 
 		# Norm and sort
 
-			bcftools norm -f ${reference_fasta} ${meta.id}.${meta.repeat}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.norm.vcf.gz
+			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
 
 		"""
 
-	else if (params.refPaths)
+	else if (params.multiRef)
 		"""
 
 		# Get reference sample prefixes from '.paths' files
@@ -73,7 +73,7 @@ process FREEBAYES {
 
 					# Generate equal coverage regions for parallelization
 
-						bamtools coverage -in ${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam | coverage_to_regions.py \$prefix.fasta.fai 500 > \$prefix.regions
+						bamtools coverage -in ${meta.id}.\$prefix.sort.dedup.bam | coverage_to_regions.py \$prefix.fasta.fai 500 > \$prefix.regions
 
 					# Run FreeBayes
 
@@ -86,13 +86,13 @@ process FREEBAYES {
 							--min-alternate-fraction ${params.minFraction} \
 							--ploidy ${params.samplePloidy} \
 							--max-complex-gap ${params.maxComplexGap} \
-							${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam | \
+							${meta.id}.\$prefix.sort.dedup.bam | \
 							bgzip --threads ${task.cpus} > \
-							${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
+							${meta.id}.\$prefix.raw.vcf.gz
 
 					# Norm and sort
 
-						bcftools norm -f \$prefix.fasta ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.norm.vcf.gz
+						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
 
 				done < referenceSamplePrefixes.txt
 

@@ -23,7 +23,7 @@ process PROCESSGRAPH {
 	script:
 	def basename = graph.baseName - '.gbz'
 
-	if (!params.refPaths)	// Assume single reference sample, extract all reference paths
+	if (!params.multiRef)	// Assume single reference sample, extract all reference paths
 		"""
 
 		# Report graph summary statistics
@@ -45,7 +45,7 @@ process PROCESSGRAPH {
 
 		"""
 
-	else if (params.refPaths)	// Assume multiple reference samples, extract provided reference paths for each sample
+	else if (params.multiRef)	// Assume multiple reference samples, extract provided reference paths for each sample
 		"""
 
 		# Report graph summary statistics

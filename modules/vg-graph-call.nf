@@ -31,7 +31,7 @@ process VGGRAPHCALL {
 	script:
 	def basename = graph.baseName - '.gbz'
 
-	if (!params.refPaths)  // Default reference paths
+	if (!params.multiRef)  // Default reference paths
 		"""
 
 		# Make raw VCF of graph snarls relative to all reference paths
@@ -48,7 +48,7 @@ process VGGRAPHCALL {
 
 		"""
 
-	else if (params.refPaths)  // User reference paths
+	else if (params.multiRef)  // User reference paths
 		"""
 
 		# Get reference sample prefixes from '.paths' files

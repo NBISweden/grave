@@ -3,8 +3,8 @@ process PROFILEPMD {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
-	label 'process_medium'
+	tag "${meta.id}"
+	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:accb8ffcbab94b7a'
 	publishDir path: 'output/pmd_profiles', mode: 'move'
 
@@ -24,16 +24,16 @@ process PROFILEPMD {
 	meta.type == 'ancient'
 
 	script:
-	if (!params.refPaths)	// Assume single reference sample
+	if (!params.multiRef)	// Assume single reference sample
 		"""
 
 		# Run PMD profiling
 
-			damageprofiler -i ${meta.id}.${meta.repeat}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_${meta.repeat}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
-	else if (params.refPaths)	// When multi ref samples, run damageprofiler on each specific pair
+	else if (params.multiRef)	// When multi ref samples, run damageprofiler on each specific pair
 		"""
 
 		# Get reference sample prefixes from '.paths' files
@@ -48,7 +48,7 @@ process PROFILEPMD {
 
 			while read prefix
 				do
-					damageprofiler -i ${meta.id}.${meta.repeat}.\$prefix.sort.dedup.bam -r \$prefix.fasta -o ${meta.id}_${meta.repeat}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+					damageprofiler -i ${meta.id}.\$prefix.sort.dedup.bam -r \$prefix.fasta -o ${meta.id}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 				done < referenceSamplePrefixes.txt
 
 		"""

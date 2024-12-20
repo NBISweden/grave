@@ -3,7 +3,7 @@ process DVPROCESSVCF {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
 	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'move'
@@ -24,7 +24,7 @@ process DVPROCESSVCF {
 	params.deepVariant == true
 
 	script:
-	if (!params.refPaths)	// Assume single reference sample
+	if (!params.multiRef)	// Assume single reference sample
 		"""
 
 		# Zip raw VCF
@@ -33,11 +33,11 @@ process DVPROCESSVCF {
 
 		# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-			bcftools norm -f ${reference_fasta} ${meta.id}.${meta.repeat}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.norm.vcf.gz
+			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
 
 		"""
 
-	else if (params.refPaths)
+	else if (params.multiRef)
 		"""
 
 		# Get reference sample prefixes from '.paths' files
@@ -56,11 +56,11 @@ process DVPROCESSVCF {
 	
 					# Zip raw VCF
 
-						bgzip --threads ${task.cpus} ${meta.id}.${meta.repeat}.\$prefix.raw.vcf
+						bgzip --threads ${task.cpus} ${meta.id}.\$prefix.raw.vcf
 
 					# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-						bcftools norm -f \$prefix.fasta ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.norm.vcf.gz
+						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
 
 				done < referenceSamplePrefixes.txt
 

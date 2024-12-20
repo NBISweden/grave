@@ -31,7 +31,7 @@ process VGMAPCALL {
 	params.vgMapCall == true
 
 	script:
-	if (!params.refPaths)  // Default reference paths
+	if (!params.multiRef)  // Default reference paths
 		"""
 
 		# Calculate depth
@@ -66,7 +66,7 @@ process VGMAPCALL {
 
 		"""
 
-	else if (params.refPaths)  // User reference paths
+	else if (params.multiRef)  // User reference paths
 		"""
 
 		# Get reference sample prefixes from '.paths' files

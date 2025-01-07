@@ -110,12 +110,12 @@ Main workflow definition
 
 			VGSURJECT (ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
-		// Merge and then deduplicate surjected BAMs per sample
+		// Merge and then deduplicate surjected BAMs per sample. If more than one reference, decompose the nested tuple for correct processing.
 
 			if (!params.multiRef) {
-				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id'), surjected_bams] }.groupTuple())
+				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple())
 			} else if (params.multiRef) {
-				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
+				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
 			}
 
 		// Post-mortem damage assessment of reads

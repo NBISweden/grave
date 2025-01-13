@@ -56,7 +56,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - The choice of method impacts whether to run `grave` in `haplo` mode [default] or `filter` mode, described more below
 
-- Because `grave` is designed to handle very short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
+- Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
 ##### Haplotype sampling
 

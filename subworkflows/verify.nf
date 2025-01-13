@@ -254,7 +254,7 @@ workflow VERIFY {
 		}
 
 		if (!foundPaths.isEmpty() && !params.multiRef) {
-			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so provide: '--multiRef').")
+			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so provide: '--multiRef'.")
 		}
 
 }

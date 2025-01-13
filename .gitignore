@@ -1,4 +1,7 @@
 data/graph/*
+data/reads/*fastq.gz
+data/samplesheet/bk/*
+
 !data/graph/README.md
 output
 work

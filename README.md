@@ -118,7 +118,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 > You can remind yourself of the reference samples in your graph using vg: `vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`
 
 >[!TIP]
-> For a list of all reference path names from, for example, GRCh38 run: `vg paths --reference-paths --metadata -x myGraph.gbz | tail -n+2 | awk '$3 == "GRCh38"' | cut -f1 > GRCh38.paths`
+> For a list of all reference path names from, for example GRCh38, run: `vg paths --reference-paths --metadata -x myGraph.gbz | tail -n+2 | awk '$3 == "GRCh38"' | cut -f1 > GRCh38.paths`
 
 - For each `.paths` file provided, `grave` will run pipeline steps relative to that sample separately from the others, e.g., `surject` will produce a separate `.bam` file per reference sample, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:
 

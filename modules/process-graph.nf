@@ -4,7 +4,7 @@ process PROCESSGRAPH {
 
 	debug false
 	tag "${graph.baseName}_graph"
-	label 'process_single'
+	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
 	publishDir path: 'output/statistics/graph', mode: 'move', pattern: "*_graph*.txt"
 
@@ -29,7 +29,7 @@ process PROCESSGRAPH {
 		# Report graph summary statistics
 
 			echo "Pangenome graph file:" > ${basename}_graph-stats.txt && echo ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
-			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
+			echo "Graph statistics:" >> ${basename}_graph-stats.txt && vg stats --threads ${task.cpus} -zlLHTA ${graph} >> ${basename}_graph-stats.txt && echo >> ${basename}_graph-stats.txt
 
 		# Report graph metadata to separate file
 

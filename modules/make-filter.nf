@@ -4,7 +4,7 @@ process MAKEFILTER {
 
 	debug false
 	tag "${graph.baseName}_graph"
-	label 'process_medium'
+	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/vg:1.60.0--e90f97d844d42049'
 
 	// I/O & script

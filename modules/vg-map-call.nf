@@ -6,7 +6,7 @@ process VGMAPCALL {
 
 	debug false
 	tag "${meta.id}.${meta.repeat}"
-	label 'process_medium'
+	label 'process_high'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
 	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'move'
 

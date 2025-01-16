@@ -6,7 +6,7 @@ process VGSURJECT {
 
 	debug false
 	tag "${meta.id}.${meta.repeat}"
-	label 'process_low'
+	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
 
 	// I/O & script

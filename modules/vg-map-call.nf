@@ -6,7 +6,7 @@ process VGMAPCALL {
 
 	debug false
 	tag "${meta.id}.${meta.repeat}"
-	label 'process_high'
+	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
 	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'move'
 
@@ -34,13 +34,9 @@ process VGMAPCALL {
 	if (!params.multiRef)  // Default reference paths
 		"""
 
-		# Calculate depth
-
-			depth=`vg depth -t ${task.cpus} --gam ${mapped_gam} ${graph} | cut -f1 | sed 's/\\..*//'`
-
 		# Compute read support
 
-			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack -Q 5
 
 		# Reference will have PanSN format, raw VCF produced by vg call won't. Convert reference to align with VCF naming & reindex
 
@@ -77,13 +73,9 @@ process VGMAPCALL {
 					echo \$prefix >> referenceSamplePrefixes.txt
 				done
 
-		# Calculate depth
-
-			depth=`vg depth -t ${task.cpus} --gam ${mapped_gam} ${graph} | cut -f1 | sed 's/\\..*//'`
-
 		# Compute read support
 
-			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack --expected-cov \$depth -Q 5
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack -Q 5
 
 		# Loop through each reference sample
 

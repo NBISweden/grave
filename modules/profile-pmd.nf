@@ -2,7 +2,7 @@ process PROFILEPMD {
 
 	// Directives
 
-	debug false
+	debug true
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:accb8ffcbab94b7a'
@@ -27,9 +27,19 @@ process PROFILEPMD {
 	if (!params.multiRef)	// Assume single reference sample
 		"""
 
+		# Find system max heap size
+
+			max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>\/dev\/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}')
+
+			echo \$max_heap_bytes
+
+			max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
+
+			echo \$max_heap_gb
+
 		# Run PMD profiling
 
-			damageprofiler -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -Xms2g -Xmx\${max_heap_gb}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 

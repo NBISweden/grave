@@ -1,35 +1,12 @@
 #!/bin/bash -l
-#SBATCH -A <my-project-allocation>
-#SBATCH -t 24:00:00
-#SBATCH -p main
-#SBATCH -N 1
-#SBATCH --mem=220GB
-#SBATCH -J my-job-name
-#SBATCH --mail-type=BEGIN,END
-#SBATCH --mail-user=myemail@somewhere.com
 
+# Go to grave repository (update path)
 
-# Go to grave repository
+cd ~/grave
 
-cd /path/to/grave
+# Run grave in the background (edit options for your needs)
 
-# Run grave using a predefined pixi task (see pixi.toml)
+tmux new -s grave-run -d /bin/bash -c "pixi run nextflow main.nf --account "naiss2024-22-619" -profile dardelSlurm"
 
-pixi run grave-dardel-default
-
-
-# See below for more info
-
-: <<'END'
-
-To run grave with other settings, either:
-
-- add a new task definition to the pixi.toml, supplying more command line parameters
-
-- or edit the pixi run command above to include the desired parameters, e.g.:
-
-```
-pixi run nextflow main.nf --graphMode filter --multiRef --deepVariant true -profile dardelLocal
-```
-
-END
+echo "Grave pipeline started in the background"
+echo "You can monitor the progress in '.nextflow.log' and with 'squeue'"

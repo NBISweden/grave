@@ -6,7 +6,7 @@ process FREEBAYES {
 	tag "${meta.id}"
 	label 'process_high'
 	container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
-	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'move'
+	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'copy'
 
 	// I/O & script
 

@@ -6,7 +6,7 @@ process PROFILEPMD {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:accb8ffcbab94b7a'
-	publishDir path: 'output/pmd_profiles', mode: 'move'
+	publishDir path: 'output/pmd_profiles', mode: 'copy'
 
 	// I/O & script
 

@@ -6,7 +6,7 @@ process FASTP {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.23.4--4ea6310369653ec7'
-	publishDir path: 'output/quality_reports/fastp', mode: 'move', pattern: "*.fastp.html"
+	publishDir path: 'output/quality_reports/fastp', mode: 'copy', pattern: "*.fastp.html"
 
 	// I/O & script
 

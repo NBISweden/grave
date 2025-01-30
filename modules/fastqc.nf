@@ -6,7 +6,7 @@ process FASTQC {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastqc:0.12.1--0827550dd72a3745'
-	publishDir path: 'output/quality_reports/fastqc', mode: 'move', pattern: "*.zip"
+	publishDir path: 'output/quality_reports/fastqc', mode: 'copy', pattern: "*.zip"
 
 	// I/O & script
 

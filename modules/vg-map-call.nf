@@ -8,7 +8,7 @@ process VGMAPCALL {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
-	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'move'
+	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy'
 
 	// I/O & script
 

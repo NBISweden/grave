@@ -6,7 +6,7 @@ process DVPROCESSVCF {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
-	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'move'
+	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'copy'
 
 	// I/O & script
 

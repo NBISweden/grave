@@ -21,6 +21,7 @@ workflow VERIFY {
 			println (" ")
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
 			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
+			println ("--account [${params.account}] 				Used only for the SLURM executor, provide an allocation name for hours billing.")
 			println (" ")
 			println ("Turn on or off variant callers:")
 			println (" ")

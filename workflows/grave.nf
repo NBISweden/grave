@@ -97,17 +97,17 @@ Main workflow definition
 
 			FASTP (ch_samplesheet)
 
-		// Merge read channels for FASTQC, report read quality before and after filtering
+		// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
 
 			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0,2])
 
 			FASTQC (ch_fastqc_input)
 
-		// Per sample, merge FASTQs and deduplicate
+		// Merge and deduplicate FASTQs per sample
 
-			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads.map{ meta, fastqs -> [meta.subMap('id', 'type'), fastqs] }.groupTuple())
+			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads.map{ meta, fastqs -> [meta.subMap('id', 'type'), fastqs] }.groupTuple().map{ meta, fastqs -> [meta, fastqs.flatten()]})
 
-			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/output/quality_reports/fastp-library-level")
+			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/output/quality_reports/fastp-sample-level")
 
 		// Map reads to pangenome graph
 			//FIXME: different input

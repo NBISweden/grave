@@ -38,7 +38,7 @@ process FASTP {
 
 		"""
 
-	else if (meta.merged == true)
+	else if (meta.merged == true) // Same settings for ancient and modern
 		"""
 
 		# Reads are already merged

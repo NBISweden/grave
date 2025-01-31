@@ -6,7 +6,8 @@ process FASTQC {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastqc:0.12.1--0827550dd72a3745'
-	publishDir path: 'output/quality_reports/fastqc', mode: 'copy', pattern: "*.zip"
+	publishDir path: 'output/quality_reports/fastqc/fastp', mode: 'copy', pattern: "*fastp*_fastqc.zip"
+	publishDir path: 'output/quality_reports/fastqc/raw', mode: 'copy', pattern: "*.zip", saveAs: { filename -> filename.contains("fastp") ? null : filename }
 
 	// I/O & script
 

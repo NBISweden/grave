@@ -26,6 +26,8 @@ process FASTP {
 
 			fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
+			rm fastp.json
+
 		"""
 
 	else if (meta.type == "modern" && meta.merged == false)
@@ -35,12 +37,16 @@ process FASTP {
 
 			fastp --in1 ${reads[0]} --in2 ${reads[1]} --out1 ${meta.id}.${meta.repeat}.fastp.1.fq.gz --out2 ${meta.id}.${meta.repeat}.fastp.2.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
+			rm fastp.json
+
 		"""
 
 	else if (meta.merged == true) // Same settings for ancient and modern
 		"""
 
 			fastp --in1 ${reads[0]} --out1 ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy}  --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
+
+			rm fastp.json
 
 		"""
 

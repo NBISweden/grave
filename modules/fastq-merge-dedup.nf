@@ -4,11 +4,11 @@ process FASTQMERGEDEDUP {
 
 	// Directives
 
-	debug true
+	debug false
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
-	publishDir path: 'quality_reports/fastp-sample-level', mode: 'copy', pattern: "*.smFastp.html"
+	publishDir path: 'output/quality_reports/fastp-sample-level', mode: 'copy', pattern: "*.smFastp.html"
 
 	// I/O & script
 
@@ -17,12 +17,12 @@ process FASTQMERGEDEDUP {
 
 	output:
 	tuple val(meta), path("*.smFastp*fq.gz"), emit: ch_sample_fastqs // Emit fastp processed sample-level FASTQs
-	path "*.smFastp.html"
-	path "skipped-samples.txt", emit: ch_skipped_samples
+	path "*.smFastp.html", optional: true
+	path "skipped-samples.txt", optional: true, emit: ch_skipped_samples
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
-	if (meta.type == "ancient" || meta.merged == true) // For ancient and merged modern reads, expect one file per library from FASTP
+	if (meta.type == "ancient" || meta.merged == true) // For ancient reads & merged modern reads, expect one file per library from FASTP
 		"""
 
 		# Count the libraries per sample
@@ -31,33 +31,33 @@ process FASTQMERGEDEDUP {
 
 		# Merge and deduplicate 
 
-			# Single library: nothing to do (deduped by FASTP). Rename file, report sample, & direct user to FASTP report.
+			# Single library: nothing to do (deduplicated by FASTP). Rename file & direct user to the FASTP report.
 
-			if (( fq_count == 1 ))
+				if (( fq_count == 1 ))
 
-				then
+					then
 
 					mv ${fastqs} ${meta.id}.smFastp.fq.gz
 
-					echo "${meta.id} has one library, and deduplication was already done. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.${meta.repeat}.fastp.html'" >> skipped-samples.txt
+					echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 
-			elif (( fq_count > 1 ))
+				elif (( fq_count > 1 ))
 
-				then
+					then
 
-					cat ${fastqs} >> ${meta.id}.cat.fq.gz
+						cat ${fastqs} >> ${meta.id}.cat.fq.gz
 
-					fastp --in1 ${meta.id}.cat.fq.gz --out1 ${meta.id}.smFastp.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
+						fastp --in1 ${meta.id}.cat.fq.gz --out1 ${meta.id}.smFastp.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
 
-					rm ${meta.id}.cat.fq.gz
+						rm ${meta.id}.cat.fq.gz fastp.json
 
-			fi
+				fi
 
 		"""
 
-	else if (meta.type == "modern" && meta.merged == false) // Expecting two files per library
+	else // Remaining condition is modern & unmerged - expect two files per library
 		"""
 
 		# Count the libraries per sample
@@ -66,35 +66,33 @@ process FASTQMERGEDEDUP {
 		
 		# Merge and deduplicate
 
-			# Single library: nothing to do (deduped by FASTP). Rename files, report sample, & direct user to FASTP report.
+			# Single library: nothing to do (deduplicated by FASTP). Rename file & direct user to the FASTP report.
 
-			if (( fq_count == 1 ))
+				if (( fq_count == 1 ))
 
-				then
+					then
 
-					mv ${fastqs[0]} ${meta.id}.smFastp.1.fq.gz
+						mv ${fastqs[0]} ${meta.id}.smFastp.1.fq.gz
 
-					mv ${fastqs[1]} ${meta.id}.smFastp.2.fq.gz
+						mv ${fastqs[1]} ${meta.id}.smFastp.2.fq.gz
 
-					echo "${meta.id} has one library, and deduplication was already done. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.${meta.repeat}.fastp.html'" >> skipped-samples.txt
+						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 
-			elif (( fq_count > 1 ))
+				elif (( fq_count > 1 ))
 
-				then
+					then
 
-					cat ${fastqs[0]} >> ${meta.id}.cat.1.fq.gz
+						cat ${fastqs[0]} >> ${meta.id}.cat.1.fq.gz
 
-					cat ${fastqs[1]} >> ${meta.id}.cat.2.fq.gz
+						cat ${fastqs[1]} >> ${meta.id}.cat.2.fq.gz
 
-					fastp --in1 ${meta.id}.cat.1.fq.gz --in2 ${meta.id}.cat.2.fq.gz --out1 ${meta.id}.smFastp.1.fq.gz --out2 ${meta.id}.smFastp.2.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
+						fastp --in1 ${meta.id}.cat.1.fq.gz --in2 ${meta.id}.cat.2.fq.gz --out1 ${meta.id}.smFastp.1.fq.gz --out2 ${meta.id}.smFastp.2.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
 
-					rm ${meta.id}.cat.1.fq.gz
+						rm ${meta.id}.cat.1.fq.gz ${meta.id}.cat.2.fq.gz fastp.json
 
-					rm ${meta.id}.cat.2.fq.gz
-
-			fi
+				fi
 
 		"""
 

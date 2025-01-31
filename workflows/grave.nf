@@ -16,9 +16,10 @@ Main workflow definition
 	include { COMPUTESNARLS } from '../modules/compute-snarls.nf'
 	include { FASTP } from '../modules/fastp.nf'
 	include { FASTQC } from '../modules/fastqc.nf'
+	include { FASTQMERGEDEDUP } from '../modules/fastq-merge-dedup.nf'
 	include { PANMAP } from '../modules/panmap.nf'
 	include { VGSURJECT } from '../modules/vg-surject.nf'
-	include { BAMMERGEDEDUP } from '../modules/bam-merge-dedup.nf'
+	include { BAMDEDUP } from '../modules/bam-dedup.nf'
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
 	include { VGMAPCALL } from '../modules/vg-map-call.nf'
@@ -102,25 +103,32 @@ Main workflow definition
 
 			FASTQC (ch_fastqc_input)
 
-		// Map reads to pangenome graph
+		// Per sample, merge FASTQs and deduplicate
 
+			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads.map{ meta, fastqs -> [meta.subMap('id', 'type'), fastqs] }.groupTuple())
+
+			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/output/quality_reports/fastp-library-level")
+
+		// Map reads to pangenome graph
+			//FIXME: different input
 			PANMAP (FASTP.out.ch_fastp_reads, ch_indexed_graph)
 
 		// Surject mapped reads to reference paths
 
 			VGSURJECT (ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
+		// FIXME: remove merge below, check all inputs and outputs still needed, version reporting, etc. 
 		// Merge and then deduplicate surjected BAMs per sample. If more than one reference, decompose the nested tuple for correct processing.
 
 			if (!params.multiRef) {
-				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple())
+				BAMDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple())
 			} else if (params.multiRef) {
-				BAMMERGEDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
+				BAMDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
 			}
 
 		// Post-mortem damage assessment of reads
 
-			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
+			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
 		// Graph based variant calling
 
@@ -130,11 +138,11 @@ Main workflow definition
 
 			VGMAPCALL (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
-			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
+			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
 			DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
-			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMMERGEDEDUP.out.ch_sample_dedup_bams)
+			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
 		// Report package versions
 

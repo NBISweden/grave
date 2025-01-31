@@ -35,6 +35,10 @@ process MAKEHAPL {
 
 		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
 
+	# Clean up
+
+		rm ${distname} ${rindexname}
+
 	"""
 
 }

@@ -16,7 +16,6 @@ process PANMAP {
 	tuple path(graph), path(indexes)
 
 	output:
-	tuple val(meta), path("${meta.id}.${meta.repeat}.gam")
 	tuple val(meta), path("${meta.id}.${meta.repeat}.filtered.gam"), emit: ch_mapped_gam
 	path "*_alignment-stats.txt"
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
@@ -49,6 +48,10 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
 
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
+
 		# Report mapping statistics
 
 			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
@@ -69,6 +72,10 @@ process PANMAP {
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
 			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
@@ -96,6 +103,10 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
 
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
+
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
 			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
@@ -116,6 +127,10 @@ process PANMAP {
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
 			vg filter -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 
@@ -138,6 +153,10 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
 
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
+
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
 			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
@@ -158,6 +177,10 @@ process PANMAP {
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
 			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+
+		# Remove raw GAM
+
+			rm ${meta.id}.${meta.repeat}.gam
 
 		# Report mapping statistics
 

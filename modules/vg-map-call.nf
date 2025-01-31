@@ -59,6 +59,7 @@ process VGMAPCALL {
 		# Clean up
 
 			rm reference.fasta
+			rm *.filtered.pack
 
 		"""
 
@@ -106,6 +107,10 @@ process VGMAPCALL {
 						rm \$prefix.fasta
 
 				done < referenceSamplePrefixes.txt
+
+		# Clean up outside of loop
+
+			rm *.filtered.pack
 
 		"""
 

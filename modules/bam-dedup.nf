@@ -1,10 +1,10 @@
-process BAMMERGEDEDUP {
+process BAMDEDUP {
 
-	// Merge bams per sample and deduplicate
+	// Deduplicate bams again FIXME:
 
 	// Directives
 
-	debug true
+	debug false
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/sambamba:53411ce753701297'

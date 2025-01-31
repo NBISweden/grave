@@ -19,7 +19,7 @@ process VGGRAPHCALL {
 	tuple path(reference_fasta), path(index)
 
 	output:
-	path "*.vcf.gz"
+	path "*.filtered.vcf.gz"
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions

@@ -16,7 +16,7 @@ process FREEBAYES {
 	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
-	tuple val(meta), path("*.vcf.gz")
+	tuple val(meta), path("*.norm.vcf.gz")
 	tuple val(task.process), val('bamtools'), eval('bamtools --version | head -n 2 | tail -n 1 | sed "s/bamtools //"'), topic: versions
 	tuple val(task.process), val('freebayes'), eval('freebayes --version | sed "s/version.*v//"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions

@@ -16,7 +16,7 @@ process DVPROCESSVCF {
 	tuple val(meta), path(deepvariant_vcf)
 
 	output:
-	path "*.vcf.gz"
+	path "*.norm.vcf.gz"
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 

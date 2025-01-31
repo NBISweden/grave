@@ -20,7 +20,7 @@ process VGMAPCALL {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	path "*.vcf.gz"
+	path "*.filtered.vcf.gz"
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions

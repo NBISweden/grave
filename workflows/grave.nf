@@ -99,7 +99,7 @@ Main workflow definition
 
 		// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
 
-			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0,2])
+			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0])
 
 			FASTQC(ch_fastqc_input)
 

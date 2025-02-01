@@ -3,7 +3,7 @@ process PANMAP {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
 	publishDir path: 'output/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
@@ -16,7 +16,7 @@ process PANMAP {
 	tuple path(graph), path(indexes)
 
 	output:
-	tuple val(meta), path("${meta.id}.${meta.repeat}.filtered.gam"), emit: ch_mapped_gam
+	tuple val(meta), path("${meta.id}.filtered.gam"), emit: ch_mapped_gam
 	path "*_alignment-stats.txt"
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
@@ -25,66 +25,63 @@ process PANMAP {
 	def memory = task.memory.toGiga()
 	def basename = graph.baseName - '.gbz'
 
-	// Note: ancient samples always end up merged after fastp, so no explicit logic is required to differentiate paired and merged original input. Panmap typically expects modern reads to be paired, so if the original input is merged this is explicitly handled.
-
-	if (meta.type == "ancient" && params.graphMode == "haplo")
+	if (meta.type == "ancient" && params.graphMode == "haplo") // Ancient samples arrive merged, thus output not interleaved
 		"""
 
 		# Generate kff index of the reads
 
-			kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id}.${meta.repeat} .
+			kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id} .
 
 		# Generate the subsampled graph and index it
 
-			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.${meta.repeat}.kff --gbz-output ${basename}.${meta.id}.${meta.repeat}.gbz ${graph}
-			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.${meta.repeat}.dist ${basename}.${meta.id}.${meta.repeat}.gbz
-			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.${meta.repeat}.dist --output-name ${basename}.${meta.id}.${meta.repeat}.min ${basename}.${meta.id}.${meta.repeat}.gbz
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${graph}
+			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.dist ${basename}.${meta.id}.gbz
+			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
 
-		# Map merged reads to graph (settings based on BWA aln)
+		# Map reads to graph (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.${meta.repeat}.gbz --dist-name ${basename}.${meta.id}.${meta.repeat}.dist --minimizer-name ${basename}.${meta.id}.${meta.repeat}.min --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.id}.gbz --dist-name ${basename}.${meta.id}.dist --minimizer-name ${basename}.${meta.id}.min --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.${meta.repeat}.* *.kff
+			rm *.${meta.id}.* *.kff
 
 		"""
 
-	else if (meta.type == "ancient" && params.graphMode == "filter")
+	else if (meta.type == "ancient" && params.graphMode == "filter") // Ancient samples arrive merged, thus output not interleaved
 		"""
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${graph} > ${meta.id}_alignment-stats.txt
 
 		"""
 
-
-	else if (meta.type == "modern" && params.graphMode == "haplo" && meta.merged == false)
+	else if (meta.type == "modern" && params.graphMode == "haplo" && meta.merged == false) // Arrives paired, output interleaved
 		"""
 
 		# Generate list of input read files
@@ -93,98 +90,98 @@ process PANMAP {
 
 		# Generate kff index of the reads
 
-			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.id}.${meta.repeat} .
+			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.id} .
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.${meta.repeat}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.${meta.repeat}.* *.kff
+			rm *.${meta.id}.* *.kff
 
 		"""
 
-	else if (meta.type == "modern" && params.graphMode == "filter" && meta.merged == false)
+	else if (meta.type == "modern" && params.graphMode == "filter" && meta.merged == false) // Arrives paired, output interleaved
 		"""
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${graph} > ${meta.id}_alignment-stats.txt
 
 		"""
 
-	else if (meta.type == "modern" && params.graphMode == "haplo" && meta.merged == true)
+	else if (meta.type == "modern" && params.graphMode == "haplo" && meta.merged == true) // Arrives merged, output not interleaved
 		"""
 
 		# Generate kff index of the reads
 
-			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id}.${meta.repeat} .
+			kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.id} .
 
 		# Map merged reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.id}.${meta.repeat}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.${meta.repeat}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${basename}.${meta.id}.${meta.repeat}.gbz > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${basename}.${meta.id}.gbz > ${meta.id}_alignment-stats.txt
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.${meta.repeat}.* *.kff
+			rm *.${meta.id}.* *.kff
 
 		"""
 
-	else if (meta.type == "modern" && params.graphMode == "filter" && meta.merged == true)
+	else if (meta.type == "modern" && params.graphMode == "filter" && meta.merged == true) // Arrives merged, output not interleaved
 		"""
 
 		# Map merged reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id}.${meta.repeat} --read-group ${meta.read_group} > ${meta.id}.${meta.repeat}.gam
+			vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
-			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.${meta.repeat}.gam > ${meta.id}.${meta.repeat}.filtered.gam
+			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM
 
-			rm ${meta.id}.${meta.repeat}.gam
+			rm ${meta.id}.gam
 
 		# Report mapping statistics
 
-			vg stats --alignments ${meta.id}.${meta.repeat}.filtered.gam ${graph} > ${meta.id}.${meta.repeat}_alignment-stats.txt
+			vg stats --alignments ${meta.id}.filtered.gam ${graph} > ${meta.id}_alignment-stats.txt
 
 		"""
 

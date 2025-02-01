@@ -1,6 +1,6 @@
 process BAMDEDUP {
 
-	// Deduplicate bams again FIXME:
+	// Secondary BAM deduplication
 
 	// Directives
 
@@ -24,20 +24,9 @@ process BAMDEDUP {
 	if (!params.multiRef) // One reference sample
 		"""
 
-		# Count BAM files
+		# Deduplicate
 
-			bam_count=\$(ls -1 *.sort.bam 2>/dev/null | wc -l)
-
-		# Single library samples: deduplicate directly. Multi library samples: merge then deduplicate
-
-			if (( bam_count == 1 ))
-				then
-					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.*.sort.bam ${meta.id}.sort.dedup.bam
-			elif (( bam_count > 1 ))
-				then
-					sambamba merge -t ${task.cpus} ${meta.id}.sort.bam *.bam
-					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.sort.bam ${meta.id}.sort.dedup.bam
-			fi
+			sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.sort.bam ${meta.id}.sort.dedup.bam
 
 		"""
 
@@ -50,15 +39,7 @@ process BAMDEDUP {
 			for i in *.paths
 				do
 					prefix=`echo \$i | sed 's/\\.paths//'`
-					bam_count=\$(ls -1 *.\$prefix.sort.bam 2>/dev/null | wc -l)
-					if (( bam_count == 1 ))
-						then
-							sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.*.\$prefix.sort.bam ${meta.id}.\$prefix.sort.dedup.bam
-					elif (( bam_count > 1 ))
-						then
-							sambamba merge -t ${task.cpus} ${meta.id}.\$prefix.sort.bam *.\$prefix.sort.bam
-							sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.\$prefix.sort.bam ${meta.id}.\$prefix.sort.dedup.bam
-					fi
+					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.\$prefix.sort.bam ${meta.id}.\$prefix.sort.dedup.bam
 				done
 
 		"""

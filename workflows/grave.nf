@@ -63,7 +63,7 @@ Main workflow definition
 		if ("$params.graphMode" == "haplo") {
 			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 			// Remake hapl indexes
-			MAKEHAPL (ch_gbz_graph)
+			MAKEHAPL(ch_gbz_graph)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
 				.map {element ->
 					def ref = element[0]
@@ -74,7 +74,7 @@ Main workflow definition
 		} else if ("$params.graphMode" == "filter") {
 			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 			// Remake filter indexes
-			MAKEFILTER (ch_gbz_graph)
+			MAKEFILTER(ch_gbz_graph)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
 				.map {element ->
 					def ref = element[0]
@@ -87,56 +87,57 @@ Main workflow definition
 
 		// Report graph summary statistics & pull FASTAs for mapdamage
 
-			PROCESSGRAPH (ch_gbz_graph, ch_ref_path_files.collect())
+			PROCESSGRAPH(ch_gbz_graph, ch_ref_path_files.collect())
 
 		// Compute graph snarls for variant calling/genotyping tasks (separate from PROCESSGRAPH to allow multithreading)
 
-			COMPUTESNARLS (ch_gbz_graph)
+			COMPUTESNARLS(ch_gbz_graph)
 
 		// Run quality filtering on input reads
 
-			FASTP (ch_samplesheet)
+			FASTP(ch_samplesheet)
 
 		// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
 
 			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0,2])
 
-			FASTQC (ch_fastqc_input)
+			FASTQC(ch_fastqc_input)
 
 		// Merge and deduplicate FASTQs per sample
 
-			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads.map{ meta, fastqs -> [meta.subMap('id', 'type'), fastqs] }.groupTuple().map{ meta, fastqs -> [meta, fastqs.flatten()]})
+			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads
+								.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
+								.groupTuple() // Group by sample
+								.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
+			)
+
+		// Report skipped single library samples, as they were already deduplicated
 
 			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/output/quality_reports/fastp-sample-level")
 
 		// Map reads to pangenome graph
-			//FIXME: different input
-			PANMAP (FASTP.out.ch_fastp_reads, ch_indexed_graph)
+
+			PANMAP(FASTQMERGEDEDUP.out.ch_sample_fastqs, ch_indexed_graph)
 
 		// Surject mapped reads to reference paths
 
-			VGSURJECT (ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
+			VGSURJECT(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
-		// FIXME: remove merge below, check all inputs and outputs still needed, version reporting, etc. 
-		// Merge and then deduplicate surjected BAMs per sample. If more than one reference, decompose the nested tuple for correct processing.
+		// Secondary deduplication on surjected BAMs per sample
 
-			if (!params.multiRef) {
-				BAMDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple())
-			} else if (params.multiRef) {
-				BAMDEDUP (ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams.map{ meta, surjected_bams -> [meta.subMap('id', 'type'), surjected_bams] }.groupTuple().map{ meta, surjected_bams -> [meta, surjected_bams.flatten()] })
-			}
+			BAMDEDUP(ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams)
 
 		// Post-mortem damage assessment of reads
 
-			PROFILEPMD (ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+			PROFILEPMD(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
 		// Graph based variant calling
 
-			VGGRAPHCALL (ch_gbz_graph, COMPUTESNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas)
+			VGGRAPHCALL(ch_gbz_graph, COMPUTESNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas)
 
 		// Mapping based variant calling
 
-			VGMAPCALL (ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
+			VGMAPCALL(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
 			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 

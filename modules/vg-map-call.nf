@@ -5,7 +5,7 @@ process VGMAPCALL {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
 	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy'
@@ -36,7 +36,7 @@ process VGMAPCALL {
 
 		# Compute read support
 
-			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack -Q 5
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.filtered.pack -Q 5
 
 		# Reference will have PanSN format, raw VCF produced by vg call won't. Convert reference to align with VCF naming & reindex
 
@@ -46,15 +46,15 @@ process VGMAPCALL {
 
 		# Genotype against all reference paths in the graph
 
-			vg call -t ${task.cpus} ${graph} --pack ${meta.id}.${meta.repeat}.filtered.pack --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id}.${meta.repeat} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.raw.vcf.gz
+			vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.raw.vcf.gz
 
 		# Index raw VCF
 
-			tabix -p vcf ${meta.id}.${meta.repeat}.raw.vcf.gz
+			tabix -p vcf ${meta.id}.raw.vcf.gz
 
 		# Pop bubbles
 
-			vcfbub --input ${meta.id}.${meta.repeat}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f reference.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.filtered.vcf.gz
+			vcfbub --input ${meta.id}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f reference.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.filtered.vcf.gz
 
 		# Clean up
 
@@ -76,7 +76,7 @@ process VGMAPCALL {
 
 		# Compute read support
 
-			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.${meta.repeat}.filtered.pack -Q 5
+			vg pack -t ${task.cpus} -x ${graph} -g ${mapped_gam} -o ${meta.id}.filtered.pack -Q 5
 
 		# Loop through each reference sample
 
@@ -92,15 +92,15 @@ process VGMAPCALL {
 
 					# Genotype against a specific reference sample in the graph
 
-						vg call -t ${task.cpus} ${graph} --pack ${meta.id}.${meta.repeat}.filtered.pack --ref-sample \$prefix --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id}.${meta.repeat} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
+						vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --ref-sample \$prefix --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.raw.vcf.gz
 
 					# Index raw VCF
 
-						tabix -p vcf ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz
+						tabix -p vcf ${meta.id}.\$prefix.raw.vcf.gz
 
 					# Pop bubbles
 
-						vcfbub --input ${meta.id}.${meta.repeat}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.${meta.repeat}.\$prefix.filtered.vcf.gz
+						vcfbub --input ${meta.id}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.filtered.vcf.gz
 
 					# Clean up
 

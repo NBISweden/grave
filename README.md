@@ -81,20 +81,18 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
 
-| id            | type    | repeat | read_group             | merged     | fastq1                | fastq2               |
-|---------------|---------|--------|------------------------|------------|-----------------------|----------------------|
-| ancientHuman1 | ancient |   1    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| ancientHuman1 | ancient |   2    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| modernHuman7  | modern  |   1    | FLOWCELL_ID.LANENUMBER | false      | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| mergedInput   | ancient |   1    | FLOWCELL_ID.LANENUMBER | true       | /path/to/merged.fq.gz |                      |
+| id            | repeat | type    | merged | fastq1                | fastq2               |
+|---------------|--------|---------|--------|-----------------------|----------------------|
+| ancientHuman1 |   1    | ancient | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| ancientHuman1 |   2    | ancient | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| modernHuman7  |   1    | modern  | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| mergedInput   |   1    | ancient | true   | /path/to/merged.fq.gz |                      |
 
-- `id`: the sample name
+- `id`: sample name
 
-- `type`: whether the sample is ancient or modern - **Note:** _this affects how the sample will be processed_
+- `repeat`: unique identifier for repeat runs on the same sample
 
-- `repeat`: metadata separation between repeat runs on the same sample
-
-- `read_group`: the read group name, usually `FLOWCELL_ID.LANENUMBER`, [see here](https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups)
+- `type`: sample is ancient or modern - **Note:** _this affects how the sample will be processed_
 
 - `merged`: whether the reads have already been merged (e.g., some ancient samples)
 

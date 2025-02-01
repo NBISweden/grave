@@ -57,7 +57,7 @@ process FASTQMERGEDEDUP {
 
 		"""
 
-	else // Remaining condition is modern & unmerged - expect two files per library
+	else if (meta.type == "modern" && meta.merged == false) // Expecting two files per library
 		"""
 
 		# Count the libraries per sample

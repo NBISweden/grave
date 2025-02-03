@@ -21,7 +21,8 @@ workflow VERIFY {
 			println (" ")
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
 			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
-			println ("--account [${params.account}] 				Used only for the SLURM executor, provide an allocation name for hours billing.")
+			println ("--samplesheet				 		Path to the samplesheet file.")
+			println ("--account [${params.account}] 					Used only for the SLURM executor, provide an allocation name for hours billing.")
 			println (" ")
 			println ("Turn on or off variant callers:")
 			println (" ")
@@ -96,11 +97,11 @@ workflow VERIFY {
 
 	// Check for input samplesheet
 
-		if (!file("./data/samplesheet/samplesheet.csv").exists()) {
-			error ("ERROR: Input file 'data/samplesheet/samplesheet.csv' was not found (please see docs).")
+		if (!file("${params.samplesheet}").exists()) {
+			error ("ERROR: Input file '${params.samplesheet}' was not found (please see docs).")
 		}
 
-	// Check directory structure
+	// Check directory structure //FIXME:
 
 		if (!file("./data/graph").isDirectory()) {
 			println("ERROR: Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
@@ -172,7 +173,7 @@ workflow VERIFY {
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
 
 		// Defines the expected graph file patterns
-		def graphDir = new File ("data/graph")
+		def graphDir = new File ("data/graph") //FIXME:
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
 		def distPattern = ~/.*\.dist$/

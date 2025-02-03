@@ -28,14 +28,13 @@ Main workflow definition
 	include { FREEBAYES } from '../modules/freebayes.nf'
 
 // Process samplesheet, check structure, output tuple "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
-//FIXME: hard coded path to samplesheet
 
 	// Initialise empty set for detecting duplicate repeat numbers
 	def uniqueRepeats = new HashSet<String>()
 
 	// Load samplesheet
 	def ch_samplesheet = Channel
-		.fromPath("./data/samplesheet/samplesheet.csv")
+		.fromPath("${params.samplesheet}")
 		.splitCsv(header: true)
 		.map { row ->
 

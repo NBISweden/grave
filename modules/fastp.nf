@@ -56,7 +56,4 @@ process FASTP {
 
 		"""
 
-	else
-		error ("Error: for '${meta.id}_repeat_${meta.repeat}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern'.")
-
 }

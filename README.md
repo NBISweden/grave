@@ -35,8 +35,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ### File setup
 
-1. In `data/graph`, add or link to the [graph](#graphs-and-indexes)
-2. Fill out a `samplesheet.csv` including paths to the reads. By default `grave` looks in `data/samplesheet` for this file. [See layout description below](#samplesheet-layout)
+1. Add or link to the [graph](#graphs-and-indexes). By default `grave` looks for the file in `data/graph`.
+2. Fill out a `samplesheet.csv` including paths to the reads. By default `grave` looks for the file in `data/samplesheet`. [See layout description below](#samplesheet-layout).
 3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples).
 
 #### Input fasta naming

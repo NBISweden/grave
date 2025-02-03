@@ -108,7 +108,7 @@ Main workflow definition
 
 		// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
 		if ("$params.graphMode" == "haplo") {
-			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
+			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
 			// Remake hapl indexes
 			MAKEHAPL(ch_gbz_graph, ch_types)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
@@ -118,7 +118,7 @@ Main workflow definition
 					return [ref: ref, indexes: indexes]
 				}
 		} else if ("$params.graphMode" == "filter") {
-			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
+			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
 			// Remake filter indexes
 			MAKEFILTER(ch_gbz_graph, ch_types)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()

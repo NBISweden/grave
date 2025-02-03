@@ -22,6 +22,7 @@ workflow VERIFY {
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
 			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
 			println ("--pathsDir				 		Path to the directory containing '.paths' files.")
+			println ("--graphDir				 		Path to the directory containing a '.gbz' file.")
 			println ("--samplesheet				 		Path to the samplesheet file.")
 			println ("--account [${params.account}] 					Used only for the SLURM executor, provide an allocation name for hours billing.")
 			println (" ")
@@ -102,12 +103,12 @@ workflow VERIFY {
 			error ("ERROR: Input file '${params.samplesheet}' was not found (please see docs).")
 		}
 
-	// Check directory structure //FIXME:
+	// Check directory structure
 
-		if (!file("./data/graph").isDirectory()) {
-			println("ERROR: Pangenome directory 'data/graph' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
-			file("data/graph").mkdirs()
-			error ("Created 'data/graph'.")
+		if (!file("${params.graphDir}").isDirectory()) {
+			println("ERROR: Pangenome directory '${params.graphDir}' was not found. Creating it and exiting. Please add or link to the graph there (see docs).")
+			file("${params.graphDir}").mkdirs()
+			error ("Created '${params.graphDir}'.")
 		}
 
 	// Warn about process settings
@@ -174,7 +175,7 @@ workflow VERIFY {
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
 
 		// Defines the expected graph file patterns
-		def graphDir = new File ("data/graph") //FIXME:
+		def graphDir = new File ("${params.graphDir}")
 		def haplPattern = ~/.*\.hapl$/
 		def gbzPattern = ~/.*\.gbz$/
 		def distPattern = ~/.*\.dist$/
@@ -190,7 +191,7 @@ workflow VERIFY {
 		if ("${params.graphMode}" == "haplo") {
 
 			if (!foundHapl.isEmpty()) {
-				println ("USER NOTE: grave will not use the '.hapl' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.hapl' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
 			}
 
 			if (foundGbz.isEmpty()) {
@@ -198,20 +199,20 @@ workflow VERIFY {
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("ERROR: More than one '.gbz' file found in 'data/graph'. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			if (!foundFilteredGbz.isEmpty()) {
-				error ("ERROR: The '.gbz' file found in 'data/graph' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
+				error ("ERROR: The '.gbz' file found in '${params.graphDir}' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
 			}
 
 			// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
 			if (!foundDist.isEmpty()) {
-				error ("ERROR: The '.dist' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
+				error ("ERROR: The '.dist' file in '${params.graphDir}' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				error ("ERROR: The '.min' file in 'data/graph' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
+				error ("ERROR: The '.min' file in '${params.graphDir}' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
 			}
 
 		// Filter mode uses the clipped filtered graph
@@ -226,19 +227,19 @@ workflow VERIFY {
 			}
 
 			if (foundGbz.size() > 1) {
-				error ("ERROR: More than one '.gbz' file found in 'data/graph'. For 'filter' mode use the clipped filtered graph.")
+				error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (foundFilteredGbz.isEmpty()) {
-				error ("ERROR: The .gbz file found in 'data/graph' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
+				error ("ERROR: The .gbz file found in '${params.graphDir}' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
 			}
 
 			if (!foundDist.isEmpty()) {
-				println ("USER NOTE: grave will not use the '.dist' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.dist' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
 			}
 
 			if (!foundMin.isEmpty()) {
-				println ("USER NOTE: grave will not use the '.min' file you provided in 'data/graph', but you don't need to take action (see docs).")
+				println ("USER NOTE: grave will not use the '.min' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
 			}
 
 		// Prompt the user if there is a typo in the graph mode param

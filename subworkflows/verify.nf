@@ -21,6 +21,7 @@ workflow VERIFY {
 			println (" ")
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
 			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
+			println ("--pathsDir				 		Path to the directory containing '.paths' files.")
 			println ("--samplesheet				 		Path to the samplesheet file.")
 			println ("--account [${params.account}] 					Used only for the SLURM executor, provide an allocation name for hours billing.")
 			println (" ")
@@ -247,16 +248,16 @@ workflow VERIFY {
 
 	// Check for files specifying reference paths
 
-		def pathsDir = new File ("data/paths")
+		def pathsDir = new File ("${params.pathsDir}")
 		def pathsPattern = ~/.*\.paths$/
 		def foundPaths = pathsDir.listFiles().findAll { it.isFile() && it.name =~ pathsPattern }
 
 		if (foundPaths.isEmpty() && params.multiRef) {
-			error ("ERROR: The workflow was expecting user provided '.paths' files, but none were found in 'data/paths/*.paths'.")
+			error ("ERROR: The workflow was expecting user provided '.paths' files, but none were found in '${params.pathsDir}'.")
 		}
 
 		if (!foundPaths.isEmpty() && !params.multiRef) {
-			println ("WARN: found reference path files in 'data/paths/*.paths', but the workflow is not configured to use them; to do so provide: '--multiRef'.")
+			println ("WARN: found reference '.paths' files in '${params.pathsDir}', but the workflow is not configured to use them; to do so provide: '--multiRef'.")
 		}
 
 }

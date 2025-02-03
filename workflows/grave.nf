@@ -98,9 +98,9 @@ Main workflow definition
 		}
 		.set { ch_types }
 
-// Process reference path files as an optional input FIXME:
+// Process reference path files as an optional input
 
-	def ch_ref_path_files = params.multiRef ? Channel.fromPath("./data/paths/*.paths") : []
+	def ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
 
 // Pangenome mapping & genotyping workflow execution
 

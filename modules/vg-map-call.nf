@@ -42,6 +42,8 @@ process VGMAPCALL {
 
 			sed -i 's/.*#/>/g' ${reference_fasta}
 
+		# Remove link to original index & recreate
+
 			rm *.fai && samtools faidx reference.fasta
 
 		# Genotype against all reference paths in the graph
@@ -58,7 +60,7 @@ process VGMAPCALL {
 
 		# Clean up
 
-			rm reference.fasta
+			rm reference.fasta*
 			rm *.filtered.pack
 
 		"""
@@ -88,6 +90,8 @@ process VGMAPCALL {
 
 						sed -i 's/.*#/>/g' \$prefix.fasta
 
+					# Remove link to original index & recreate
+
 						rm \$prefix.fasta.fai && samtools faidx \$prefix.fasta
 
 					# Genotype against a specific reference sample in the graph
@@ -104,7 +108,7 @@ process VGMAPCALL {
 
 					# Clean up
 
-						rm \$prefix.fasta
+						rm \$prefix.fasta*
 
 				done < referenceSamplePrefixes.txt
 

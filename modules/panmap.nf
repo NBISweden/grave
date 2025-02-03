@@ -34,7 +34,7 @@ process PANMAP {
 
 		# Generate the subsampled graph and index it
 
-			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input ${indexes[0]} --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${graph}
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.adna.hapl --kmer-input ${meta.id}.kff --gbz-output ${basename}.${meta.id}.gbz ${graph}
 			vg index --threads ${task.cpus} --dist-name ${basename}.${meta.id}.dist ${basename}.${meta.id}.gbz
 			vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.id}.dist --output-name ${basename}.${meta.id}.min ${basename}.${meta.id}.gbz
 
@@ -65,7 +65,7 @@ process PANMAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
@@ -94,7 +94,7 @@ process PANMAP {
 
 		# Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
@@ -119,7 +119,7 @@ process PANMAP {
 
 		# Map paired-end reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
@@ -144,7 +144,7 @@ process PANMAP {
 
 		# Map merged reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name ${indexes[1]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.id}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 
@@ -169,7 +169,7 @@ process PANMAP {
 
 		# Map merged reads (default settings are equivalent to BWA mem)
 
-			vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name ${indexes[0]} --minimizer-name ${indexes[2]} --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
+			vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} --sample ${meta.id} > ${meta.id}.gam
 
 		# Filter GAM (remove unmapped reads, apply MAPQ filter, minimum primary alignment score, defray ambiguous alignment ends)
 

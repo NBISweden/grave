@@ -8,7 +8,7 @@ process FASTQMERGEDEDUP {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
-	publishDir path: 'output/quality_reports/fastp-sample-level', mode: 'copy', pattern: "*.smFastp.html"
+	publishDir path: 'output/quality_reports/fastp-sample-level', mode: 'copy', pattern: "*.smFastp.html.gz"
 
 	// I/O & script
 
@@ -17,7 +17,7 @@ process FASTQMERGEDEDUP {
 
 	output:
 	tuple val(meta), path("*.smFastp*fq.gz"), emit: ch_sample_fastqs // Emit fastp processed sample-level FASTQs
-	path "*.smFastp.html", optional: true
+	path "*.smFastp.html.gz", optional: true
 	path "skipped-samples.txt", optional: true, emit: ch_skipped_samples
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
@@ -39,7 +39,7 @@ process FASTQMERGEDEDUP {
 
 					mv ${fastqs} ${meta.id}.smFastp.fq.gz
 
-					echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html'" >> skipped-samples.txt
+					echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html.gz'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 
@@ -52,6 +52,8 @@ process FASTQMERGEDEDUP {
 						fastp --in1 ${meta.id}.cat.fq.gz --out1 ${meta.id}.smFastp.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
 
 						rm ${meta.id}.cat.fq.gz fastp.json
+
+						gzip ${meta.id}.${meta.repeat}.fastp.html
 
 				fi
 
@@ -76,7 +78,7 @@ process FASTQMERGEDEDUP {
 
 						mv ${fastqs[1]} ${meta.id}.smFastp.2.fq.gz
 
-						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html'" >> skipped-samples.txt
+						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html.gz'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 
@@ -91,6 +93,8 @@ process FASTQMERGEDEDUP {
 						fastp --in1 ${meta.id}.cat.1.fq.gz --in2 ${meta.id}.cat.2.fq.gz --out1 ${meta.id}.smFastp.1.fq.gz --out2 ${meta.id}.smFastp.2.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
 
 						rm ${meta.id}.cat.1.fq.gz ${meta.id}.cat.2.fq.gz fastp.json
+
+						gzip ${meta.id}.${meta.repeat}.fastp.html
 
 				fi
 

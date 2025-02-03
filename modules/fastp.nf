@@ -6,7 +6,7 @@ process FASTP {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
-	publishDir path: 'output/quality_reports/fastp-library-level', mode: 'copy', pattern: "*.fastp.html"
+	publishDir path: 'output/quality_reports/fastp-library-level', mode: 'copy', pattern: "*.fastp.html.gz"
 
 	// I/O & script
 
@@ -15,7 +15,7 @@ process FASTP {
 
 	output:
 	tuple val(meta), path("*.fastp*fq.gz"), emit: ch_fastp_reads
-	path "*.fastp.html"
+	path "*.fastp.html.gz"
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
@@ -28,6 +28,8 @@ process FASTP {
 
 			rm fastp.json
 
+			gzip ${meta.id}.${meta.repeat}.fastp.html
+
 		"""
 
 	else if (meta.type == "modern" && meta.merged == false)
@@ -39,6 +41,8 @@ process FASTP {
 
 			rm fastp.json
 
+			gzip ${meta.id}.${meta.repeat}.fastp.html
+
 		"""
 
 	else if (meta.merged == true) // Same settings for ancient and modern
@@ -47,6 +51,8 @@ process FASTP {
 			fastp --in1 ${reads[0]} --out1 ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy}  --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
 			rm fastp.json
+
+			gzip ${meta.id}.${meta.repeat}.fastp.html
 
 		"""
 

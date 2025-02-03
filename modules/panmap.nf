@@ -110,7 +110,7 @@ process PANMAP {
 
 		# Remove sample specific indexes
 
-			rm *.${meta.id}.* *.kff
+			rm *.${meta.id}.* *.kff readfiles
 
 		"""
 

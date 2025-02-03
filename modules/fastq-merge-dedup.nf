@@ -53,7 +53,7 @@ process FASTQMERGEDEDUP {
 
 						rm ${meta.id}.cat.fq.gz fastp.json
 
-						gzip ${meta.id}.${meta.repeat}.fastp.html
+						gzip ${meta.id}.smFastp.html
 
 				fi
 
@@ -94,7 +94,7 @@ process FASTQMERGEDEDUP {
 
 						rm ${meta.id}.cat.1.fq.gz ${meta.id}.cat.2.fq.gz fastp.json
 
-						gzip ${meta.id}.${meta.repeat}.fastp.html
+						gzip ${meta.id}.smFastp.html
 
 				fi
 

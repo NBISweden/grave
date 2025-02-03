@@ -27,18 +27,49 @@ Main workflow definition
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
 	include { FREEBAYES } from '../modules/freebayes.nf'
 
-// Process samplesheet, output tuple channel "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
+// Process samplesheet, check structure, output tuple "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
+//FIXME: hard coded path to samplesheet
 
+	// Initialise empty set for detecting duplicate repeat numbers
+	def uniqueRepeats = new HashSet<String>()
+
+	// Load samplesheet
 	def ch_samplesheet = Channel
 		.fromPath("./data/samplesheet/samplesheet.csv")
 		.splitCsv(header: true)
 		.map { row ->
-			meta = [id: row.id, type: row.type, repeat: row.repeat, read_group: row.read_group, merged: row.merged.toBoolean()]
+
+			// Populate metadata
+			def meta = [
+				id: row.id,
+				repeat: row.repeat,
+				type: row.type.toLowerCase(),
+				merged: row.merged.toLowerCase()
+			]
+
+			// Check no duplicate "sample + repeat" combinations
+			def key = "${meta.id}${meta.repeat}"
+			if (!uniqueRepeats.add(key)) {
+				error ("Error: found duplicate repeat numbers for sample '${meta.id}' in the samplesheet.")
+			}
+
+			// Check that merge information is true or false, convert to boolean
+			if (!['true', 'false'].contains(meta.merged)) {
+				error ("ERROR: Sample '${meta.id}' has an invalid 'merged' value: '${meta.merged}'. Please only supply 'true' or 'false' (case insensitive).")
+			}
+			meta.merged = meta.merged.toBoolean()
+
+			// Check sample types are correctly stated
+			if (!['ancient', 'modern'].contains(meta.type)) {
+				error ("Error: for '${meta.id}_repeat_${meta.repeat}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
+			}
+
+			// Initial checks passed, add FASTQ paths
 			if (meta.merged) {
 				if (row.fastq_1 && !row.fastq_2) {
 					return [meta, [file(row.fastq_1)]]
 				} else if (!row.fastq_1) {
-					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. No path to the FASTQ file is provided.")
+					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
 				} else {
 					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. The 'merged' field is true, but a second FASTQ file was unexpectedly provided.")
 				}
@@ -46,12 +77,29 @@ Main workflow definition
 				if (row.fastq_1 && row.fastq_2) {
 					return [meta, [file(row.fastq_1), file(row.fastq_2)]]
 				} else {
-					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet it does not appear to be paired-end or the second FASTQ file is missing.")
+					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet one or more FASTQ files appear to be missing.")
 				}
 			}
 		}
 
-// Process reference path files as an optional input
+// Determine whether to create modern or ancient indexes (or both), depending on sample input
+
+	// Initialise channel to summarise discovered sample types
+	ch_types = Channel.empty()
+
+	// Collect sample types from samplesheet
+	ch_samplesheet
+		.map { meta, fastqs ->
+			return meta.type // Return all sample types
+		}
+		.unique() // Remove duplicates
+		.collect() // Add uniques to list
+		.map { uniqueTypes ->
+			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". If two found, assign "both".
+		}
+		.set { ch_types }
+
+// Process reference path files as an optional input FIXME:
 
 	def ch_ref_path_files = params.multiRef ? Channel.fromPath("./data/paths/*.paths") : []
 
@@ -63,25 +111,22 @@ Main workflow definition
 		if ("$params.graphMode" == "haplo") {
 			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 			// Remake hapl indexes
-			MAKEHAPL(ch_gbz_graph)
+			MAKEHAPL(ch_gbz_graph, ch_types)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
 				.map {element ->
 					def ref = element[0]
-					def adna_hapl = element[1]
-					def modern_hapl = element[2]
-					return [ref: ref, indexes: [adna_hapl, modern_hapl]]
+					def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
+					return [ref: ref, indexes: indexes]
 				}
 		} else if ("$params.graphMode" == "filter") {
 			ch_gbz_graph = Channel.fromPath("./data/graph/*.gbz")
 			// Remake filter indexes
-			MAKEFILTER(ch_gbz_graph)
+			MAKEFILTER(ch_gbz_graph, ch_types)
 			ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
 				.map {element ->
 					def ref = element[0]
-					def dist = element[1]
-					def adna_min = element[2]
-					def modern_min = element[3]
-					return [ref: ref, indexes: [dist, adna_min, modern_min]]
+					def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
+					return [ref: ref, indexes: indexes]
 				}
 		}
 

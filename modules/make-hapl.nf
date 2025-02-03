@@ -11,9 +11,10 @@ process MAKEHAPL {
 
 	input:
 	path (graph)
+	val (types)
 
 	output:
-	tuple path ("*.adna.hapl"), path ("*.modern.hapl"), emit: ch_hapl_indexes
+	path ("*.hapl"), emit: ch_hapl_indexes
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
@@ -25,15 +26,24 @@ process MAKEHAPL {
 
 	"""
 
-	# Produce ".hapl" index appropriate for ancient samples
+	# Create common indexes for all sample types
 
 		vg index --threads ${task.cpus} --dist-name ${distname} ${graph}
 		vg gbwt --num-threads ${task.cpus} --r-index ${rindexname} --gbz-input ${graph}
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
 
-	# Produce ".hapl" index appropriate for modern samples (giraffe defaults)
+	# Type specific ".hapl" production
 
-		vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+	if [ "${types}" == "ancient" ]
+		then
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
+	elif [ "${types}" == "modern" ]
+		then
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+	elif [ "${types}" == "both" ]
+		then
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
+			vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+	fi
 
 	# Clean up
 

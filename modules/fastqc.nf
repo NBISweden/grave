@@ -25,6 +25,10 @@ process FASTQC {
 
 		fastqc --format fastq --threads ${task.cpus} ${raw_reads} ${fastp_reads}
 
+	# Clean up
+
+		rm *.html
+
 	"""
 
 }

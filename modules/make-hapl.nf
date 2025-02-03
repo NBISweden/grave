@@ -5,7 +5,7 @@ process MAKEHAPL {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/vg:1.60.0--e90f97d844d42049'
+	container 'oras://community.wave.seqera.io/library/vg:1.63.1--77c63f4a6f8f9d7a'
 
 	// I/O & script
 

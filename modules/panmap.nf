@@ -5,7 +5,7 @@ process PANMAP {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/kmc_vg:353e0f1b839eee94'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:71fb384e609a2165'
 	publishDir path: 'output/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
 	publishDir path: 'output/statistics/mapped_samples', mode: 'copy', pattern: "*_alignment-stats.txt"
 

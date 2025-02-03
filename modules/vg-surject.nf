@@ -7,7 +7,7 @@ process VGSURJECT {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/samtools_vg:8f930d468758b80f'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:708cddc079bf2492'
 
 	// I/O & script
 

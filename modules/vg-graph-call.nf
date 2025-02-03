@@ -7,7 +7,7 @@ process VGGRAPHCALL {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:c247a9f35d75b27d'
+	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:6b57aa764c6e5ab4'
 	publishDir path: 'output/variant_calling/graph', mode: 'copy'
 
 	// I/O & script

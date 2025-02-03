@@ -64,6 +64,10 @@ process DVPROCESSVCF {
 
 				done < referenceSamplePrefixes.txt
 
+		# Clean up
+
+			rm referenceSamplePrefixes.txt
+
 		"""
 
 }

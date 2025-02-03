@@ -57,6 +57,10 @@ process PROFILEPMD {
 					damageprofiler -i ${meta.id}.\$prefix.sort.dedup.bam -r \$prefix.fasta -o ${meta.id}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 				done < referenceSamplePrefixes.txt
 
+		# Clean up
+
+			rm referenceSamplePrefixes.txt
+
 		"""
 
 }

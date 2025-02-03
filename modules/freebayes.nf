@@ -52,6 +52,10 @@ process FREEBAYES {
 
 			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
 
+		# Clean up
+
+			rm ${reference_fasta}.regions
+
 		"""
 
 	else if (params.multiRef)
@@ -90,11 +94,19 @@ process FREEBAYES {
 							bgzip --threads ${task.cpus} > \
 							${meta.id}.\$prefix.raw.vcf.gz
 
+					# Clean up
+
+						rm \$prefix.regions
+
 					# Norm and sort
 
 						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
 
 				done < referenceSamplePrefixes.txt
+
+		# Clean up
+		
+			rm referenceSamplePrefixes.txt
 
 		"""
 

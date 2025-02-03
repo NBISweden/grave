@@ -80,6 +80,10 @@ process VGGRAPHCALL {
 					vcfbub --input ${basename}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.\$prefix.filtered.vcf.gz
 				done < referenceSamplePrefixes.txt
 
+		# Clean up
+
+			rm referenceSamplePrefixes.txt
+
 		"""
 
 }

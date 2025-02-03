@@ -114,7 +114,7 @@ process VGMAPCALL {
 
 		# Clean up outside of loop
 
-			rm *.filtered.pack
+			rm *.filtered.pack referenceSamplePrefixes.txt
 
 		"""
 

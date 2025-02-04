@@ -7,6 +7,7 @@ process PANMAP {
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:71fb384e609a2165'
 	publishDir path: 'output/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
+	publishDir path: 'output/mapped_files/gams', mode: 'copy', enabled: params.keepRawGam , pattern: "*.gam", saveAs: { file -> file.endsWith('.filtered.gam') ? null : file }
 	publishDir path: 'output/statistics/mapped_samples', mode: 'copy', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
@@ -17,6 +18,7 @@ process PANMAP {
 
 	output:
 	tuple val(meta), path("${meta.id}.filtered.gam"), emit: ch_mapped_gam
+	path "${meta.id}.gam", optional: true
 	path "*_alignment-stats.txt"
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
@@ -46,9 +48,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics
 
@@ -71,9 +76,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics
 
@@ -100,9 +108,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
@@ -125,9 +136,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics
 
@@ -150,9 +164,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
 
@@ -175,9 +192,12 @@ process PANMAP {
 
 			vg filter -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu --only-mapped -q ${params.minimumMapQFilter} -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
-		# Remove raw GAM
+		# Remove raw GAM unless overridden
 
-			rm ${meta.id}.gam
+			if [ "${params.keepRawGam}" != "true" ]
+				then
+					rm ${meta.id}.gam
+			fi
 
 		# Report mapping statistics
 

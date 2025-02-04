@@ -94,7 +94,7 @@ Main workflow definition
 		.unique() // Remove duplicates
 		.collect() // Add uniques to list
 		.map { uniqueTypes ->
-			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". Else found, assign "both".
+			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". Else assign "both".
 		}
 		.set { ch_types }
 

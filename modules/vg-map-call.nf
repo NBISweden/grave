@@ -8,7 +8,8 @@ process VGMAPCALL {
 	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
-	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy'
+	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy', pattern: "*.filtered.vcf.gz"
+	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -21,6 +22,7 @@ process VGMAPCALL {
 
 	output:
 	path "*.filtered.vcf.gz"
+	path "*.raw.vcf.gz", optional: true
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
@@ -59,6 +61,13 @@ process VGMAPCALL {
 			vcfbub --input ${meta.id}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f reference.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.filtered.vcf.gz
 
 		# Clean up
+
+			if [ "${params.keepRawVcf}" != "true" ]
+				then
+					rm ${meta.id}.raw.vcf.gz ${meta.id}.raw.vcf.gz.tbi
+				else
+					rm ${meta.id}.raw.vcf.gz.tbi
+			fi
 
 			rm reference.fasta*
 			rm *.filtered.pack
@@ -107,6 +116,13 @@ process VGMAPCALL {
 						vcfbub --input ${meta.id}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.filtered.vcf.gz
 
 					# Clean up
+
+						if [ "${params.keepRawVcf}" != "true" ]
+							then
+								rm ${meta.id}.\$prefix.raw.vcf.gz ${meta.id}.\$prefix.raw.vcf.gz.tbi
+							else
+								rm ${meta.id}.\$prefix.raw.vcf.gz.tbi
+						fi
 
 						rm \$prefix.fasta*
 

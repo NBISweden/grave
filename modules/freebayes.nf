@@ -6,7 +6,8 @@ process FREEBAYES {
 	tag "${meta.id}"
 	label 'process_high'
 	container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
-	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'copy'
+	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'copy', pattern: "*.norm.vcf.gz"
+	publishDir path: 'output/variant_calling/mapped_samples/freebayes', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -16,7 +17,8 @@ process FREEBAYES {
 	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
-	tuple val(meta), path("*.norm.vcf.gz")
+	path("*.norm.vcf.gz")
+	path("*.raw.vcf.gz"), optional: true
 	tuple val(task.process), val('bamtools'), eval('bamtools --version | head -n 2 | tail -n 1 | sed "s/bamtools //"'), topic: versions
 	tuple val(task.process), val('freebayes'), eval('freebayes --version | sed "s/version.*v//"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
@@ -53,6 +55,11 @@ process FREEBAYES {
 			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
 
 		# Clean up
+
+			if [ "${params.keepRawVcf}" != "true" ]
+				then
+					rm ${meta.id}.raw.vcf.gz
+			fi
 
 			rm ${reference_fasta}.regions
 
@@ -94,17 +101,22 @@ process FREEBAYES {
 							bgzip --threads ${task.cpus} > \
 							${meta.id}.\$prefix.raw.vcf.gz
 
-					# Clean up
-
-						rm \$prefix.regions
-
 					# Norm and sort
 
 						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
 
+					# Clean up
+
+						if [ "${params.keepRawVcf}" != "true" ]
+							then
+								rm ${meta.id}.\$prefix.raw.vcf.gz
+						fi
+
+						rm \$prefix.regions
+
 				done < referenceSamplePrefixes.txt
 
-		# Clean up
+		# Clean up outside loop
 		
 			rm referenceSamplePrefixes.txt
 

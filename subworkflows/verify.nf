@@ -29,6 +29,7 @@ workflow VERIFY {
 			println ("Optional output files:")
 			println (" ")
 			println ("--keepRawGam [${params.keepRawGam}] 					Output the raw GAM files, not just filtered.")
+			println ("--keepRawVcf [${params.keepRawVcf}] 					Output the raw VCF files, not just filtered/normalised.")
 			println (" ")
 			println ("Turn on/off specific variant callers:")
 			println (" ")

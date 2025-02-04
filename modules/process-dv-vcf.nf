@@ -6,7 +6,8 @@ process DVPROCESSVCF {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
-	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'copy'
+	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'copy', pattern: "*.norm.vcf.gz"
+	publishDir path: 'output/variant_calling/mapped_samples/deepvariant', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -17,6 +18,7 @@ process DVPROCESSVCF {
 
 	output:
 	path "*.norm.vcf.gz"
+	path "*.raw.vcf.gz", optional: true
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 
@@ -34,6 +36,13 @@ process DVPROCESSVCF {
 		# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
 			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
+
+		# Clean up
+
+			if [ "${params.keepRawVcf}" != "true" ]
+				then
+					rm ${meta.id}.raw.vcf.gz
+			fi
 
 		"""
 
@@ -61,6 +70,13 @@ process DVPROCESSVCF {
 					# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
 						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
+
+					# Clean up
+
+						if [ "${params.keepRawVcf}" != "true" ]
+							then
+								rm ${meta.id}.\$prefix.raw.vcf.gz
+						fi
 
 				done < referenceSamplePrefixes.txt
 

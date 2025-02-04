@@ -94,7 +94,7 @@ Main workflow definition
 		.unique() // Remove duplicates
 		.collect() // Add uniques to list
 		.map { uniqueTypes ->
-			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". If two found, assign "both".
+			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". Else found, assign "both".
 		}
 		.set { ch_types }
 
@@ -129,11 +129,11 @@ Main workflow definition
 				}
 		}
 
-		// Report graph summary statistics & pull FASTAs for mapdamage
+		// Report graph summary statistics & pull linear reference FASTAs
 
 			PROCESSGRAPH(ch_gbz_graph, ch_ref_path_files.collect())
 
-		// Compute graph snarls for variant calling/genotyping tasks (separate from PROCESSGRAPH to allow multithreading)
+		// Compute graph snarls for variant calling/genotyping tasks
 
 			COMPUTESNARLS(ch_gbz_graph)
 
@@ -143,7 +143,7 @@ Main workflow definition
 
 		// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
 
-			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0])
+			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0]) // Join on matching metadata
 
 			FASTQC(ch_fastqc_input)
 

@@ -1,1 +1,1 @@
-# Read files (paired-end .fq.gz)
+# Read files (paired-end or merged .fq.gz)

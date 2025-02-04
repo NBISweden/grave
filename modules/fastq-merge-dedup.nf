@@ -39,7 +39,7 @@ process FASTQMERGEDEDUP {
 
 					mv ${fastqs} ${meta.id}.smFastp.fq.gz
 
-					echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html.gz'" >> skipped-samples.txt
+					echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.*.fastp.html.gz'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 
@@ -78,7 +78,7 @@ process FASTQMERGEDEDUP {
 
 						mv ${fastqs[1]} ${meta.id}.smFastp.2.fq.gz
 
-						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.1.fastp.html.gz'" >> skipped-samples.txt
+						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'output/quality_reports/fastp-library-level/${meta.id}.*.fastp.html.gz'" >> skipped-samples.txt
 
 			# Multiple libraries: merge and deduplicate again
 

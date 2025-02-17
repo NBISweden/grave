@@ -14,7 +14,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ### Option 1 (recommended): use pixi
 
-1. [Install Pixi](https://pixi.sh/v0.17.1)
+1. [Install Pixi](https://pixi.sh/latest/)
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
 3. [File setup](#file-setup)
 4. From the repo, run `pixi run nextflow main.nf`, or run `pixi shell` to enter the environment, and run `grave` with `nextflow main.nf`

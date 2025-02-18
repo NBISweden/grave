@@ -29,7 +29,7 @@ Run with the provided test data: `pixi run grave-test`
 ### Run grave with your data
 
 1. [Input file setup](#file-setup)
-2. Run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss1999-87-324 -profile dardelSlurm`
+2. Run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile dardelSlurm`
 
 >[!TIP]
 >For help with command line options: `pixi run help`
@@ -39,8 +39,8 @@ Run with the provided test data: `pixi run grave-test`
 
 ### File setup
 
-1. Add or link to the [graph](#graphs-and-indexes). By default `grave` looks for the file in `data`.
-2. Fill out a `samplesheet.csv` including paths to the reads. By default `grave` looks for the file in `data`. [See layout description below](#samplesheet-layout).
+1. Add the [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`.
+2. Fill out a `samplesheet.csv` including file system paths to the reads. By default `grave` looks for this in `data`. [See layout description below](#samplesheet-layout).
 3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples).
 
 #### Input fasta naming
@@ -48,9 +48,9 @@ Run with the provided test data: `pixi run grave-test`
 - When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)
 
 >[!WARNING]
->But crucially: entirely avoid hash characters in contig names
+>Crucially: avoid hash characters in contig names
 
-#### Graphs and indexes
+#### Graphs
 
 - `grave` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
 
@@ -112,7 +112,7 @@ Run with the provided test data: `pixi run grave-test`
 
 - Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files. By default `grave` looks for these in the `data/paths` directory.
 
-- Each `.paths` file contains a list reference paths from one reference sample (e.g., a subset or all paths), with one path name per line
+- Each `.paths` file contains a list reference paths from one reference sample, with one path name per line
 
 - __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
 
@@ -128,8 +128,6 @@ Run with the provided test data: `pixi run grave-test`
 unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
-
-- Another use case for the `--multiRef` option is targeting a subset of reference paths found in one reference sample (one `.paths` file required) or multiple reference samples (multiple `.paths` files required), for example only the autosomes, or only chr1
 
 ## Pipeline overview
 

@@ -1,5 +1,0 @@
-simChimp	https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactusTestData/master/evolver/primates/loci1/simChimp.chr6
-simOrang	https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactusTestData/master/evolver/primates/loci1/simOrang.chr6
-simHuman	https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactusTestData/master/evolver/primates/loci1/simHuman.chr6
-simGorilla	https://raw.githubusercontent.com/ComparativeGenomicsToolkit/cactusTestData/master/evolver/primates/loci1/simGorilla.chr6
-_MINIGRAPH_	/cfs/klemming/projects/supr/sheep_processing/NBIS-T_Gunther_2402/env/bin/cactus-bin-v2.9.0/primates-pg/primates-pg.sv.gfa.fa.gz

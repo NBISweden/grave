@@ -39,8 +39,8 @@ Run with the provided test data: `pixi run grave-test`
 
 ### File setup
 
-1. Add or link to the [graph](#graphs-and-indexes). By default `grave` looks for the file in `data/graph`.
-2. Fill out a `samplesheet.csv` including paths to the reads. By default `grave` looks for the file in `data/samplesheet`. [See layout description below](#samplesheet-layout).
+1. Add or link to the [graph](#graphs-and-indexes). By default `grave` looks for the file in `data`.
+2. Fill out a `samplesheet.csv` including paths to the reads. By default `grave` looks for the file in `data`. [See layout description below](#samplesheet-layout).
 3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples).
 
 #### Input fasta naming

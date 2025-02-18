@@ -12,8 +12,7 @@ workflow VERIFY {
 
 		if (params.help) {
 			println (" ")
-			println ("grave: Graph Variant Explorer")
-			println ("To run with all defaults: nextflow main.nf")
+			println ("grave")
 			println (" ")
 			println ("Command line parameters [default option within square brackets]:")
 			println (" ")
@@ -174,7 +173,7 @@ workflow VERIFY {
 	// Check for reference paths
 
 		if (!params.multiRef) {
-			println ("USER NOTE: As no reference paths were provided, grave will assume a single reference sample is present in your graph.")
+			println ("USER NOTE: As grave was not configured to take paths files, it will assume a single reference sample is present in your graph.")
 		}
 
 	// Check for graph files (different inputs depending on 'haplo' or 'filter' modes)
@@ -263,7 +262,7 @@ workflow VERIFY {
 		}
 
 		if (!foundPaths.isEmpty() && !params.multiRef) {
-			println ("WARN: found reference '.paths' files in '${params.pathsDir}', but the workflow is not configured to use them; to do so provide: '--multiRef'.")
+			println ("WARN: found reference '.paths' files in '${params.pathsDir}', but grave is not configured to use them. To do so add the '--multiRef' parameter.")
 		}
 
 }

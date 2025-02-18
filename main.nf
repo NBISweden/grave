@@ -17,12 +17,12 @@ Contributors:
 ----------------------------------------------------------------------------------------
 */
 
-include { VERIFY } from './subworkflows/verify.nf'
+include { INITIALISE } from './subworkflows/initialise.nf'
 include { GRAVE } from './workflows/grave.nf'
 
 workflow {
 
-	VERIFY ()
+	INITIALISE ()
 	GRAVE ()
 
 }

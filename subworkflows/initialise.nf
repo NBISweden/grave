@@ -1,12 +1,10 @@
 /* 
 ----------------------------------------------------------------------------------------
-Verify base dependencies & check required inputs
+Initialisation subworkflow
 ----------------------------------------------------------------------------------------
 */
 
-// Verification workflow execution
-
-workflow VERIFY {
+workflow INITIALISE {
 
 	// Help message
 

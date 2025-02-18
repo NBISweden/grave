@@ -2,6 +2,10 @@
 
 **Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
 
+[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
+
+[![Open grave in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/NBISweden/grave)
+
 ## Description
 
 `grave` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).

@@ -1,10 +1,8 @@
+[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)![Nextflow](https://img.shields.io/badge/Nextflow-v24.10.0-brightgreen)
+
 # Grave
 
 **Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
-
-[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
-
-[![Open grave in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/NBISweden/grave)
 
 ## Description
 
@@ -16,26 +14,28 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ## Quick start
 
-### Option 1 (recommended): use pixi
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/NBISweden/grave)
+
+### Local or HPC installation
 
 1. [Install Pixi](https://pixi.sh/latest/)
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-3. [File setup](#file-setup)
-4. From the repo, run `pixi run nextflow main.nf`, or run `pixi shell` to enter the environment, and run `grave` with `nextflow main.nf`
+3. Run `pixi install`
+
+### Run grave with test data
+
+Run with the provided test data: `pixi run grave-test`
+
+### Run grave with your data
+
+1. [Input file setup](#file-setup)
+2. Run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss1999-87-324 -profile dardelSlurm`
 
 >[!TIP]
->For help with command line options, run: `pixi run nextflow main.nf --help`
+>For help with command line options: `pixi run help`
 
 >[!TIP]
->An example shell script for running `grave` on a cluster with SLURM is provided in the repo, edit filepath, account number, and profile as needed
-
-### Option 2: install Nextflow + Apptainer
-
-1. [Install Nextflow](https://www.nextflow.io/docs/latest/install.html) (`grave` uses DSL2 & features introduced in `Nextflow 24.02.0-edge`. It was tested with `Nextflow v24.10.0`)
-2. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html)
-3. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-4. [File setup](#file-setup)
-5. Run the workflow: `nextflow main.nf`. To see extra command line options and default settings, run: `nextflow main.nf --help`
+>An example shell script for running `grave` on a cluster with SLURM is provided in the repo
 
 ### File setup
 

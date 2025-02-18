@@ -107,7 +107,7 @@ Main workflow definition
 	workflow GRAVE {
 
 		// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
-		if ("$params.graphMode" == "haplo") {
+		if ("${params.graphMode}" == "haplo") {
 			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
 			// Remake hapl indexes
 			MAKEHAPL(ch_gbz_graph, ch_types)
@@ -117,7 +117,7 @@ Main workflow definition
 					def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
 					return [ref: ref, indexes: indexes]
 				}
-		} else if ("$params.graphMode" == "filter") {
+		} else if ("${params.graphMode}" == "filter") {
 			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
 			// Remake filter indexes
 			MAKEFILTER(ch_gbz_graph, ch_types)

@@ -7,5 +7,3 @@ rm -rf results
 cd work
 
 rm -rf  !(apptainer)
-
-cd ..

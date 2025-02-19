@@ -4,7 +4,7 @@ process PROFILEPMD {
 
 	debug false
 	tag "${meta.id}"
-	label 'process_low'
+	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:befed64123034044'
 
 	// I/O & script

@@ -48,3 +48,36 @@ Contributors:
 		}
 
 	}
+
+// Email report
+
+	if (params.email_report) {
+
+		workflow.onComplete {
+
+			// Prepare email content
+			def workflow_status = workflow.success ? 'COMPLETED' : 'FAILED'
+			def email_address = params.email
+			def subject = "grave workflow run ${workflow.runName}: ${workflow_status}"
+			def msg = """
+			Pipeline execution summary
+			---------------------------
+			Run Name     : ${workflow.runName}
+			Completed at : ${workflow.complete}
+			Duration     : ${workflow.duration}
+			Success      : ${workflow.success}
+			Exit status  : ${workflow.exitStatus}
+			Error report : ${workflow.errorReport ?: 'No errors'}
+			"""
+			.stripIndent()
+
+			// Send the email
+			sendMail(
+				to: email_address,
+				subject: subject,
+				body: msg
+			)
+
+		}
+
+	}

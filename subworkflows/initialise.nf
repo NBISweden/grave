@@ -16,12 +16,17 @@ workflow INITIALISE {
 			println (" ")
 			println ("General settings:")
 			println (" ")
+			println ("--account [${params.account}] 					Used only for the SLURM executor, provide an allocation name for hours billing.")
+			println ("--email_report [${params.email_report}] 					Receive an email on pipeline completion.")
+			println ("--email [${params.email}] 						Email address for report.")
+			println (" ")
+			println ("Input settings:")
+			println (" ")
 			println ("--graphMode [${params.graphMode}] 					Use personal pangenomes (haplo), or filtered graphs (filter). See main docs or Minigraph-Cactus docs for more info.")
 			println ("--multiRef [${params.multiRef}] 					Tell grave to use provided '.paths' files containing lists of reference sample paths (not required for graphs containing only one reference sample).")
-			println ("--pathsDir				 		Path to the directory containing '.paths' files.")
 			println ("--graphDir				 		Path to the directory containing a '.gbz' file.")
 			println ("--samplesheet				 		Path to the samplesheet file.")
-			println ("--account [${params.account}] 					Used only for the SLURM executor, provide an allocation name for hours billing.")
+			println ("--pathsDir				 		Path to the directory containing '.paths' files.")
 			println (" ")
 			println ("Optional output files:")
 			println (" ")
@@ -85,6 +90,12 @@ workflow INITIALISE {
 			println ("Help message:")
 			println (" ")
 			error ("--help 							Print this message.")
+		}
+
+	// Early error if email requested but address not provided
+
+		if (params.email_report && !params.email) {
+			error ("ERROR: Email reporting requested but no email address provided, please provide an email address with '--email'.")
 		}
 
 	// Nextflow version

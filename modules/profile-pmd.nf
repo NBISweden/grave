@@ -4,7 +4,7 @@ process PROFILEPMD {
 
 	debug false
 	tag "${meta.id}"
-	label 'process_low'
+	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:befed64123034044'
 	publishDir path: 'output/pmd_profiles', mode: 'copy'
 
@@ -35,7 +35,7 @@ process PROFILEPMD {
 
 		# Run PMD profiling
 
-			damageprofiler -Xms2g -Xmx\${max_heap_gb}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -Xms4g -Xmx\${max_heap_gb}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 

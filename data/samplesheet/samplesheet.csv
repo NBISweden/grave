@@ -1,6 +1,1 @@
-id,repeat,type,merged,fastq_1,fastq_2
-ancientSimian,1,ancient,false,./data/reads/test/ancientSimian_s1.fq.gz,./data/reads/test/ancientSimian_s2.fq.gz
-modernHuman,1,modern,false,./data/reads/test/modernHuman_s1.fq.gz,./data/reads/test/modernHuman_s2.fq.gz
-ancientApe,1,ancient,false,./data/reads/test/ancientApe_s1.fq.gz,./data/reads/test/ancientApe_s2.fq.gz
-ancientApe,2,ancient,false,./data/reads/test/ancientApe_lib2_s1.fq.gz,./data/reads/test/ancientApe_lib2_s2.fq.gz
-ancientMerged,1,ancient,true,./data/reads/test/ancientMerged.fq.gz,
+/cfs/klemming/home/c/corma/Private/sheep_pangenome/NBIS-T_Gunther_2402/raw/reads/samplesheet.csv

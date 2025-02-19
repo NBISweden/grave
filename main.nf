@@ -3,9 +3,9 @@
 /* 
 ----------------------------------------------------------------------------------------
 
-Main workflow
+Graph Variant Explorer
 
-Grave: Graph Variant Explorer
+NBISweden/Grave
 
 GitHub: https://github.com/NBISweden/grave
 
@@ -17,12 +17,34 @@ Contributors:
 ----------------------------------------------------------------------------------------
 */
 
-include { INITIALISE } from './subworkflows/initialise.nf'
-include { GRAVE } from './workflows/grave.nf'
+// Imports
 
-workflow {
+	include { INITIALISE } from './subworkflows/initialise.nf'
+	include { GRAVE } from './workflows/grave.nf'
 
-	INITIALISE ()
-	GRAVE ()
+// Entry workflow
 
-}
+	workflow {
+
+		main:
+
+			INITIALISE ()
+			GRAVE ()
+
+		publish:
+
+			GRAVE.out.ch_versions >> 'package_versions'
+
+	}
+
+// Publish outputs
+
+	output {
+
+		package_versions {
+			path 'package_versions'
+			mode 'copy'
+			overwrite true
+		}
+
+	}

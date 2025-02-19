@@ -1,14 +1,15 @@
 /* 
 ----------------------------------------------------------------------------------------
-Main workflow definition
+Main workflow
 ----------------------------------------------------------------------------------------
 */
 
 // Feature flags
 
 	nextflow.preview.topic = true
+	nextflow.preview.output = true
 
-// Import modules
+// Imports
 
 	include { MAKEHAPL } from '../modules/make-hapl.nf'
 	include { MAKEFILTER } from '../modules/make-filter.nf'
@@ -102,102 +103,111 @@ Main workflow definition
 
 	def ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
 
-// Pangenome mapping & genotyping workflow execution
+// Main workflow
 
 	workflow GRAVE {
 
-		// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
-		if ("${params.graphMode}" == "haplo") {
-			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
-			// Remake hapl indexes
-			MAKEHAPL(ch_gbz_graph, ch_types)
-			ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
-				.map {element ->
-					def ref = element[0]
-					def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
-					return [ref: ref, indexes: indexes]
-				}
-		} else if ("${params.graphMode}" == "filter") {
-			ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
-			// Remake filter indexes
-			MAKEFILTER(ch_gbz_graph, ch_types)
-			ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
-				.map {element ->
-					def ref = element[0]
-					def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
-					return [ref: ref, indexes: indexes]
-				}
-		}
+		main:
 
-		// Report graph summary statistics & pull linear reference FASTAs
+			// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
+			if ("${params.graphMode}" == "haplo") {
+				ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
+				// Remake hapl indexes
+				MAKEHAPL(ch_gbz_graph, ch_types)
+				ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
+					.map {element ->
+						def ref = element[0]
+						def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
+						return [ref: ref, indexes: indexes]
+					}
+			} else if ("${params.graphMode}" == "filter") {
+				ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
+				// Remake filter indexes
+				MAKEFILTER(ch_gbz_graph, ch_types)
+				ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
+					.map {element ->
+						def ref = element[0]
+						def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
+						return [ref: ref, indexes: indexes]
+					}
+			}
 
-			PROCESSGRAPH(ch_gbz_graph, ch_ref_path_files.collect())
+			// Report graph summary statistics & pull linear reference FASTAs
 
-		// Compute graph snarls for variant calling/genotyping tasks
+				PROCESSGRAPH(ch_gbz_graph, ch_ref_path_files.collect())
 
-			COMPUTESNARLS(ch_gbz_graph)
+			// Compute graph snarls for variant calling/genotyping tasks
 
-		// Run quality filtering on input reads
+				COMPUTESNARLS(ch_gbz_graph)
 
-			FASTP(ch_samplesheet)
+			// Run quality filtering on input reads
 
-		// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
+				FASTP(ch_samplesheet)
 
-			ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0]) // Join on matching metadata
+			// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
 
-			FASTQC(ch_fastqc_input)
+				ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0]) // Join on matching metadata
 
-		// Merge and deduplicate FASTQs per sample
+				FASTQC(ch_fastqc_input)
 
-			FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads
-								.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
-								.groupTuple() // Group by sample
-								.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
-			)
+			// Merge and deduplicate FASTQs per sample
 
-		// Report skipped single library samples, as they were already deduplicated
+				FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads
+									.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
+									.groupTuple() // Group by sample
+									.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
+				)
 
-			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
+			// Report skipped single library samples, as they were already deduplicated
 
-		// Map reads to pangenome graph
+				FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
 
-			PANMAP(FASTQMERGEDEDUP.out.ch_sample_fastqs, ch_indexed_graph)
+			// Map reads to pangenome graph
 
-		// Surject mapped reads to reference paths
+				PANMAP(FASTQMERGEDEDUP.out.ch_sample_fastqs, ch_indexed_graph)
 
-			VGSURJECT(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
+			// Surject mapped reads to reference paths
 
-		// Secondary deduplication on surjected BAMs per sample
+				VGSURJECT(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANMAP.out.ch_mapped_gam)
 
-			BAMDEDUP(ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams)
+			// Secondary deduplication on surjected BAMs per sample
 
-		// Post-mortem damage assessment of reads
+				BAMDEDUP(ch_ref_path_files.collect(), VGSURJECT.out.ch_surjected_bams)
 
-			PROFILEPMD(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+			// Post-mortem damage assessment of reads
 
-		// Graph based variant calling
+				PROFILEPMD(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
-			VGGRAPHCALL(ch_gbz_graph, COMPUTESNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas)
+			// Graph based variant calling
 
-		// Mapping based variant calling
+				VGGRAPHCALL(ch_gbz_graph, COMPUTESNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas)
 
-			VGMAPCALL(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
+			// Mapping based variant calling
 
-			DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+				VGMAPCALL(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
-			DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
+				DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
-			FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+				DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
-		// Report package versions
+				FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
 
-			Channel.topic('versions')
-				.map { process, tool, version ->
-					return [process: process, tool: tool, version: version]
-				}
-				.unique()
-				.collect()
-				.map { it.join('\n') } // Back to a single string
-				.collectFile(name: 'package_versions.txt', newLine: true, storeDir: 'results/package_versions')
+			// Report package versions
+
+				Channel.topic('versions')
+					.map { process, tool, version ->
+						return [process: process, tool: tool, version: version]
+					}
+					.unique()
+					.collect()
+					.map { it.join('\n') }
+					.collectFile(name: 'package_versions.txt', newLine: true)
+					.set { ch_versions }
+
+		emit:
+
+			// Emit channels for publication
+
+				ch_versions = ch_versions
 
 	}

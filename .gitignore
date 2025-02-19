@@ -8,3 +8,4 @@ work
 trace-*
 .pixi
 *.egg-info
+results/

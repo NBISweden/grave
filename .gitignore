@@ -1,10 +1,22 @@
-data/graph/*
-data/reads/*fastq.gz
-data/samplesheet/bk/*
-!data/graph/README.md
-output
-work
+# Output files & directories
+
 .nextflow*
+work/
+results/
+report-*
 trace-*
+.DS_Store
+null/
+
+# Pixi
+
 .pixi
 *.egg-info
+
+# Input data + exceptions
+
+data/*
+!data/README.md
+!data/samplesheet.csv
+!data/test
+!data/paths/README.md

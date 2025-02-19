@@ -79,7 +79,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/lz4-c-1.10.0-h5888daf_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/lzo-2.10-hd590300_1001.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.5-he02047a_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-24.10.0-hdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-24.10.4-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/oniguruma-6.9.9-hd590300_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjdk-11.0.1-h516909a_1016.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openssl-3.4.0-hb9d3cd8_0.conda
@@ -987,16 +987,16 @@ packages:
   license: X11 AND BSD-3-Clause
   size: 889086
   timestamp: 1724658547447
-- conda: https://conda.anaconda.org/bioconda/noarch/nextflow-24.10.0-hdfd78af_0.tar.bz2
-  sha256: 2f871e135d5969b5a1e961339a26536742ac0f6fa10dd3c74fef89e8fd6d66f9
-  md5: 8b4fb80367cfbf7779efd2346037fdcb
+- conda: https://conda.anaconda.org/bioconda/noarch/nextflow-24.10.4-hdfd78af_0.tar.bz2
+  sha256: d4d9cd0f7aeabb8589a7b1fc4e2afe7414932f59c57dbc0ea1262504a3e62685
+  md5: 28be665561d11cd4f9a08b6fbdf47bc7
   depends:
   - coreutils
   - curl
   - openjdk >=11,<=21
   license: Apache-2.0
-  size: 30952607
-  timestamp: 1730161329409
+  size: 30960407
+  timestamp: 1737393749267
 - conda: https://conda.anaconda.org/conda-forge/linux-64/oniguruma-6.9.9-hd590300_0.conda
   sha256: dec1c78df7670d34880f71f75ac716f082d087494b4a2c6a90d5d75a82c933ed
   md5: 77dab674d16c1525ebe65e67de30de0d
@@ -1096,8 +1096,6 @@ packages:
 - conda: https://conda.anaconda.org/bioconda/linux-64/vg-1.63.1-h9ee0642_0.tar.bz2
   sha256: e1cb0028c84c84376d330528c6566a6ebbd62f1bd87fa32df2b50e1b8e21e2fd
   md5: 77ebadde6db1edb754c1391f803cb3ab
-  arch: x86_64
-  platform: linux
   license: MIT
   license_family: MIT
   size: 15966851

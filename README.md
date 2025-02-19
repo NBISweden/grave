@@ -30,7 +30,7 @@ Run with the provided test data: `pixi run grave-test`
 ### Run grave with your data
 
 1. [Input file setup](#file-setup)
-2. Run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile dardelSlurm`
+2. Run with defaults: `pixi run grave` (equivalent to `pixi run nextflow main.nf`). Or run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile dardelSlurm`
 
 >[!TIP]
 >For help with command line options: `pixi run help`
@@ -55,13 +55,14 @@ Run with the provided test data: `pixi run grave-test`
 
 - `grave` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
 
+>[!TIP]
+>Note on idex files: Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
+
 - There are two main methods for building the graph with `Minigraph-Cactus`:
-	1) haplotype sampling [best practice]
-	2) coverage filtering
+	1) build an unfiltered graph, for downstream haplotype sampling prior to mapping [**best practice**]
+	2) build a graph with low coverage nodes filtered out
 
 - The choice of method impacts whether to run `grave` in `haplo` mode [default] or `filter` mode, described more below
-
-- Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
 
 ##### Haplotype sampling
 

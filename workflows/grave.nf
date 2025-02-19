@@ -28,60 +28,6 @@ Main workflow
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
 	include { FREEBAYES } from '../modules/freebayes.nf'
 
-// Process samplesheet, check structure, output tuple "ch_samplesheet" with two elements: key-accessible metadata and FASTQ path list
-
-	// Initialise empty set for detecting duplicate repeat numbers
-	def uniqueRepeats = new HashSet<String>()
-
-	// Load samplesheet
-	def ch_samplesheet = Channel
-		.fromPath("${params.samplesheet}")
-		.splitCsv(header: true)
-		.map { row ->
-
-			// Populate metadata
-			def meta = [
-				id: row.id,
-				repeat: row.repeat,
-				type: row.type.toLowerCase(),
-				merged: row.merged.toLowerCase()
-			]
-
-			// Check no duplicate "sample + repeat" combinations
-			def key = "${meta.id}${meta.repeat}"
-			if (!uniqueRepeats.add(key)) {
-				error ("Error: found duplicate repeat numbers for sample '${meta.id}' in the samplesheet.")
-			}
-
-			// Check that merge information is true or false, convert to boolean
-			if (!['true', 'false'].contains(meta.merged)) {
-				error ("ERROR: Sample '${meta.id}' has an invalid 'merged' value: '${meta.merged}'. Please only supply 'true' or 'false' (case insensitive).")
-			}
-			meta.merged = meta.merged.toBoolean()
-
-			// Check sample types are correctly stated
-			if (!['ancient', 'modern'].contains(meta.type)) {
-				error ("Error: for '${meta.id}_repeat_${meta.repeat}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
-			}
-
-			// Initial checks passed, add FASTQ paths
-			if (meta.merged) {
-				if (row.fastq_1 && !row.fastq_2) {
-					return [meta, [file(row.fastq_1)]]
-				} else if (!row.fastq_1) {
-					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
-				} else {
-					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. The 'merged' field is true, but a second FASTQ file was unexpectedly provided.")
-				}
-			} else if (!meta.merged) {
-				if (row.fastq_1 && row.fastq_2) {
-					return [meta, [file(row.fastq_1), file(row.fastq_2)]]
-				} else {
-					error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet one or more FASTQ files appear to be missing.")
-				}
-			}
-		}
-
 // Determine whether to create modern or ancient indexes (or both), depending on sample input
 
 	// Initialise channel to summarise discovered sample types
@@ -103,9 +49,15 @@ Main workflow
 
 	def ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
 
+
+
 // Main workflow
 
 	workflow GRAVE {
+
+		take:
+
+			ch_samplesheet
 
 		main:
 

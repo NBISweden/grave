@@ -29,7 +29,7 @@ Contributors:
 		main:
 
 			INITIALISE ()
-			GRAVE ()
+			GRAVE (INITIALISE.out.ch_samplesheet)
 
 		publish:
 

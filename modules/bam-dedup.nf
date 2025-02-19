@@ -8,7 +8,7 @@ process BAMDEDUP {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/sambamba:53411ce753701297'
-	publishDir path: 'output/mapped_files/bams', mode: 'copy', pattern: "*.sort.dedup.bam"
+	publishDir path: 'results/mapped_files/bams', mode: 'copy', pattern: "*.sort.dedup.bam"
 
 	// I/O & script
 

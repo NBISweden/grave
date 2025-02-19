@@ -8,8 +8,8 @@ process VGGRAPHCALL {
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:6b57aa764c6e5ab4'
-	publishDir path: 'output/variant_calling/graph', mode: 'copy', pattern: "*.filtered.vcf.gz"
-	publishDir path: 'output/variant_calling/graph', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
+	publishDir path: 'results/variant_calling/graph', mode: 'copy', pattern: "*.filtered.vcf.gz"
+	publishDir path: 'results/variant_calling/graph', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 

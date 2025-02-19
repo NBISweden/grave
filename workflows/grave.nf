@@ -157,7 +157,7 @@ Main workflow definition
 
 		// Report skipped single library samples, as they were already deduplicated
 
-			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/output/quality_reports/fastp-sample-level")
+			FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
 
 		// Map reads to pangenome graph
 
@@ -198,6 +198,6 @@ Main workflow definition
 				.unique()
 				.collect()
 				.map { it.join('\n') } // Back to a single string
-				.collectFile(name: 'package_versions.txt', newLine: true, storeDir: 'output/package_versions')
+				.collectFile(name: 'package_versions.txt', newLine: true, storeDir: 'results/package_versions')
 
 	}

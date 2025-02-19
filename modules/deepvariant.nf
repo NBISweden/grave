@@ -6,7 +6,7 @@ process DEEPVARIANT {
 	tag "${meta.id}"
 	label 'process_high'
 	container 'docker://google/deepvariant:1.6.1'
-	publishDir path: 'output/quality_reports/deepvariant', mode: 'copy', pattern: "*.html"
+	publishDir path: 'results/quality_reports/deepvariant', mode: 'copy', pattern: "*.html"
 
 	// I/O & script
 

@@ -1,6 +1,8 @@
+# Work and results cleanup
+
 shopt -s extglob
 
-rm -rf output/
+rm -rf results
 
 cd work
 

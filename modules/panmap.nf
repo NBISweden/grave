@@ -6,9 +6,9 @@ process PANMAP {
 	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:71fb384e609a2165'
-	publishDir path: 'output/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
-	publishDir path: 'output/mapped_files/gams', mode: 'copy', enabled: params.keepRawGam, pattern: "*.gam", saveAs: { file -> file.endsWith('.filtered.gam') ? null : file }
-	publishDir path: 'output/statistics/mapped_samples', mode: 'copy', pattern: "*_alignment-stats.txt"
+	publishDir path: 'results/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
+	publishDir path: 'results/mapped_files/gams', mode: 'copy', enabled: params.keepRawGam, pattern: "*.gam", saveAs: { file -> file.endsWith('.filtered.gam') ? null : file }
+	publishDir path: 'results/statistics/mapped_samples', mode: 'copy', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
 

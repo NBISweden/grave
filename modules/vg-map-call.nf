@@ -8,8 +8,8 @@ process VGMAPCALL {
 	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
-	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy', pattern: "*.filtered.vcf.gz"
-	publishDir path: 'output/variant_calling/mapped_samples/vg-call', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
+	publishDir path: 'results/variant_calling/mapped_samples/vg-call', mode: 'copy', pattern: "*.filtered.vcf.gz"
+	publishDir path: 'results/variant_calling/mapped_samples/vg-call', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 

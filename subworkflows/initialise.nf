@@ -324,10 +324,33 @@ workflow INITIALISE {
 				}
 				.set { ch_samplesheet }
 
+		// Create types channel for correct index generation (modern, ancient, or both)
+
+			ch_types = Channel.empty()
+
+			ch_samplesheet
+				.map { meta, fastqs ->
+					return meta.type // Return all sample types
+				}
+				.unique() // Remove duplicates
+				.collect() // Add uniques to list
+				.map { uniqueTypes ->
+					return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". Else assign "both".
+				}
+				.set { ch_types }
+
+		// Create graph channel
+
+			Channel
+				.fromPath("${params.graphDir}/*.gbz")
+				.set { ch_gbz_graph }
+
 	emit:
 
 		// Emit channels to main workflow
 
-			ch_samplesheet = ch_samplesheet
+			ch_samplesheet
+			ch_types
+			ch_gbz_graph
 
 }

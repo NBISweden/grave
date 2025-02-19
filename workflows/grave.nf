@@ -28,61 +28,43 @@ Main workflow
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
 	include { FREEBAYES } from '../modules/freebayes.nf'
 
-// Determine whether to create modern or ancient indexes (or both), depending on sample input
-
-	// Initialise channel to summarise discovered sample types
-	ch_types = Channel.empty()
-
-	// Collect sample types from samplesheet
-	ch_samplesheet
-		.map { meta, fastqs ->
-			return meta.type // Return all sample types
-		}
-		.unique() // Remove duplicates
-		.collect() // Add uniques to list
-		.map { uniqueTypes ->
-			return uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign it to "ch_types". Else assign "both".
-		}
-		.set { ch_types }
-
-// Process reference path files as an optional input
-
-	def ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
-
-
-
 // Main workflow
+
+	// Optional input defined in main workflow script to avoid implicit channel creation if absent
+
+	ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
+
+	// Grave
 
 	workflow GRAVE {
 
 		take:
 
 			ch_samplesheet
+			ch_types
+			ch_gbz_graph
 
 		main:
 
-			// Load pangenome graph. Allow for two upstream construction modes: "haplo" (current best practice) and "filter"
-			if ("${params.graphMode}" == "haplo") {
-				ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
-				// Remake hapl indexes
-				MAKEHAPL(ch_gbz_graph, ch_types)
-				ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
-					.map {element ->
-						def ref = element[0]
-						def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
-						return [ref: ref, indexes: indexes]
-					}
-			} else if ("${params.graphMode}" == "filter") {
-				ch_gbz_graph = Channel.fromPath("${params.graphDir}/*.gbz")
-				// Remake filter indexes
-				MAKEFILTER(ch_gbz_graph, ch_types)
-				ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
-					.map {element ->
-						def ref = element[0]
-						def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
-						return [ref: ref, indexes: indexes]
-					}
-			}
+			// Create appropriate graph indexes
+
+				if ("${params.graphMode}" == "haplo") {
+					MAKEHAPL(ch_gbz_graph, ch_types)
+					ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
+						.map {element ->
+							def ref = element[0]
+							def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
+							return [ref: ref, indexes: indexes]
+						}
+				} else if ("${params.graphMode}" == "filter") {
+					MAKEFILTER(ch_gbz_graph, ch_types)
+					ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
+						.map {element ->
+							def ref = element[0]
+							def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
+							return [ref: ref, indexes: indexes]
+						}
+				}
 
 			// Report graph summary statistics & pull linear reference FASTAs
 
@@ -104,15 +86,17 @@ Main workflow
 
 			// Merge and deduplicate FASTQs per sample
 
-				FASTQMERGEDEDUP(FASTP.out.ch_fastp_reads
-									.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
-									.groupTuple() // Group by sample
-									.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
+				FASTQMERGEDEDUP(
+					FASTP.out.ch_fastp_reads
+						.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
+						.groupTuple() // Group by sample
+						.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
 				)
 
 			// Report skipped single library samples, as they were already deduplicated
 
-				FASTQMERGEDEDUP.out.ch_skipped_samples | collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
+				FASTQMERGEDEDUP.out.ch_skipped_samples
+					.collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
 
 			// Map reads to pangenome graph
 

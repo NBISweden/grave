@@ -27,15 +27,9 @@ process PROFILEPMD {
 	if (!params.multiRef)	// Assume single reference sample
 		"""
 
-		# Find system Java max heap size & convert to GB
-
-			max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}')
-
-			max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
-
 		# Run PMD profiling
 
-			damageprofiler -Xms2g -Xmx\${max_heap_gb}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 

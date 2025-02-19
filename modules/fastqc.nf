@@ -21,15 +21,9 @@ process FASTQC {
 	script:
 	"""
 
-	# Find system Java max heap size & convert to GB
-
-		max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}')
-
-		max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
-
 	# Run FastQC on raw and fastp processed reads
 
-		fastqc -Xms2g -Xmx\${max_heap_gb}g --format fastq --threads ${task.cpus} ${raw_reads} ${fastp_reads}
+		fastqc --format fastq --threads ${task.cpus} ${raw_reads} ${fastp_reads}
 
 	# Clean up
 

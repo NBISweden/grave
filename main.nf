@@ -36,6 +36,7 @@ Contributors:
 			)
 
 		publish:
+
 			GRAVE.out.ch_graph_stats >> 'graph_stats'
 			GRAVE.out.ch_library_fastp_report >> 'fastp_libraries'
 			GRAVE.out.ch_sample_fastp_report >> 'fastp_merged_samples'

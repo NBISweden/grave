@@ -6,7 +6,6 @@ process FASTP {
 	tag "${meta.id}.${meta.repeat}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
-	publishDir path: 'results/quality_reports/fastp-library-level', mode: 'copy', pattern: "*.fastp.html.gz"
 
 	// I/O & script
 
@@ -15,7 +14,7 @@ process FASTP {
 
 	output:
 	tuple val(meta), path("*.fastp*fq.gz"), emit: ch_fastp_reads
-	path "*.fastp.html.gz"
+	path "*.fastp.html.gz", emit: ch_library_fastp_report
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:

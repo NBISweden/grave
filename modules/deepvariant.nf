@@ -6,7 +6,6 @@ process DEEPVARIANT {
 	tag "${meta.id}"
 	label 'process_high'
 	container 'docker://google/deepvariant:1.6.1'
-	publishDir path: 'results/quality_reports/deepvariant', mode: 'copy', pattern: "*.html"
 
 	// I/O & script
 
@@ -17,7 +16,7 @@ process DEEPVARIANT {
 
 	output:
 	tuple val(meta), path("*.vcf"), emit: ch_raw_deepvariant_vcf
-	tuple val(meta), path("*.html")
+	tuple val(meta), path("*.html"), emit: ch_deepvariant_html
 	tuple val(task.process), val('deepvariant'), eval('/opt/deepvariant/bin/run_deepvariant --version 2>/dev/null | sed "s/.*version //"'), topic: versions
 
 	when:

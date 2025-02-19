@@ -1,14 +1,11 @@
 process FASTQMERGEDEDUP {
 
-	// Merge FASTQs per sample and deduplicate
-
 	// Directives
 
 	debug false
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
-	publishDir path: 'results/quality_reports/fastp-sample-level', mode: 'copy', pattern: "*.smFastp.html.gz"
 
 	// I/O & script
 
@@ -16,8 +13,8 @@ process FASTQMERGEDEDUP {
 	tuple val(meta), path(fastqs)
 
 	output:
-	tuple val(meta), path("*.smFastp*fq.gz"), emit: ch_sample_fastqs // Emit fastp processed sample-level FASTQs
-	path "*.smFastp.html.gz", optional: true
+	tuple val(meta), path("*.smFastp*fq.gz"), emit: ch_sample_fastqs
+	path "*.smFastp.html.gz", optional: true, emit: ch_sample_fastp_report
 	path "skipped-samples.txt", optional: true, emit: ch_skipped_samples
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 

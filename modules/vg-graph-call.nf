@@ -8,8 +8,6 @@ process VGGRAPHCALL {
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:6b57aa764c6e5ab4'
-	publishDir path: 'results/variant_calling/graph', mode: 'copy', pattern: "*.filtered.vcf.gz"
-	publishDir path: 'results/variant_calling/graph', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -20,8 +18,8 @@ process VGGRAPHCALL {
 	tuple path(reference_fasta), path(index)
 
 	output:
-	path "*.filtered.vcf.gz"
-	path "*.raw.vcf.gz", optional: true
+	path "*.filtered.vcf.gz", emit: ch_vg_graph_call_filtered_vcf
+	path "*.raw.vcf.gz", optional: true, emit: ch_vg_graph_call_raw_vcf
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions

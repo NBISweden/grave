@@ -6,7 +6,6 @@ process PROCESSGRAPH {
 	tag "${graph.baseName}_graph"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/samtools_vg:708cddc079bf2492'
-	publishDir path: 'results/statistics/graph', mode: 'copy', pattern: "*_graph-*.txt*"
 
 	// I/O & script
 
@@ -15,7 +14,7 @@ process PROCESSGRAPH {
 	path ref_path_files
 
 	output:
-	path "*_graph-*.txt*"
+	path "*_graph-*.txt*", emit: ch_graph_stats
 	tuple path("*.fasta"), path("*.fasta.fai"), emit: ch_reference_fastas
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions

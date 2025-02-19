@@ -16,7 +16,7 @@ Main workflow
 	include { PROCESSGRAPH } from '../modules/process-graph.nf'
 	include { COMPUTESNARLS } from '../modules/compute-snarls.nf'
 	include { FASTP } from '../modules/fastp.nf'
-	include { FASTQC } from '../modules/fastqc.nf'
+	include { FASTQC as QCRAW; FASTQC as QCFASTP } from '../modules/fastqc.nf'
 	include { FASTQMERGEDEDUP } from '../modules/fastq-merge-dedup.nf'
 	include { PANMAP } from '../modules/panmap.nf'
 	include { VGSURJECT } from '../modules/vg-surject.nf'
@@ -24,9 +24,9 @@ Main workflow
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VGGRAPHCALL } from '../modules/vg-graph-call.nf'
 	include { VGMAPCALL } from '../modules/vg-map-call.nf'
+	include { FREEBAYES } from '../modules/freebayes.nf'
 	include { DEEPVARIANT } from '../modules/deepvariant.nf'
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
-	include { FREEBAYES } from '../modules/freebayes.nf'
 
 // Main workflow
 
@@ -78,11 +78,13 @@ Main workflow
 
 				FASTP(ch_samplesheet)
 
-			// Merge raw and processed read channels for FASTQC, report read quality before and after filtering
+			// Run FASTQC on raw reads
 
-				ch_fastqc_input = ch_samplesheet.join(FASTP.out.ch_fastp_reads, by: [0]) // Join on matching metadata
+				QCRAW(ch_samplesheet)
 
-				FASTQC(ch_fastqc_input)
+			// Run FASTQC on filtered reads
+
+				QCFASTP(FASTP.out.ch_fastp_reads)
 
 			// Merge and deduplicate FASTQs per sample
 
@@ -92,11 +94,6 @@ Main workflow
 						.groupTuple() // Group by sample
 						.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
 				)
-
-			// Report skipped single library samples, as they were already deduplicated
-
-				FASTQMERGEDEDUP.out.ch_skipped_samples
-					.collectFile(name: 'skipped-samples.txt', storeDir: "${projectDir}/results/quality_reports/fastp-sample-level")
 
 			// Map reads to pangenome graph
 
@@ -112,7 +109,7 @@ Main workflow
 
 			// Post-mortem damage assessment of reads
 
-				PROFILEPMD(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+				PROFILEPMD(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_indexed_bams)
 
 			// Graph based variant calling
 
@@ -122,11 +119,17 @@ Main workflow
 
 				VGMAPCALL(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
-				DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+				DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_indexed_bams)
 
 				DVPROCESSVCF(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
 
-				FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_bams)
+				FREEBAYES(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_indexed_bams)
+
+			// Report skipped single library samples, as they were already deduplicated
+
+				FASTQMERGEDEDUP.out.ch_skipped_samples
+					.collectFile(name: 'skipped-samples.txt')
+					.set { ch_skipped_samples }
 
 			// Report package versions
 
@@ -144,6 +147,26 @@ Main workflow
 
 			// Emit channels for publication
 
+				ch_graph_stats = PROCESSGRAPH.out.ch_graph_stats
+				ch_library_fastp_report = FASTP.out.ch_library_fastp_report
+				ch_sample_fastp_report = FASTQMERGEDEDUP.out.ch_sample_fastp_report
+				ch_fastqc_raw = QCRAW.out.ch_fastqc
+				ch_fastqc_fastp = QCFASTP.out.ch_fastqc
+				ch_alignment_stats = PANMAP.out.ch_alignment_stats
+				ch_mapped_gam = PANMAP.out.ch_mapped_gam
+				ch_raw_gam = PANMAP.out.ch_raw_gam
+				ch_sample_dedup_bams = BAMDEDUP.out.ch_sample_dedup_bams
+				ch_pmd_profiles = PROFILEPMD.out.ch_pmd_profiles
+				ch_vg_graph_call_filtered_vcf = VGGRAPHCALL.out.ch_vg_graph_call_filtered_vcf
+				ch_vg_graph_call_raw_vcf = VGGRAPHCALL.out.ch_vg_graph_call_raw_vcf
+				ch_vg_map_call_filtered_vcf = VGMAPCALL.out.ch_vg_map_call_filtered_vcf
+				ch_vg_map_call_raw_vcf = VGMAPCALL.out.ch_vg_map_call_raw_vcf
+				ch_freebayes_norm_vcf = FREEBAYES.out.ch_freebayes_norm_vcf
+				ch_freebayes_raw_vcf = FREEBAYES.out.ch_freebayes_raw_vcf
+				ch_deepvariant_html = DEEPVARIANT.out.ch_deepvariant_html
+				ch_deepvariant_norm_vcf = DVPROCESSVCF.out.ch_deepvariant_norm_vcf
+				ch_deepvariant_raw_vcf = DVPROCESSVCF.out.ch_deepvariant_raw_vcf
+				ch_skipped_samples = ch_skipped_samples
 				ch_versions = ch_versions
 
 	}

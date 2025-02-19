@@ -6,8 +6,6 @@ process DVPROCESSVCF {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
-	publishDir path: 'results/variant_calling/mapped_samples/deepvariant', mode: 'copy', pattern: "*.norm.vcf.gz"
-	publishDir path: 'results/variant_calling/mapped_samples/deepvariant', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -17,8 +15,8 @@ process DVPROCESSVCF {
 	tuple val(meta), path(deepvariant_vcf)
 
 	output:
-	path "*.norm.vcf.gz"
-	path "*.raw.vcf.gz", optional: true
+	path "*.norm.vcf.gz", emit: ch_deepvariant_norm_vcf
+	path "*.raw.vcf.gz", optional: true, emit: ch_deepvariant_raw_vcf
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 

@@ -6,8 +6,6 @@ process FREEBAYES {
 	tag "${meta.id}"
 	label 'process_high'
 	container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
-	publishDir path: 'results/variant_calling/mapped_samples/freebayes', mode: 'copy', pattern: "*.norm.vcf.gz"
-	publishDir path: 'results/variant_calling/mapped_samples/freebayes', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -17,8 +15,8 @@ process FREEBAYES {
 	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
-	path("*.norm.vcf.gz")
-	path("*.raw.vcf.gz"), optional: true
+	path("*.norm.vcf.gz"), emit: ch_freebayes_norm_vcf
+	path("*.raw.vcf.gz"), optional: true, emit: ch_freebayes_raw_vcf
 	tuple val(task.process), val('bamtools'), eval('bamtools --version | head -n 2 | tail -n 1 | sed "s/bamtools //"'), topic: versions
 	tuple val(task.process), val('freebayes'), eval('freebayes --version | sed "s/version.*v//"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions

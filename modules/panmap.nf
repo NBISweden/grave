@@ -6,9 +6,6 @@ process PANMAP {
 	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/kmc_vg:71fb384e609a2165'
-	publishDir path: 'results/mapped_files/gams', mode: 'copy', pattern: "*.filtered.gam"
-	publishDir path: 'results/mapped_files/gams', mode: 'copy', enabled: params.keepRawGam, pattern: "*.gam", saveAs: { file -> file.endsWith('.filtered.gam') ? null : file }
-	publishDir path: 'results/statistics/mapped_samples', mode: 'copy', pattern: "*_alignment-stats.txt"
 
 	// I/O & script
 
@@ -18,8 +15,8 @@ process PANMAP {
 
 	output:
 	tuple val(meta), path("${meta.id}.filtered.gam"), emit: ch_mapped_gam
-	path "${meta.id}.gam", optional: true
-	path "*_alignment-stats.txt"
+	path "${meta.id}.gam", optional: true, emit: ch_raw_gam
+	path "*_alignment-stats.txt", emit: ch_alignment_stats
 	tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 

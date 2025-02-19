@@ -8,7 +8,6 @@ process BAMDEDUP {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/sambamba:53411ce753701297'
-	publishDir path: 'results/mapped_files/bams', mode: 'copy', pattern: "*.sort.dedup.bam"
 
 	// I/O & script
 
@@ -17,7 +16,8 @@ process BAMDEDUP {
 	tuple val(meta), path(surjected_bams)
 
 	output:
-	tuple val(meta), path("${meta.id}*.sort.dedup.bam"), path ("${meta.id}*.sort.dedup.bam.bai"), emit: ch_sample_dedup_bams
+	path "*.sort.dedup.bam", emit: ch_sample_dedup_bams
+	tuple val(meta), path("${meta.id}*.sort.dedup.bam"), path ("${meta.id}*.sort.dedup.bam.bai"), emit: ch_sample_dedup_indexed_bams
 	tuple val(task.process), val('sambamba'), eval('sambamba --version 2>&1 | head -n 2 | tail -n 1 | sed "s/sambamba //"'), topic: versions
 
 	script:

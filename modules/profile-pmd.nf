@@ -6,7 +6,6 @@ process PROFILEPMD {
 	tag "${meta.id}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/damageprofiler_vg:befed64123034044'
-	publishDir path: 'results/pmd_profiles', mode: 'copy'
 
 	// I/O & script
 
@@ -16,7 +15,7 @@ process PROFILEPMD {
 	tuple val(meta), path(surjected_bam), path(bam_index)
 
 	output:
-	path "*_pmd"
+	path "*_pmd", emit: ch_pmd_profiles
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 	tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 

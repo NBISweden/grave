@@ -8,8 +8,6 @@ process VGMAPCALL {
 	tag "${meta.id}"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
-	publishDir path: 'results/variant_calling/mapped_samples/vg-call', mode: 'copy', pattern: "*.filtered.vcf.gz"
-	publishDir path: 'results/variant_calling/mapped_samples/vg-call', mode: 'copy', enabled: params.keepRawVcf, pattern: "*.raw.vcf.gz"
 
 	// I/O & script
 
@@ -21,8 +19,8 @@ process VGMAPCALL {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	path "*.filtered.vcf.gz"
-	path "*.raw.vcf.gz", optional: true
+	path "*.filtered.vcf.gz", emit: ch_vg_map_call_filtered_vcf
+	path "*.raw.vcf.gz", optional: true, emit: ch_vg_map_call_raw_vcf
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions

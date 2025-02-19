@@ -102,20 +102,14 @@ workflow INITIALISE {
 
 		// Nextflow version
 
-			if (!nextflow.version.matches('>=24.02.0')) {
-				error ("ERROR: This workflow requires Nextflow version '24.02.0-edge' or later. You are running '${nextflow.version}'. Update with 'nextflow self-update'.")
+			if (!nextflow.version.matches('==24.10.4')) {
+				error ("ERROR: This workflow asks for Nextflow version '24.10.4'. You are running '${nextflow.version}'. Consider using the provided pixi environment.")
 			}
 
 		// Apptainer executable
 
 			if (!"apptainer".execute().text.trim()) {
 				error ("ERROR: This workflow requires the Apptainer executable available in PATH.")
-			}
-
-		// Check for input samplesheet
-
-			if (!file("${params.samplesheet}").exists()) {
-				error ("ERROR: Input file '${params.samplesheet}' was not found (please see docs).")
 			}
 
 		// Check directory structure
@@ -181,7 +175,7 @@ workflow INITIALISE {
 				}
 			}
 
-		// Check for reference paths
+		// Remind user of reference sample setting
 
 			if (!params.multiRef) {
 				println ("USER NOTE: As grave was not configured to take paths files, it will assume a single reference sample is present in your graph.")
@@ -214,27 +208,27 @@ workflow INITIALISE {
 				}
 
 				if (foundGbz.size() > 1) {
-					error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'haplo' mode use the clipped unfiltered graph.")
+					error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'haplo' mode provide only the clipped unfiltered graph.")
 				}
 
 				if (!foundFilteredGbz.isEmpty()) {
-					error ("ERROR: The '.gbz' file found in '${params.graphDir}' looks like a filtered graph. For 'haplo' mode use the clipped unfiltered graph.")
+					error ("ERROR: The '.gbz' file found in '${params.graphDir}' looks like a filtered graph. For 'haplo' mode provide a clipped unfiltered graph.")
 				}
 
 				// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
 				if (!foundDist.isEmpty()) {
-					error ("ERROR: The '.dist' file in '${params.graphDir}' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
+					error ("ERROR: The '.dist' file in '${params.graphDir}' is not required in haplo mode and suggests a filtered graph is present (see docs).")
 				}
 
 				if (!foundMin.isEmpty()) {
-					error ("ERROR: The '.min' file in '${params.graphDir}' is not required in haplo mode, please ensure you have run upstream processes correctly (see docs).")
+					error ("ERROR: The '.min' file in '${params.graphDir}' is not required in haplo mode and suggests a filtered graph is present (see docs).")
 				}
 
 			// Filter mode uses the clipped filtered graph
 			} else if ("$params.graphMode" == "filter") {
 
 				if (!foundHapl.isEmpty()) {
-					error ("ERROR: Graph mode is 'filter' but a '.hapl' index was found, please ensure you have run upstream processes correctly (see docs).")
+					error ("ERROR: Graph mode is 'filter' but a '.hapl' index was found suggesting an unfiltered graph (see docs).")
 				}
 
 				if (foundGbz.isEmpty()) {
@@ -242,11 +236,11 @@ workflow INITIALISE {
 				}
 
 				if (foundGbz.size() > 1) {
-					error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'filter' mode use the clipped filtered graph.")
+					error ("ERROR: More than one '.gbz' file found in '${params.graphDir}'. For 'filter' mode provide a clipped and filtered graph.")
 				}
 
 				if (foundFilteredGbz.isEmpty()) {
-					error ("ERROR: The .gbz file found in '${params.graphDir}' does not look like a filtered graph. For 'filter' mode use the clipped filtered graph.")
+					error ("ERROR: The .gbz file found in '${params.graphDir}' does not look like a filtered graph. For 'filter' mode provide the clipped filtered graph.")
 				}
 
 				if (!foundDist.isEmpty()) {
@@ -275,6 +269,8 @@ workflow INITIALISE {
 			if (!foundPaths.isEmpty() && !params.multiRef) {
 				println ("WARN: found reference '.paths' files in '${params.pathsDir}', but grave is not configured to use them. To do so add the '--multiRef' parameter.")
 			}
+
+		// Import samplesheet
 
 	emit:
 

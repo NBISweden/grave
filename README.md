@@ -33,9 +33,7 @@ Run with the provided test data: `pixi run grave-test`
 2. Run with defaults: `pixi run grave` (equivalent to `pixi run nextflow main.nf`). Or run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile dardelSlurm`
 
 >[!TIP]
->For help with command line options: `pixi run help`
-
->[!TIP]
+>For help with command line options: `pixi run help`<br><br>
 >An example shell script for running `grave` on a cluster with SLURM is provided in the repo
 
 ### File setup

@@ -8,7 +8,7 @@
 
 - deepvariant updates
 
-- may need to address java heap space: `FASTQC` abd `PROFILEPMD`
+- may need to address java heap space: `FASTQC` & `PROFILEPMD`
 
 ___
 

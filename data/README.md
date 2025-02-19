@@ -12,6 +12,6 @@ To run on filtered graphs, the graph is made using Minigraph-Cactus with the `--
 
 CSV file, following the template column headers provided.
 
-## Reads
+## Reads (provided within the samplesheet, see docs)
 
 Paired-end or merged reads in FASTQ format.

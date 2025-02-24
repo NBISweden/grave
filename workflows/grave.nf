@@ -30,7 +30,7 @@ Main workflow
 
 // Main workflow
 
-	// Optional input defined in main workflow script to avoid implicit channel creation if absent
+	// Optional input defined in main workflow script
 
 	ch_ref_path_files = params.multiRef ? Channel.fromPath("${params.pathsDir}/*.paths") : []
 

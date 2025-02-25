@@ -1,12 +1,37 @@
 #!/bin/bash -l
 
-# Go to grave repository (edit path as needed)
+# VARIABLES
 
-cd ~/grave
+GRAVE_REPO_PATH=~/grave
+TMUX_SESSION_NAME=grave
+PIXI_COMMAND="pixi run nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths -profile standard"
 
-# Run grave in the background (edit parameters as needed)
+### DO NOT EDIT BELOW THIS LINE ###
 
-tmux new -s grave-run -d /bin/bash -c "pixi run nextflow main.nf --account "naiss2024-22-619" -profile dardelSlurm"
+cd $GRAVE_REPO_PATH
 
-echo "Grave pipeline started in the background"
-echo "You can monitor the progress in '.nextflow.log' and with 'squeue'"
+tmux_version_output=$(tmux -V 2>&1)
+
+if [ $? -ne 0 ]; then
+	echo "Error: tmux not found"
+else
+	if echo "$tmux_version_output" | grep -q "^tmux "; then
+		majorVersion=$(echo "$tmux_version_output" | sed 's/^tmux //;s/\..*$//')
+		if [ "$majorVersion" -eq 1 ]; then
+			tmux new-session -s $TMUX_SESSION_NAME -d
+			tmux send-keys -t $TMUX_SESSION_NAME $PIXI_COMMAND C-m
+			echo "Found tmux version $majorVersion"
+			echo "Grave pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
+			echo "$PIXI_COMMAND"
+			echo "Monitor workflow progress in '.nextflow.log' or with 'squeue'"
+		elif [ "$majorVersion" -ge 2 ]; then
+			tmux new -s $TMUX_SESSION_NAME -d /bin/bash -c $PIXI_COMMAND
+			echo "Found tmux version $majorVersion"
+			echo "Grave pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
+			echo "$PIXI_COMMAND"
+			echo "Monitor workflow progress in '.nextflow.log' or with 'squeue'"
+		fi
+	else
+		echo "Error: Unable to parse tmux version"
+	fi
+fi

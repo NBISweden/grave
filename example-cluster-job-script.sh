@@ -18,14 +18,14 @@ else
 	if echo "$tmux_version_output" | grep -q "^tmux "; then
 		majorVersion=$(echo "$tmux_version_output" | sed 's/^tmux //;s/\..*$//')
 		if [ "$majorVersion" -eq 1 ]; then
-			tmux new-session -s $TMUX_SESSION_NAME -d
-			tmux send-keys -t $TMUX_SESSION_NAME $PIXI_COMMAND C-m
+			tmux new-session -s "$TMUX_SESSION_NAME" -d
+			tmux send-keys -t "$TMUX_SESSION_NAME" "$PIXI_COMMAND" C-m
 			echo "Found tmux version $majorVersion"
 			echo "Grave pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
 			echo "$PIXI_COMMAND"
 			echo "Monitor workflow progress in '.nextflow.log' or with 'squeue -u $USER'"
 		elif [ "$majorVersion" -ge 2 ]; then
-			tmux new -s $TMUX_SESSION_NAME -d /bin/bash -c $PIXI_COMMAND
+			tmux new -s "$TMUX_SESSION_NAME" -d /bin/bash -c "$PIXI_COMMAND"
 			echo "Found tmux version $majorVersion"
 			echo "Grave pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
 			echo "$PIXI_COMMAND"

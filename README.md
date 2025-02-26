@@ -25,8 +25,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 >[!NOTE]
 >The pixi project contains two environments:<br><br>
->`default`: installed with `pixi install`, and lacks apptainer (e.g. for systems with their own Apptainer installation)<br><br>
->`apptainer`: installed with `pixi install -e apptainer`, and provides Apptainer support
+>`default`: installed with `pixi install` - lacks apptainer (e.g. for systems with their own Apptainer installation)<br><br>
+>`apptainer`: installed with `pixi install -e apptainer` - provides Apptainer support
 
 ### Run grave with test data
 

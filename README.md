@@ -23,9 +23,18 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
 3. Run `pixi install`
 
+>[!NOTE]
+>The pixi project contains two environments:<br>
+>`default` is installed with `pixi install`, and lacks apptainer (e.g. for systems with their own Apptainer installation)<br>
+>`apptainer` is installed with `pixi install -e apptainer`, and provides Apptainer support
+
 ### Run grave with test data
 
 Run with the provided test data: `pixi run grave-test`
+
+>[!TIP]
+> All `pixi run` commands assume the `default` environment. To use the `apptainer` environment, add `-e apptainer`, e.g.:<br>
+>`pixi run -e apptainer grave-test`
 
 ### Run grave with your data
 
@@ -117,7 +126,7 @@ Run with the provided test data: `pixi run grave-test`
 - __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
 
 >[!TIP]
-> `vg` is packaged in the pixi environment, to see the reference samples in your graph run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`<br><br>
+> `vg` is packaged in the default pixi environment, to see the reference samples in your graph run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`<br><br>
 > For a list of all reference path names from, for example GRCh38, run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | tail -n+2 | awk '$3 == "GRCh38"' | cut -f1 > GRCh38.paths`
 
 - For each `.paths` file provided, `grave` will run pipeline steps relative to that sample separately from the others, e.g., `surject` will produce a separate `.bam` file per reference sample, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:

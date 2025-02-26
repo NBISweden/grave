@@ -1,10 +1,10 @@
 [project]
 authors = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
 channels = ["conda-forge", "bioconda"]
-description = "Grave pixi environment"
+description = "Grave pixi environments"
 name = "grave"
 platforms = ["linux-64"]
-version = "0.1.8"
+version = "1.0.0"
 
 [system-requirements]
 linux="3.10"
@@ -18,7 +18,12 @@ grave-test = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./da
 
 [dependencies]
 nextflow="==24.10.4"
-apptainer="==1.3.6"
 graphviz=">=12.2.1"
 msmtp-sendmail=">=1.8.28"
 vg="==1.63.1"
+
+[feature.apptainer.dependencies]
+apptainer="==1.3.6"
+
+[environments]
+apptainer = ["apptainer"]

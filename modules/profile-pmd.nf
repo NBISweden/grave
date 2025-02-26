@@ -20,7 +20,7 @@ process PROFILEPMD {
 	tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 
 	when:
-	meta.type == 'ancient'
+	meta.type == 'ancient' && params.profilePMD == true
 
 	script:
 	if (!params.multiRef)	// Assume single reference sample

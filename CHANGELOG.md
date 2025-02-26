@@ -8,11 +8,27 @@
 
 - deepvariant updates
 
-- may need to address java heap space: `FASTQC` & `PROFILEPMD`
-
 ___
 
 <!-- Release history -->
+
+## [1.1.0] - 2025-02-26
+
+### Added
+
+- pixi environments, accounting for systems with custom Apptainer installations (e.g. systems where user namespace is not allowed). `default` lacks apptainer and will look for system-wide Apptainer, `apptainer` provides Apptainer support in the pixi environment
+
+- option to skip profile pmd process
+
+### Changed
+
+- Batch submission shell script accounts for older tmux versions & other minor improvements
+
+- Safety added to projectDir cleanup shell script
+
+### Fixed
+
+- addressed java heap space for `PROFILEPMD`
 
 ## [1.0.0] - 2025-02-19
 

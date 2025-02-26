@@ -24,16 +24,16 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 3. Run `pixi install`
 
 >[!NOTE]
->The pixi project contains two environments:<br>
->`default` is installed with `pixi install`, and lacks apptainer (e.g. for systems with their own Apptainer installation)<br>
->`apptainer` is installed with `pixi install -e apptainer`, and provides Apptainer support
+>The pixi project contains two environments:<br><br>
+>`default`: installed with `pixi install`, and lacks apptainer (e.g. for systems with their own Apptainer installation)<br><br>
+>`apptainer`: installed with `pixi install -e apptainer`, and provides Apptainer support
 
 ### Run grave with test data
 
 Run with the provided test data: `pixi run grave-test`
 
 >[!TIP]
-> All `pixi run` commands assume the `default` environment. To use the `apptainer` environment, add `-e apptainer`, e.g.:<br>
+> All `pixi run` commands assume the `default` environment. To use the `apptainer` environment, add `-e apptainer`, e.g.:<br><br>
 >`pixi run -e apptainer grave-test`
 
 ### Run grave with your data

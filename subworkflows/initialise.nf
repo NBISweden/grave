@@ -109,7 +109,7 @@ workflow INITIALISE {
 		// Apptainer executable
 
 			if (!"apptainer".execute().text.trim()) {
-				error ("ERROR: This workflow requires the Apptainer executable available in PATH.")
+				error ("ERROR: This workflow requires Apptainer. To run using the pixi apptainer environment, add '-e apptainer' to your pixi run command.")
 			}
 
 		// Check directory structure

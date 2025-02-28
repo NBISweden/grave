@@ -15,7 +15,10 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ## Quick start
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/NBISweden/grave)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
+
+>[!TIP]
+>The image includes pixi, Nextflow, Apptainer, wave, nf-core tools, and more - so you can directly run pipeline tests.
 
 ### Local or HPC installation
 

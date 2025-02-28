@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
 ### Planned
 
 - long read support
@@ -10,7 +8,19 @@
 
 ___
 
+
+## [Unreleased]
+
+
+
+
 <!-- Release history -->
+
+## [1.2.0] - 2025-02-28
+
+### Changed
+
+- Migrated to codespaces from gitpod
 
 ## [1.1.0] - 2025-02-26
 

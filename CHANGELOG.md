@@ -16,6 +16,12 @@ ___
 
 <!-- Release history -->
 
+## [1.2.1] - 2025-03-04
+
+### Fixed
+
+- Patched profilepmd heap space issues, dynamically get maximum heap space and provide to profilepmd as upper limit
+
 ## [1.2.0] - 2025-02-28
 
 ### Changed

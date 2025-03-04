@@ -16,6 +16,12 @@ ___
 
 <!-- Release history -->
 
+## [1.2.2] - 2025-03-04
+
+### Fixed/added
+
+- Patch to profiles, add cluster resource limits to prevent SLURM rejections
+
 ## [1.2.1] - 2025-03-04
 
 ### Fixed

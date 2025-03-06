@@ -11,7 +11,9 @@ ___
 
 ## [Unreleased]
 
+### Fixed
 
+- Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
 
 
 <!-- Release history -->

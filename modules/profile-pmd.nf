@@ -29,6 +29,7 @@ process PROFILEPMD {
 		# Find system Java max heap size & convert to GB
 
 			max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
+
 			max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
 
 		# Run PMD profiling

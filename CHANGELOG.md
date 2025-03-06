@@ -6,6 +6,8 @@
 
 - deepvariant updates
 
+- Reinstate support for topic channel version reporting in processes that use storeDir, see GH issue: https://github.com/nextflow-io/nextflow/issues/5785, currently disabled due to a Nextflow bug
+
 ___
 
 
@@ -14,6 +16,13 @@ ___
 ### Fixed
 
 - Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
+
+### Added
+
+- Implemented `storeDir` for several outputs that need to be run only once. This is helpful when multiple users share a file system hosting graphs for instance, as these outputs will be pulled from the store.
+
+- Linked to adding `storeDir`, temporarily disabled all topic channel version reporting from modules that use it (https://github.com/nextflow-io/nextflow/issues/5785)
+
 
 
 <!-- Release history -->

@@ -50,20 +50,22 @@ Main workflow
 
 				if ("${params.graphMode}" == "haplo") {
 					MAKEHAPL(ch_gbz_graph, ch_types)
-					ch_indexed_graph = ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
+					ch_gbz_graph.combine(MAKEHAPL.out.ch_hapl_indexes).collect()
 						.map {element ->
 							def ref = element[0]
 							def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
 							return [ref: ref, indexes: indexes]
 						}
+						.set { ch_indexed_graph }
 				} else if ("${params.graphMode}" == "filter") {
 					MAKEFILTER(ch_gbz_graph, ch_types)
-					ch_indexed_graph = ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
+					ch_gbz_graph.combine(MAKEFILTER.out.ch_filter_indexes).collect()
 						.map {element ->
 							def ref = element[0]
 							def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
 							return [ref: ref, indexes: indexes]
 						}
+						.set { ch_indexed_graph }
 				}
 
 			// Report graph summary statistics & pull linear reference FASTAs

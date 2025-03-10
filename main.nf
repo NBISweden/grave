@@ -38,6 +38,7 @@ Contributors:
 		publish:
 
 			GRAVE.out.ch_graph_stats >> 'graph_stats'
+			GRAVE.out.ch_reference_fasta >> 'linear_references'
 			GRAVE.out.ch_library_fastp_report >> 'fastp_libraries'
 			GRAVE.out.ch_sample_fastp_report >> 'fastp_merged_samples'
 			GRAVE.out.ch_fastqc_raw >> 'fastqc_raw'
@@ -71,14 +72,20 @@ Contributors:
 			overwrite false
 		}
 
+		linear_references {
+			path 'linear_references'
+			mode 'copy'
+			overwrite false
+		}
+
 		fastp_libraries {
-			path 'quality_reports/fastp-library-level'
+			path 'quality_reports/fastp_library_level'
 			mode 'copy'
 			overwrite false
 		}
 
 		fastp_merged_samples {
-			path 'quality_reports/fastp-sample-level'
+			path 'quality_reports/fastp_sample_level'
 			mode 'copy'
 			overwrite false
 		}
@@ -142,13 +149,13 @@ Contributors:
 		}
 
 		vg_map_call_filtered_vcf {
-			path 'variant_calling/mapped_samples/vg-call'
+			path 'variant_calling/mapped_samples/vg_call'
 			mode 'copy'
 			overwrite false
 		}
 
 		vg_map_call_raw_vcf {
-			path 'variant_calling/mapped_samples/vg-call'
+			path 'variant_calling/mapped_samples/vg_call'
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf
@@ -187,7 +194,7 @@ Contributors:
 		}
 
 		skip_fastp_merge_samples {
-			path 'quality_reports/fastp-sample-level'
+			path 'quality_reports/fastp_sample_level'
 			mode 'copy'
 			overwrite false
 		}

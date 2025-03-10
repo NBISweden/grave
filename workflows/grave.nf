@@ -150,6 +150,7 @@ Main workflow
 			// Emit channels for publication
 
 				ch_graph_stats = PROCESSGRAPH.out.ch_graph_stats
+				ch_reference_fasta = PROCESSGRAPH.out.ch_reference_fastas
 				ch_library_fastp_report = FASTP.out.ch_library_fastp_report
 				ch_sample_fastp_report = FASTQMERGEDEDUP.out.ch_sample_fastp_report
 				ch_fastqc_raw = QCRAW.out.ch_fastqc

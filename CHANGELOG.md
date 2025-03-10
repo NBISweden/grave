@@ -16,12 +16,19 @@ ___
 ### Fixed
 
 - Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
+- All output folders use underscores (no dashes) for consistency
 
 ### Added
 
-- Implemented `storeDir` for several outputs that need to be run only once. This is helpful when multiple users share a file system hosting graphs for instance, as these outputs will be pulled from the store.
+- Implemented `storeDir` for outputs that need to be run once (snarls, hapl index, filter index). This is helpful when multiple users share a file system for storing graphs. Processes won't rerun even on fresh repo clones
+- These now store to a new folder next to the graph using the graph basename, e.g.: `example-unfiltered.gbz`, indexes are stored in: `example-unfiltered_indexes`
+- To ensure other stored indexes are not picked up by other stores, each index category goes into a specific subdirectory
+- Linked to adding `storeDir`, temporarily disabled topic channel version reporting from 3 modules that use it (https://github.com/nextflow-io/nextflow/issues/5785)
 
-- Linked to adding `storeDir`, temporarily disabled all topic channel version reporting from modules that use it (https://github.com/nextflow-io/nextflow/issues/5785)
+### Added
+
+- Linear references extracted from the graph are now included as output files in `results/linear_references`
+
 
 
 

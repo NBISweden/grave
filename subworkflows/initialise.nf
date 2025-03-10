@@ -201,7 +201,7 @@ workflow INITIALISE {
 			if ("${params.graphMode}" == "haplo") {
 
 				if (!foundHapl.isEmpty()) {
-					println ("USER NOTE: grave will not use the '.hapl' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
+					println ("USER NOTE: grave will not use the '.hapl' file(s) in '${params.graphDir}'.")
 				}
 
 				if (foundGbz.isEmpty()) {
@@ -245,11 +245,11 @@ workflow INITIALISE {
 				}
 
 				if (!foundDist.isEmpty()) {
-					println ("USER NOTE: grave will not use the '.dist' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
+					println ("USER NOTE: grave will not use the '.dist' file in '${params.graphDir}'.")
 				}
 
 				if (!foundMin.isEmpty()) {
-					println ("USER NOTE: grave will not use the '.min' file you provided in '${params.graphDir}', but you don't need to take action (see docs).")
+					println ("USER NOTE: grave will not use the '.min' file(s) in '${params.graphDir}'.")
 				}
 
 			// Prompt the user if there is a typo in the graph mode param

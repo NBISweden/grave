@@ -15,6 +15,7 @@ help = { cmd = "nextflow main.nf --help" }
 dag = { cmd = "nextflow main.nf -preview -with-dag flowchart.png" }
 grave = { cmd = "nextflow main.nf" }
 grave-test = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths" }
+grave-filter = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphMode filter" }
 
 [dependencies]
 nextflow="==24.10.4"

@@ -21,3 +21,6 @@ data/*
 !data/test
 !data/paths/README.md
 *.snarls
+*.hapl
+*.min
+*.dist

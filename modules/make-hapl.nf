@@ -6,6 +6,7 @@ process MAKEHAPL {
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
 	container 'oras://community.wave.seqera.io/library/vg:1.63.1--77c63f4a6f8f9d7a'
+	storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes/hapl") }
 
 	// I/O & script
 
@@ -15,7 +16,8 @@ process MAKEHAPL {
 
 	output:
 	path ("*.hapl"), emit: ch_hapl_indexes
-	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+	// PLANNED: enable topic channel once Nextflow bug resolved
+	//tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
 	def basename = graph.baseName - '.gbz'

@@ -29,6 +29,10 @@ ___
 
 - Linear references extracted from the graph are now included as output files in `results/linear_references`
 
+### Added
+
+- ext.args template added to each module, and placeholder module config file added `conf/modules.config`
+
 ### Changed
 
 - changed names of genotyping modules, channels, params etc. to increase their descriptive clarity - e.g. vg-graph-call -> vg_deconstruct, vg-map-call -> vg_genotype
@@ -42,11 +46,26 @@ ___
 
 - module names use consistent underscore separation, more descriptive
 
+### Changed
+
+- GAM filtering: no MAPQ filter, keep unmapped reads
 
 ### Fixed
 
 - Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
 - All output folders use underscores (no dashes) for consistency
+
+
+### Updated
+
+- TODO: updated DAG
+
+
+
+
+
+
+
 
 
 <!-- Release history -->
@@ -55,7 +74,7 @@ ___
 
 ### Fixed/added
 
-- Patch to profiles, add cluster resource limits to prevent SLURM rejections
+- Patch to profiles, add cluster resource limits to prevent SLURM rejections on retry attempts
 
 ## [1.2.1] - 2025-03-04
 

@@ -182,9 +182,13 @@ unknownSimian.1.gorilla.bam
 
 ### Provided variant calling tools
 
+#### Freebayes
 
+- `Freebayes` is integrated in `grave`, read more [here](https://github.com/freebayes/freebayes)
 
+#### DeepVariant
 
+- `DeepVariant` is integrated in `grave` (recommended for human input data), read more [here](https://github.com/google/deepvariant)
 
 ## Pipeline overview
 

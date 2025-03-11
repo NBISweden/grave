@@ -1,6 +1,6 @@
-process VGGRAPHCALL {
+process VG_DECONSTRUCT {
 
-	// Output variants in the graph as VCF, relative to selected paths
+	// Output variants in the graph as VCF
 
 	// Directives
 
@@ -18,15 +18,15 @@ process VGGRAPHCALL {
 	tuple path(reference_fasta), path(index)
 
 	output:
-	path "*.filtered.vcf.gz", emit: ch_vg_graph_call_filtered_vcf
-	path "*.raw.vcf.gz", optional: true, emit: ch_vg_graph_call_raw_vcf
+	path "*.filtered.vcf.gz", emit: ch_vg_deconstruct_filtered_vcf
+	path "*.raw.vcf.gz", optional: true, emit: ch_vg_deconstruct_raw_vcf
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vcfbub'), eval('vcfbub --version | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	when:
-	params.graphCall == true
+	params.graphDeconstruct == true
 
 	script:
 	def basename = graph.baseName - '.gbz'

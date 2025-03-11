@@ -48,8 +48,8 @@ Contributors:
 			GRAVE.out.ch_raw_gam >> 'raw_gam'
 			GRAVE.out.ch_sample_dedup_bams >> 'mapped_bams'
 			GRAVE.out.ch_pmd_profiles >> 'post_mortem_damage'
-			GRAVE.out.ch_vg_graph_call_filtered_vcf >> 'vg_graph_call_filtered_vcf'
-			GRAVE.out.ch_vg_graph_call_raw_vcf >> 'vg_graph_call_raw_vcf'
+			GRAVE.out.ch_vg_deconstruct_filtered_vcf >> 'vg_graph_deconstruct_filtered_vcf'
+			GRAVE.out.ch_vg_deconstruct_raw_vcf >> 'vg_graph_deconstruct_raw_vcf'
 			GRAVE.out.ch_vg_map_call_filtered_vcf >> 'vg_map_call_filtered_vcf'
 			GRAVE.out.ch_vg_map_call_raw_vcf >> 'vg_map_call_raw_vcf'
 			GRAVE.out.ch_freebayes_norm_vcf >> 'freebayes_normalised_vcf'
@@ -135,14 +135,14 @@ Contributors:
 			overwrite false
 		}
 
-		vg_graph_call_filtered_vcf {
-			path 'variant_calling/graph'
+		vg_graph_deconstruct_filtered_vcf {
+			path 'genotyping/graph'
 			mode 'copy'
 			overwrite false
 		}
 
-		vg_graph_call_raw_vcf {
-			path 'variant_calling/graph'
+		vg_graph_deconstruct_raw_vcf {
+			path 'genotyping/graph'
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf

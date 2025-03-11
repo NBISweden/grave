@@ -38,7 +38,7 @@ workflow INITIALISE {
 				println ("Optional processes:")
 				println (" ")
 				println ("--profilePMD [${params.profilePMD}] 					Turn off post-mortem damage profiling for ancient samples (true/false).")
-				println ("--graphCall [${params.graphCall}] 					Call variants from the graph, or skip (true/false).")
+				println ("--graphDeconstruct [${params.graphDeconstruct}] 				Produce VCF of variants in the graph, or skip (true/false).")
 				println ("--vgMapCall [${params.vgMapCall}] 					Call graph variants in mapped samples with vg call (true/false).")
 				println ("--freeBayes [${params.freeBayes}] 					Call variants in mapped samples with FreeBayes (true/false).")
 				println ("--deepVariant [${params.deepVariant}] 					Call variants in mapped samples with DeepVariant (true/false), recommended true for human data.")
@@ -125,13 +125,13 @@ workflow INITIALISE {
 
 		// Graph call
 
-			if (params.graphCall.toString().toLowerCase() in ["true", "false"]) {
-				boolean graphCallEnabled = params.graphCall.toString().toLowerCase() == "true"
-				if (!graphCallEnabled) {
+			if (params.graphDeconstruct.toString().toLowerCase() in ["true", "false"]) {
+				boolean graphDeconstructEnabled = params.graphDeconstruct.toString().toLowerCase() == "true"
+				if (!graphDeconstructEnabled) {
 					println ("USER NOTE: Variant calling directly from the graph is disabled.")
 				}
 			} else {
-				error ("ERROR: Invalid value '${params.graphCall}' for '--graphCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
+				error ("ERROR: Invalid value '${params.graphDeconstruct}' for '--graphDeconstruct' parameter. Please specify either 'true' or 'false' (case insensitive).")
 			}
 
 		// Vg map call
@@ -169,8 +169,8 @@ workflow INITIALISE {
 
 		// Compute snarls (only if both graph calling and vg call are disabled)
 
-			if (params.graphCall.toString().toLowerCase() && params.vgMapCall.toString().toLowerCase() in ["true", "false"]) {
-				boolean graphAndVgCallDisabled = params.graphCall.toString().toLowerCase() == "false" && params.vgMapCall.toString().toLowerCase() == "false"
+			if (params.graphDeconstruct.toString().toLowerCase() && params.vgMapCall.toString().toLowerCase() in ["true", "false"]) {
+				boolean graphAndVgCallDisabled = params.graphDeconstruct.toString().toLowerCase() == "false" && params.vgMapCall.toString().toLowerCase() == "false"
 				if (graphAndVgCallDisabled) {
 					println ("USER NOTE: Since the graph and vg call variant callers are disabled, snarls will also not be computed.")
 				}

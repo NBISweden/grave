@@ -39,7 +39,7 @@ workflow INITIALISE {
 				println (" ")
 				println ("--profilePMD [${params.profilePMD}] 					Turn off post-mortem damage profiling for ancient samples (true/false).")
 				println ("--graphDeconstruct [${params.graphDeconstruct}] 				Produce VCF of variants in the graph, or skip (true/false).")
-				println ("--vgMapCall [${params.vgMapCall}] 					Call graph variants in mapped samples with vg call (true/false).")
+				println ("--vgGenotype [${params.vgGenotype}] 					Genotype graph variants in mapped samples with vg call (true/false).")
 				println ("--freeBayes [${params.freeBayes}] 					Call variants in mapped samples with FreeBayes (true/false).")
 				println ("--deepVariant [${params.deepVariant}] 					Call variants in mapped samples with DeepVariant (true/false), recommended true for human data.")
 				println (" ")
@@ -70,8 +70,8 @@ workflow INITIALISE {
 				println (" ")
 				println ("General variant calling parameters:")
 				println (" ")
-				println ("--maxNestLevel [${params.maxNestLevel}]					During VCF processing (for graph based calling & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
-				println ("--maxRefLength [${params.maxRefLength}] 				During VCF processing (for graph based calling & vg call), remove variants over INT in length. Does not affect raw VCF output.")
+				println ("--maxNestLevel [${params.maxNestLevel}]					During VCF processing (for graph based genotyping & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
+				println ("--maxRefLength [${params.maxRefLength}] 				During VCF processing (for graph based genotyping & vg call), remove variants over INT in length. Does not affect raw VCF output.")
 				println ("--samplePloidy [${params.samplePloidy}] 					Sample ploidy.")
 				println ("--minimumAlleleSupport [${params.minimumAlleleSupport}] 				Minimum allele support for a call.")
 				println (" ")
@@ -128,7 +128,7 @@ workflow INITIALISE {
 			if (params.graphDeconstruct.toString().toLowerCase() in ["true", "false"]) {
 				boolean graphDeconstructEnabled = params.graphDeconstruct.toString().toLowerCase() == "true"
 				if (!graphDeconstructEnabled) {
-					println ("USER NOTE: Variant calling directly from the graph is disabled.")
+					println ("USER NOTE: Genotyping directly from the graph is disabled.")
 				}
 			} else {
 				error ("ERROR: Invalid value '${params.graphDeconstruct}' for '--graphDeconstruct' parameter. Please specify either 'true' or 'false' (case insensitive).")
@@ -136,13 +136,13 @@ workflow INITIALISE {
 
 		// Vg map call
 
-			if (params.vgMapCall.toString().toLowerCase() in ["true", "false"]) {
-				boolean vgMapCallEnabled = params.vgMapCall.toString().toLowerCase() == "true"
-				if (!vgMapCallEnabled) {
-					println ("USER NOTE: Variant calling with vg call is disabled.")
+			if (params.vgGenotype.toString().toLowerCase() in ["true", "false"]) {
+				boolean vgGenotypeEnabled = params.vgGenotype.toString().toLowerCase() == "true"
+				if (!vgGenotypeEnabled) {
+					println ("USER NOTE: Genotyping with vg call is disabled.")
 				}
 			} else {
-				error ("ERROR: Invalid value '${params.vgMapCall}' for '--vgMapCall' parameter. Please specify either 'true' or 'false' (case insensitive).")
+				error ("ERROR: Invalid value '${params.vgGenotype}' for '--vgGenotype' parameter. Please specify either 'true' or 'false' (case insensitive).")
 			}
 
 		// DeepVariant
@@ -167,12 +167,12 @@ workflow INITIALISE {
 				error ("ERROR: Invalid value '${params.freeBayes}' for '--freeBayes' parameter. Please specify either 'true' or 'false' (case insensitive).")
 			}
 
-		// Compute snarls (only if both graph calling and vg call are disabled)
+		// Compute snarls (only if both graph genotyping and vg call genotyping are disabled)
 
-			if (params.graphDeconstruct.toString().toLowerCase() && params.vgMapCall.toString().toLowerCase() in ["true", "false"]) {
-				boolean graphAndVgCallDisabled = params.graphDeconstruct.toString().toLowerCase() == "false" && params.vgMapCall.toString().toLowerCase() == "false"
+			if (params.graphDeconstruct.toString().toLowerCase() && params.vgGenotype.toString().toLowerCase() in ["true", "false"]) {
+				boolean graphAndVgCallDisabled = params.graphDeconstruct.toString().toLowerCase() == "false" && params.vgGenotype.toString().toLowerCase() == "false"
 				if (graphAndVgCallDisabled) {
-					println ("USER NOTE: Since the graph and vg call variant callers are disabled, snarls will also not be computed.")
+					println ("USER NOTE: Since the graph and vg call genotypers are disabled, snarls will also not be computed.")
 				}
 			}
 
@@ -268,7 +268,7 @@ workflow INITIALISE {
 			}
 
 			if (!foundPaths.isEmpty() && !params.multiRef) {
-				println ("WARN: found reference '.paths' files in '${params.pathsDir}', but grave is not configured to use them. To do so add the '--multiRef' parameter.")
+				println ("WARN: found reference '.paths' files in '${params.pathsDir}', but grave is not configured to use them. To do so use the '--multiRef' parameter and provide a multi-reference graph.")
 			}
 
 		// Import samplesheet

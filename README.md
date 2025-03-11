@@ -161,22 +161,27 @@ unknownSimian.1.gorilla.bam
 | variant_calling   | Variant calling outputs per sample                                                                         |
 
 >[!TIP]
-> The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered workflow outputs.
+> The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered workflow outputs
 
 ![Storedir example](assets/storedir.png)
 
 ## Genotyping and variant calling
 
 >[!TIP]
-> `grave` outputs BAM files surjected to reference assemblies in the graph, therefore users can use these in custom downstream tools.
+> `grave` outputs BAM files surjected to reference assemblies in the graph, therefore users can use these in custom downstream tools
 
-### In-built genotyping tools
+### Provided genotyping tools
 
 #### vg deconstruct
 
-- Outputs a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here ](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
+- `VG_DECONSTRUCT` uses `vg deconstruct` to produce a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
 
-### In-built variant calling tools
+#### vg call
+
+- `VG_GENOTYPE` uses `vg call` to genotype graph variants in mapped samples (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph)
+
+
+### Provided variant calling tools
 
 
 

@@ -23,7 +23,7 @@ Main workflow
 	include { BAMDEDUP } from '../modules/bam-dedup.nf'
 	include { PROFILEPMD } from '../modules/profile-pmd.nf'
 	include { VG_DECONSTRUCT } from '../modules/vg-deconstruct.nf'
-	include { VGMAPCALL } from '../modules/vg-map-call.nf'
+	include { VG_GENOTYPE } from '../modules/vg-genotype.nf'
 	include { FREEBAYES } from '../modules/freebayes.nf'
 	include { DEEPVARIANT } from '../modules/deepvariant.nf'
 	include { DVPROCESSVCF } from '../modules/process-dv-vcf.nf'
@@ -119,7 +119,7 @@ Main workflow
 
 			// Mapping based variant calling
 
-				VGMAPCALL(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
+				VG_GENOTYPE(ch_gbz_graph.collect(), COMPUTESNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), PANMAP.out.ch_mapped_gam)
 
 				DEEPVARIANT(ch_ref_path_files.collect(), PROCESSGRAPH.out.ch_reference_fastas.collect(), BAMDEDUP.out.ch_sample_dedup_indexed_bams)
 
@@ -162,8 +162,8 @@ Main workflow
 				ch_pmd_profiles = PROFILEPMD.out.ch_pmd_profiles
 				ch_vg_deconstruct_filtered_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_filtered_vcf
 				ch_vg_deconstruct_raw_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_raw_vcf
-				ch_vg_map_call_filtered_vcf = VGMAPCALL.out.ch_vg_map_call_filtered_vcf
-				ch_vg_map_call_raw_vcf = VGMAPCALL.out.ch_vg_map_call_raw_vcf
+				ch_vg_genotype_filtered_vcf = VG_GENOTYPE.out.ch_vg_genotype_filtered_vcf
+				ch_vg_genotype_raw_vcf = VG_GENOTYPE.out.ch_vg_genotype_raw_vcf
 				ch_freebayes_norm_vcf = FREEBAYES.out.ch_freebayes_norm_vcf
 				ch_freebayes_raw_vcf = FREEBAYES.out.ch_freebayes_raw_vcf
 				ch_deepvariant_html = DEEPVARIANT.out.ch_deepvariant_html

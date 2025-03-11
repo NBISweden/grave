@@ -1,4 +1,4 @@
-process VGMAPCALL {
+process VG_GENOTYPE {
 
 	// Genotypes each mapped sample against variants present in the graph (not novel read variants)
 
@@ -19,8 +19,8 @@ process VGMAPCALL {
 	tuple val(meta), path(mapped_gam)
 
 	output:
-	path "*.filtered.vcf.gz", emit: ch_vg_map_call_filtered_vcf
-	path "*.raw.vcf.gz", optional: true, emit: ch_vg_map_call_raw_vcf
+	path "*.filtered.vcf.gz", emit: ch_vg_genotype_filtered_vcf
+	path "*.raw.vcf.gz", optional: true, emit: ch_vg_genotype_raw_vcf
 	tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('htslib'), eval('tabix --version | head -n 1 | sed "s/.* //"'), topic: versions
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
@@ -28,7 +28,7 @@ process VGMAPCALL {
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	when:
-	params.vgMapCall == true
+	params.vgGenotype == true
 
 	script:
 	if (!params.multiRef)  // Default reference paths

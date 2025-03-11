@@ -50,8 +50,8 @@ Contributors:
 			GRAVE.out.ch_pmd_profiles >> 'post_mortem_damage'
 			GRAVE.out.ch_vg_deconstruct_filtered_vcf >> 'vg_graph_deconstruct_filtered_vcf'
 			GRAVE.out.ch_vg_deconstruct_raw_vcf >> 'vg_graph_deconstruct_raw_vcf'
-			GRAVE.out.ch_vg_map_call_filtered_vcf >> 'vg_map_call_filtered_vcf'
-			GRAVE.out.ch_vg_map_call_raw_vcf >> 'vg_map_call_raw_vcf'
+			GRAVE.out.ch_vg_genotype_filtered_vcf >> 'vg_genotype_filtered_vcf'
+			GRAVE.out.ch_vg_genotype_raw_vcf >> 'vg_genotype_raw_vcf'
 			GRAVE.out.ch_freebayes_norm_vcf >> 'freebayes_normalised_vcf'
 			GRAVE.out.ch_freebayes_raw_vcf >> 'freebayes_raw_vcf'
 			GRAVE.out.ch_deepvariant_html >> 'deepvariant_report'
@@ -148,27 +148,27 @@ Contributors:
 			enabled params.keepRawVcf
 		}
 
-		vg_map_call_filtered_vcf {
-			path 'variant_calling/mapped_samples/vg_call'
+		vg_genotype_filtered_vcf {
+			path 'genotyping/vg_genotype'
 			mode 'copy'
 			overwrite false
 		}
 
-		vg_map_call_raw_vcf {
-			path 'variant_calling/mapped_samples/vg_call'
+		vg_genotype_raw_vcf {
+			path 'genotyping/vg_genotype'
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf
 		}
 
 		freebayes_normalised_vcf {
-			path 'variant_calling/mapped_samples/freebayes'
+			path 'variant_calling/freebayes'
 			mode 'copy'
 			overwrite false
 		}
 
 		freebayes_raw_vcf {
-			path 'variant_calling/mapped_samples/freebayes'
+			path 'variant_calling/freebayes'
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf
@@ -181,13 +181,13 @@ Contributors:
 		}
 
 		deepvariant_normalised_vcf {
-			path 'variant_calling/mapped_samples/deepvariant'
+			path 'variant_calling/deepvariant'
 			mode 'copy'
 			overwrite false
 		}
 
 		deepvariant_raw_vcf {
-			path 'variant_calling/mapped_samples/deepvariant'
+			path 'variant_calling/deepvariant'
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf

@@ -1,4 +1,4 @@
-process PROCESSGRAPH {
+process PROCESS_GRAPH {
 
 	// Directives
 

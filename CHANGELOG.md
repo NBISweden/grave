@@ -38,6 +38,11 @@ ___
 
 - output directory structure improved to reduce nesting, as a result of related changes to outputs
 
+### Changed
+
+- module names use consistent underscore separation, more descriptive
+
+
 ### Fixed
 
 - Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.

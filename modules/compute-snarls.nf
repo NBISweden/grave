@@ -1,4 +1,4 @@
-process COMPUTESNARLS {
+process COMPUTE_SNARLS {
 
 	// Directives
 

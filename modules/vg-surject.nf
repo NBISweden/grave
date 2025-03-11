@@ -1,4 +1,4 @@
-process VGSURJECT {
+process VG_SURJECT {
 
 	// Projects GAM mappings to BAM against reference paths. If no user path files provided, uses vg defaults. If paths provided, each set is surjected to separately.
 

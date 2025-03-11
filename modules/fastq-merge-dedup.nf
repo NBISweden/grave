@@ -1,4 +1,4 @@
-process FASTQMERGEDEDUP {
+process FASTQ_MERGE_DEDUP {
 
 	// Directives
 

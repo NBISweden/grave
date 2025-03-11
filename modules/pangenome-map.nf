@@ -1,4 +1,4 @@
-process PANMAP {
+process PANGENOME_MAP {
 
 	// Directives
 

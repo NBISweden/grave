@@ -1,4 +1,4 @@
-process PROFILEPMD {
+process PROFILE_PMD {
 
 	// Directives
 

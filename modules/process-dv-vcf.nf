@@ -1,4 +1,4 @@
-process DVPROCESSVCF {
+process PROCESS_DEEPVARIANT {
 
 	// Directives
 

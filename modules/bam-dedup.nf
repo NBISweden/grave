@@ -1,4 +1,4 @@
-process BAMDEDUP {
+process BAM_DEDUP {
 
 	// Secondary BAM deduplication
 

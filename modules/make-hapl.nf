@@ -1,4 +1,4 @@
-process MAKEHAPL {
+process MAKE_HAPL {
 
 	// Directives
 

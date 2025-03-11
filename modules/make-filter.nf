@@ -1,4 +1,4 @@
-process MAKEFILTER {
+process MAKE_FILTER {
 
 	// Directives
 

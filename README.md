@@ -149,19 +149,19 @@ unknownSimian.1.gorilla.bam
 >[!TIP]
 > Results are stored in the `results` directory. Exact outputs depend on the settings used (`pixi run help`), but the following can be configured:
 
-| Output directory    | Description                                                                                      |
-|---------------------|--------------------------------------------------------------------------------------------------|
-| genotyping          | Genotyping outputs directly on the graph, and per sample                                         |
-| linear_references   | Graph reference samples, extracted as FASTA with PAN-SN format headers + index                   |
-| mapped_files        | GAM files, and BAMs surjected to respective graph references                                     |
-| package_versions    | Tool version report                                                                              |
-| pmd_profiles        | Post-mortem damage assessments (only for samples with `ancient` metadata tag)                    |
-| quality_reports     | FASTQC reports for raw and quality controlled + merged reads, fastp reports at the library and sample levels |
-| statistics          | Graph statistics and metadata, and alignment statistics per sample                               |
-| variant_calling     | Variant calling outputs per sample                                                               |
+| Output directory  | Description                                                                                                |
+|-------------------|------------------------------------------------------------------------------------------------------------|
+| genotyping        | Genotyping outputs directly from the graph, & per sample                                                   |
+| linear_references | Graph reference assemblies in FASTA formatwith Pan-SN headers + index                                      |
+| mapped_files      | GAM files, & BAMs surjected to respective graph references                                                 |
+| package_versions  | Tool version report                                                                                        |
+| pmd_profiles      | Post-mortem damage assessments (only for samples with the `ancient` metadata tag)                          |
+| quality_reports   | FASTQC reports for raw + quality controlled & merged reads, fastp reports at the library and sample levels |
+| statistics        | Graph statistics & metadata, & alignment statistics per sample                                             |
+| variant_calling   | Variant calling outputs per sample                                                                         |
 
 >[!TIP]
-> The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered as workflow outputs.
+> The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered workflow outputs.
 
 ![Storedir example](assets/storedir.png)
 

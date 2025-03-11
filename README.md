@@ -152,7 +152,7 @@ unknownSimian.1.gorilla.bam
 | Output directory  | Description                                                                                                |
 |-------------------|------------------------------------------------------------------------------------------------------------|
 | genotyping        | Genotyping outputs directly from the graph, & per sample                                                   |
-| linear_references | Graph reference assemblies in FASTA formatwith Pan-SN headers + index                                      |
+| linear_references | Graph reference assemblies in FASTA format with Pan-SN headers + index                                     |
 | mapped_files      | GAM files, & BAMs surjected to respective graph references                                                 |
 | package_versions  | Tool version report                                                                                        |
 | pmd_profiles      | Post-mortem damage assessments (only for samples with the `ancient` metadata tag)                          |

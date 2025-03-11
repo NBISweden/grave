@@ -85,6 +85,15 @@ ______________________________________________________________________
 - GAM filtering: added a param "--gamFilterMore". When false, filters only on primary alignment score + defrays ends. When true, applies MAPQ filter and discards unmapped reads
 - Under the hood this is controlled by conditional logic in `modules.config` that sets the value of `ext.args2`
 
+### Changed
+
+- FASTP defaulted to discard unmerged reads for aDNA samples. It now defaults to keeping them.
+- This is controlled by a parameter `--discardUnmerged` (default false)
+- Under the hood this controls FASTP `ext.args` in `modules.config`, outputting two extra fastq files for unmerged reads.
+- These files are:
+a) output to the user without further processing OR
+b) concatenated with the merged file and used as mapping input
+
 ### Fixed
 
 - Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.

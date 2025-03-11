@@ -59,6 +59,7 @@ workflow INITIALISE {
 				println (" ")
 				println ("FASTP parameters:")
 				println (" ")
+				println ("--discardUnmerged [${params.discardUnmerged}] 				Discard unmerged reads when merging aDNA paired-end FASTQ files (true/false).")
 				println ("--dupCalcAccuracy [${params.dupCalcAccuracy}] 					Accuracy level to calculate duplication (1~6), higher level uses more memory (1G, 2G, 4G, 8G, 16G, 24G). 1 for no-dedup mode, 3 for dedup mode.")
 				println ("--readDiscardLength [${params.readDiscardLength}] 				Reads shorter than INT will be discarded.")
 				println (" ")

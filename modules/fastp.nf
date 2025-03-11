@@ -23,9 +23,9 @@ process FASTP {
 	if (meta.type == "ancient" && meta.merged == false)
 		"""
 
-		# Ancient DNA read QC, merge reads & discard unmerged
+		# Ancient DNA read QC, merge reads (unmerged read discard behaviour controlled by args + param "discardUnmerged")
 
-			fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
+			fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz ${args} --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
 
 			rm fastp.json
 

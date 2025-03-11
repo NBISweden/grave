@@ -7,9 +7,13 @@
 
 ## Description
 
-`grave` is a Nextflow workflow for mapping and genotyping ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).
+`grave` is a Nextflow workflow for mapping and genotyping/variant calling ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).
 
 As input it takes a pangenome graph in `.gbz` format and either paired-end or merged FASTQ data (from samples listed in a `.csv` samplesheet).
+
+Outputs are described [here](#workflow-outputs).
+
+More information on genotyping and variant calling is found [here](#genotyping-and-variant-calling).
 
 It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#input-fasta-naming).
 
@@ -138,6 +142,45 @@ Run with the provided test data: `pixi run grave-test`
 unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
+
+
+## Workflow outputs
+
+>[!TIP]
+> Results are stored in the `results` directory. Exact outputs depend on the settings used (`pixi run help`), but the following can be configured:
+
+| Output directory    | Description                                                                                      |
+|---------------------|--------------------------------------------------------------------------------------------------|
+| genotyping          | Genotyping outputs directly on the graph, and per sample                                         |
+| linear_references   | Graph reference samples, extracted as FASTA with PAN-SN format headers + index                   |
+| mapped_files        | GAM files, and BAMs surjected to respective graph references                                     |
+| package_versions    | Tool version report                                                                              |
+| pmd_profiles        | Post-mortem damage assessments (only for samples with `ancient` metadata tag)                    |
+| quality_reports     | FASTQC reports for raw and quality controlled + merged reads, fastp reports at the library and sample levels |
+| statistics          | Graph statistics and metadata, and alignment statistics per sample                               |
+| variant_calling     | Variant calling outputs per sample                                                               |
+
+>[!TIP]
+> The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered as workflow outputs.
+
+![Storedir example](assets/storedir.png)
+
+## Genotyping and variant calling
+
+>[!TIP]
+> `grave` outputs BAM files surjected to reference assemblies in the graph, therefore users can use these in custom downstream tools.
+
+### In-built genotyping tools
+
+#### vg deconstruct
+
+- Outputs a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here ](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
+
+### In-built variant calling tools
+
+
+
+
 
 ## Pipeline overview
 

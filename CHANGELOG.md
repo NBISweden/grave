@@ -3,12 +3,46 @@
 ### Planned
 
 - long read support
+	- add metadata field
+	- plug in long read variant callers
 
-- deepvariant updates
+- deepvariant updates: now directly supports graphs
+	- also see [here](https://ucsc-ci.com/comparativegenomicstoolkit/cactus/-/blob/2dd29514027a0ad2c1a5d0ab581c7930c943fac5/doc/sa_refgraph_hackathon_2023.md#part-3-mapping-reads-to-the-graph)
+	- and [here](https://google.github.io/deepvariant/posts/2018-12-05-improved-non-human-variant-calling-using-species-specific-deepvariant-models/)
 
 - Reinstate support for topic channel version reporting in processes that use storeDir, see GH issue: https://github.com/nextflow-io/nextflow/issues/5785, currently disabled due to a Nextflow bug
 
-___
+- Better test data with known variants of interest, add screenshots of variant calls vs genotyping outcomes
+
+- Integrate an optional input of reference assembly annotation file(s), with built in liftover to the extracted references
+
+- Support interleaved BAM input, convert to FASTQ (see EAGER)
+
+- Joint freebayes calling, or post-hoc (multiVCFanalyzer?) (see EAGER). Check also freebayes implementation in EAGER.
+
+- Check other EAGER modules
+
+- Consider mapping quality assessment: preseq, qualimap2, endorS.py (EAGER)
+
+- Consider other tools: MtNucRatio, GATK, bedtools, bamUtils, ANGSD, pileupcaller, VCF2Genome, MultiVCFAnalyzer, bcftools annotate, bcftools for genotyping/filtering, snpeff, vep, bamRefine
+	- ANGSD: instead of using pileupCaller, could use ANGSE in two separate modules: pseudo-haploid genotyping and genotype likelihoods
+
+- Consider VCF binning (e.g., HPRC deconstructs twice with different filters, also does joint calling? and then splits to sample level VCF)
+	- HPRC: -l 0 -r 10000000, then separates into SVs and small variants
+	- HPRC: -r 100000, keeping nested variants
+	- Split multi-sample VCF to single with bcftools
+	- Multiallelic sites split to bi-allelic records
+	- VCF decomposed to SNPs and indels with vcfdecompose
+	- Extract and normalise small variants with bcftools
+	- Concatenate again on sample level
+	- Similar with DeepVariant & then compare
+
+- Potential flaw:
+	- this approach assumes sample name will never be the same. But two haplotypes from the same sample will have the same sample name:
+	`vg paths --paths-file \$i --extract-fasta -x ${graph} > \$basename.fasta`
+	- add haplotype number metadata field and update metadata labelling within processes
+
+______________________________________________________________________
 
 
 ## [Unreleased]

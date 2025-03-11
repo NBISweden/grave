@@ -31,6 +31,8 @@ process VG_GENOTYPE {
 	params.vgGenotype == true
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (!params.multiRef)  // Default reference paths
 		"""
 

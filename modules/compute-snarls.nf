@@ -22,6 +22,7 @@ process COMPUTE_SNARLS {
 	params.graphDeconstruct == true || params.vgGenotype == true
 
 	script:
+	def args = task.ext.args ?: ''
 	"""
 
 	# Compute graph snarls for genotyping tasks

@@ -29,6 +29,7 @@ process VG_DECONSTRUCT {
 	params.graphDeconstruct == true
 
 	script:
+	def args = task.ext.args ?: ''
 	def basename = graph.baseName - '.gbz'
 
 	if (!params.multiRef)  // Default reference paths

@@ -20,6 +20,7 @@ process MAKE_HAPL {
 	//tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
 	def basename = graph.baseName - '.gbz'
 	def distname = "${basename}.dist"
 	def rindexname = "${basename}.ri"

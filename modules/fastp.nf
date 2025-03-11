@@ -18,6 +18,8 @@ process FASTP {
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (meta.type == "ancient" && meta.merged == false)
 		"""
 

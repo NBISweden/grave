@@ -23,6 +23,8 @@ process DEEPVARIANT {
 	params.deepVariant == true
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (!params.multiRef)	// Assume single reference sample
 		"""
 

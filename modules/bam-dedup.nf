@@ -21,6 +21,8 @@ process BAM_DEDUP {
 	tuple val(task.process), val('sambamba'), eval('sambamba --version 2>&1 | head -n 2 | tail -n 1 | sed "s/sambamba //"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (!params.multiRef) // One reference sample
 		"""
 

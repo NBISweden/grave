@@ -19,6 +19,8 @@ process FASTQ_MERGE_DEDUP {
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (meta.type == "ancient" || meta.merged == true) // For ancient reads & merged modern reads, expect one file per library from FASTP
 		"""
 

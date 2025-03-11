@@ -17,6 +17,8 @@ process FASTQC {
 	tuple val(task.process), val('fastqc'), eval('fastqc --version | sed "s/.* v//"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
+
 	"""
 
 	# Run FastQC on raw and fastp processed reads

@@ -21,6 +21,7 @@ process PANGENOME_MAP {
 	tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
 	def memory = task.memory.toGiga()
 	def basename = graph.baseName - '.gbz'
 

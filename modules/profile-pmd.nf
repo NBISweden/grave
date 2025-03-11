@@ -20,6 +20,7 @@ process PROFILE_PMD {
 	tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 
 	when:
+	def args = task.ext.args ?: ''
 	meta.type == 'ancient' && params.profilePMD == true
 
 	script:

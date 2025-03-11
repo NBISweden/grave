@@ -22,6 +22,8 @@ process VG_SURJECT {
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
+
 	if (!params.multiRef && meta.type == "ancient")	// Default reference paths, GAM not interleaved
 		"""
 

@@ -20,6 +20,7 @@ process PROCESS_GRAPH {
 	tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
 	script:
+	def args = task.ext.args ?: ''
 	def basename = graph.baseName - '.gbz'
 
 	if (!params.multiRef)	// Assume single reference sample, extract all reference paths

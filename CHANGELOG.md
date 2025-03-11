@@ -48,7 +48,8 @@ ___
 
 ### Changed
 
-- GAM filtering: no MAPQ filter, keep unmapped reads
+- GAM filtering: added a param "--gamFilterMore". When false, filters only on primary alignment score + defrays ends. When true, applies MAPQ filter and discards unmapped reads
+- Under the hood this is controlled by conditional logic in `modules.config` that sets the value of `ext.args2`
 
 ### Fixed
 

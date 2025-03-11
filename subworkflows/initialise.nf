@@ -64,6 +64,7 @@ workflow INITIALISE {
 				println (" ")
 				println ("Mapping parameters:")
 				println (" ")
+				println ("--gamFilterMore [${params.gamFilterMore}] 				When false, GAMs are filtered on primary alignment score & read ends are defrayed. When true, also filters on MAPQ and discards unmapped reads (true/false).")
 				println ("--kffKmerMinimum [${params.kffKmerMinimum}] 					Minimum occurences of a K-mer to be counted during haplotype subsampling.")
 				println ("--minimumScorePrimaryAlign [${params.minimumScorePrimaryAlign}] 			Minimum score to keep primary alignment during filtering.")
 				println ("--minimumMapQFilter [${params.minimumMapQFilter}] 				Filter alignments with mapping quality < INT.")

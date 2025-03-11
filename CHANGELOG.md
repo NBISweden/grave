@@ -13,10 +13,10 @@ ___
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
-- All output folders use underscores (no dashes) for consistency
+- README.md updated with workflow output details and more information on genotyping and variant calling tools
+- Most relevant, now explicitly point out the difference between the genotyping and variant calling tools
 
 ### Added
 
@@ -29,7 +29,19 @@ ___
 
 - Linear references extracted from the graph are now included as output files in `results/linear_references`
 
+### Changed
 
+- changed names of genotyping modules, channels, params etc. to increase their descriptive clarity - e.g. vg-graph-call -> vg_deconstruct, vg-map-call -> vg_genotype
+- for clarity genotyping outputs go into a genotyping folder, not variant_calling
+
+### Changed
+
+- output directory structure improved to reduce nesting, as a result of related changes to outputs
+
+### Fixed
+
+- Patched non-zero exit when getting heap space for profilepmd, which would cause process to fail even if successful. Force 0 exit.
+- All output folders use underscores (no dashes) for consistency
 
 
 <!-- Release history -->

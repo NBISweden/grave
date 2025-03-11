@@ -54,9 +54,9 @@ Run with the provided test data: `pixi run grave-test`
 
 ### File setup
 
-1. Add the [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`.
-2. Fill out a `samplesheet.csv` including file system paths to the reads. By default `grave` looks for this in `data`. [See layout description below](#samplesheet-layout).
-3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples).
+1. Add the [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`
+2. Fill out a `samplesheet.csv` including file system paths to the reads. By default `grave` looks for this in `data`. [See layout description below](#samplesheet-layout)
+3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples)
 
 #### Input fasta naming
 
@@ -126,7 +126,7 @@ Run with the provided test data: `pixi run grave-test`
 
 - Paths through the reference sample are _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others
 
-- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files. By default `grave` looks for these in the `data/paths` directory.
+- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files. By default `grave` looks for these in the `data/paths` directory
 
 - Each `.paths` file contains a list reference paths from one reference sample, with one path name per line
 
@@ -179,7 +179,6 @@ unknownSimian.1.gorilla.bam
 #### vg call
 
 - `VG_GENOTYPE` uses `vg call` to genotype graph variants in mapped samples (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph)
-
 
 ### Provided variant calling tools
 

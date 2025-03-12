@@ -21,9 +21,19 @@ process FASTQC {
 
 	"""
 
-	# Run FastQC on raw and fastp processed reads
+	# Remove empty files (most common in unmerged aDNA output from fastp)
 
-		fastqc --format fastq --threads ${task.cpus} ${reads}
+		for file in *.fq.gz
+			do
+				if [ ! -s \$file ]; then
+					rm \$file
+					echo "Removed empty file \$file."
+				fi
+			done
+
+	# Run FastQC
+
+		fastqc --format fastq --threads ${task.cpus} *.fq.gz
 
 	# Clean up
 

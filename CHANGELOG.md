@@ -47,10 +47,17 @@ ______________________________________________________________________
 
 ## [Unreleased]
 
+
+
+
+
+## [1.3.0] - 2025-03-XX TODO: [Unreleased]
+
 ### Added
 
 - README.md updated with workflow output details and more information on genotyping and variant calling tools
 - Most relevant, now explicitly point out the difference between the genotyping and variant calling tools
+- TODO: detail on deepvariant and freebayes
 
 ### Added
 
@@ -87,12 +94,12 @@ ______________________________________________________________________
 
 ### Changed
 
-- FASTP defaulted to discard unmerged reads for aDNA samples. It now defaults to keeping them.
+- Fastp previously defaulted to discard unmerged reads for aDNA samples. It now defaults to keeping them.
 - This is controlled by a parameter `--discardUnmerged` (default false)
 - Under the hood this controls FASTP `ext.args` in `modules.config`, outputting two extra fastq files for unmerged reads.
-- These files are:
-a) output to the user without further processing OR
-b) concatenated with the merged file and used as mapping input
+- If these files are present, they are first concatenated with the respective merged reads before sample level concatenation and re-deduplication
+- i.e. the mapper would receiving one file per sample, containing all libraries, and both merged and unmerged reads in a single deduplicated package
+- As a result of this change, also added safety to FASTQC on receiving empty FASTQ files
 
 ### Fixed
 

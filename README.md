@@ -149,16 +149,16 @@ unknownSimian.1.gorilla.bam
 >[!TIP]
 > Results are stored in the `results` directory. Exact outputs depend on the settings used (`pixi run help`), but the following can be configured:
 
-| Output directory  | Description                                                                                                |
-|-------------------|------------------------------------------------------------------------------------------------------------|
-| genotyping        | Genotyping outputs directly from the graph, & per sample                                                   |
-| linear_references | Graph reference assemblies in FASTA format with Pan-SN headers + index                                     |
-| mapped_files      | GAM files, & BAMs surjected to respective graph references                                                 |
-| package_versions  | Tool version report                                                                                        |
-| pmd_profiles      | Post-mortem damage assessments (only for samples with the `ancient` metadata tag)                          |
-| quality_reports   | FASTQC reports for raw + quality controlled & merged reads, fastp reports at the library and sample levels |
-| statistics        | Graph statistics & metadata, & alignment statistics per sample                                             |
-| variant_calling   | Variant calling outputs per sample                                                                         |
+| Output directory  | Description                                                                                                           |
+|-------------------|-----------------------------------------------------------------------------------------------------------------------|
+| genotyping        | Genotyping outputs directly from the graph, & per sample                                                              |
+| linear_references | Graph reference assemblies in FASTA format with Pan-SN headers + index                                                |
+| mapped_files      | GAM files, & BAMs surjected to respective graph references                                                            |
+| package_versions  | Tool version report                                                                                                   |
+| pmd_profiles      | Post-mortem damage assessments (only for samples with the `ancient` metadata tag)                                     |
+| quality_reports   | FASTQC reports for both raw reads & quality controlled + merged reads, fastp reports at the library and sample levels |
+| statistics        | Graph statistics & metadata, & alignment statistics per sample                                                        |
+| variant_calling   | Variant calling outputs per sample                                                                                    |
 
 >[!TIP]
 > The workflow also computes graph snarls and indexes. These are stored in a folder alongside the input graph, and are detected on repeat runs (also if using a shared file system), but are not considered workflow outputs
@@ -174,11 +174,11 @@ unknownSimian.1.gorilla.bam
 
 #### vg deconstruct
 
-- `VG_DECONSTRUCT` uses `vg deconstruct` to produce a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
+- `vg deconstruct` produces a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
 
 #### vg call
 
-- `VG_GENOTYPE` uses `vg call` to genotype graph variants in mapped samples (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph)
+- `vg call` genotypes graph variants present in each mapped sample (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph)
 
 ### Provided variant calling tools
 

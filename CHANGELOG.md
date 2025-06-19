@@ -2,6 +2,8 @@
 
 ### Planned
 
+- consider options for removing params from processes: done as lists within ext.args. potentially with conditional logic on metadata to provide different args.
+
 - long read support
 	- add metadata field
 	- plug in long read variant callers

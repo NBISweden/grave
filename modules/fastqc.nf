@@ -23,9 +23,8 @@ process FASTQC {
 
 	# Remove empty files (most common in unmerged aDNA output from fastp)
 
-		for file in *.fq.gz
-			do
-				if [ ! -s \$file ]; then
+		for file in *.fq.gz *.fastq.gz; do
+				if [ -f "\$file" ] && [ ! -s "\$file" ]; then # Added -f check to ensure file exists before checking size
 					rm \$file
 					echo "Removed empty file \$file."
 				fi
@@ -33,7 +32,7 @@ process FASTQC {
 
 	# Run FastQC
 
-		fastqc --format fastq --threads ${task.cpus} *.fq.gz
+		fastqc --format fastq --threads ${task.cpus} *.fq.gz  *.fastq.gz
 
 	# Clean up
 

@@ -105,8 +105,8 @@ workflow INITIALISE {
 
 		// Nextflow version
 
-			if (!nextflow.version.matches('==24.10.4')) {
-				error ("ERROR: This workflow asks for Nextflow version '24.10.4'. You are running '${nextflow.version}'. Consider using the provided pixi environment.")
+			if (!nextflow.version.matches('>=25.04.6')) {
+				error ("ERROR: This workflow asks for Nextflow version '>=25.04.6'. You are running '${nextflow.version}'. Consider using the provided pixi environment.")
 			}
 
 		// Apptainer executable

@@ -37,28 +37,28 @@ Contributors:
 
 		publish:
 
-			GRAVE.out.ch_graph_stats >> 'graph_stats'
-			GRAVE.out.ch_reference_fasta >> 'linear_references'
-			GRAVE.out.ch_library_fastp_report >> 'fastp_libraries'
-			GRAVE.out.ch_sample_fastp_report >> 'fastp_merged_samples'
-			GRAVE.out.ch_fastqc_raw >> 'fastqc_raw'
-			GRAVE.out.ch_fastqc_fastp >> 'fastqc_fastp'
-			GRAVE.out.ch_alignment_stats >> 'alignment_stats'
-			GRAVE.out.ch_mapped_gam >> 'mapped_gam'
-			GRAVE.out.ch_raw_gam >> 'raw_gam'
-			GRAVE.out.ch_sample_dedup_bams >> 'mapped_bams'
-			GRAVE.out.ch_pmd_profiles >> 'post_mortem_damage'
-			GRAVE.out.ch_vg_deconstruct_filtered_vcf >> 'vg_graph_deconstruct_filtered_vcf'
-			GRAVE.out.ch_vg_deconstruct_raw_vcf >> 'vg_graph_deconstruct_raw_vcf'
-			GRAVE.out.ch_vg_genotype_filtered_vcf >> 'vg_genotype_filtered_vcf'
-			GRAVE.out.ch_vg_genotype_raw_vcf >> 'vg_genotype_raw_vcf'
-			GRAVE.out.ch_freebayes_norm_vcf >> 'freebayes_normalised_vcf'
-			GRAVE.out.ch_freebayes_raw_vcf >> 'freebayes_raw_vcf'
-			GRAVE.out.ch_deepvariant_html >> 'deepvariant_report'
-			GRAVE.out.ch_deepvariant_norm_vcf >> 'deepvariant_normalised_vcf'
-			GRAVE.out.ch_deepvariant_raw_vcf >> 'deepvariant_raw_vcf'
-			GRAVE.out.ch_skipped_samples >> 'skip_fastp_merge_samples'
-			GRAVE.out.ch_versions >> 'package_versions'
+			graph_stats = GRAVE.out.ch_graph_stats
+			linear_references = GRAVE.out.ch_reference_fasta
+			fastp_libraries = GRAVE.out.ch_library_fastp_report
+			fastp_merged_samples = GRAVE.out.ch_sample_fastp_report
+			fastqc_raw = GRAVE.out.ch_fastqc_raw
+			fastqc_fastp = GRAVE.out.ch_fastqc_fastp
+			alignment_stats = GRAVE.out.ch_alignment_stats
+			mapped_gam = GRAVE.out.ch_mapped_gam
+			raw_gam = GRAVE.out.ch_raw_gam
+			mapped_bams = GRAVE.out.ch_sample_dedup_bams
+			post_mortem_damage = GRAVE.out.ch_pmd_profiles
+			vg_graph_deconstruct_filtered_vcf = GRAVE.out.ch_vg_deconstruct_filtered_vcf
+			vg_graph_deconstruct_raw_vcf = GRAVE.out.ch_vg_deconstruct_raw_vcf
+			vg_genotype_filtered_vcf = GRAVE.out.ch_vg_genotype_filtered_vcf
+			vg_genotype_raw_vcf = GRAVE.out.ch_vg_genotype_raw_vcf
+			freebayes_normalised_vcf = GRAVE.out.ch_freebayes_norm_vcf
+			freebayes_raw_vcf = GRAVE.out.ch_freebayes_raw_vcf
+			deepvariant_report = GRAVE.out.ch_deepvariant_html
+			deepvariant_normalised_vcf = GRAVE.out.ch_deepvariant_norm_vcf
+			deepvariant_raw_vcf = GRAVE.out.ch_deepvariant_raw_vcf
+			skip_fastp_merge_samples = GRAVE.out.ch_skipped_samples
+			package_versions = GRAVE.out.ch_versions
 
 	}
 

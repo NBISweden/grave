@@ -6,7 +6,6 @@ Main workflow
 
 // Feature flags
 
-	nextflow.preview.topic = true
 	nextflow.preview.output = true
 
 // Imports

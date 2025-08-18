@@ -2,12 +2,9 @@
 
 # EDIT VARIABLES
 
-GRAVE_REPO_PATH=~/grave
+GRAVE_REPO_PATH=~/grave # Edit this path
 TMUX_SESSION_NAME=grave
-PIXI_COMMAND="pixi run nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths -profile standard"
-
-
-
+PIXI_COMMAND="pixi run nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --account SLURM_PROJECT_CODE -profile apptainer,dardelSlurm" # Your command and SLURM project code here
 
 
 ### DO NOT EDIT BELOW THIS LINE ###

@@ -7,7 +7,7 @@
 
 ## Description
 
-`grave` is a Nextflow workflow for mapping and genotyping/variant calling ancient or modern samples against a pangenome graph. The steps are shown [here](#pipeline-overview).
+`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview).
 
 As input it takes a pangenome graph in `.gbz` format and either paired-end or merged FASTQ data (from samples listed in a `.csv` samplesheet).
 
@@ -22,39 +22,55 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
 >[!TIP]
->The image includes pixi, Nextflow, Apptainer, wave, nf-core tools, and more - so you can directly run pipeline tests.
+>The base image includes pixi, Nextflow, Apptainer, wave, & nf-core tools. There is a 4-core minimum requirement to run the test
 
 ### Local or HPC installation
 
-1. [Install Pixi](https://pixi.sh/latest/)
+1. [Install Pixi](https://pixi.sh/latest/installation/): `curl -fsSL https://pixi.sh/install.sh | sh`
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-3. Run `pixi install`
+3. Run `pixi install` (or `pixi install -e apptainer` for Apptainer support)
 
 >[!NOTE]
 >The pixi project contains two environments:<br><br>
 >`default`: installed with `pixi install` - lacks apptainer (e.g. for systems with their own Apptainer installation)<br><br>
 >`apptainer`: installed with `pixi install -e apptainer` - provides Apptainer support
 
+<details>
+
+<summary><h3>Introduction to pixi (drop down)</h3></summary>
+
+- `grave` can run with only `Nextflow` and `Apptainer` installed in `$PATH`, but for reproducibility it is recommended to run it via `pixi`
+- `pixi` is a drop-in replacement for `conda`, and is used to easily and reproducibly share tested environments for running software
+- `pixi` environments have an editable manifest file of direct dependencies, the `pixi.toml`
+- Solved environments also have a `pixi.lock` file, which lists exact versions of all dependencies including transitive ones - the lockfile in this repository defines a tested environment for Linux systems
+- Installed `pixi` environments are found in the hidden folder `.pixi/envs`
+- `pixi` will automatically install an environment it lacks, if implied by another command (e.g., `pixi run -e apptainer ...` would install the `apptainer` environment even if the `default` environment is the only one currently installed)
+- You can run commands from outside the default `pixi` environment by prefixing them with `pixi run`, or in a specific environment with `pixi run -e <environment>`
+- You can also shell inside the default `pixi` environment with `pixi shell`, or into a specific environment with `pixi shell -e <environment>`, similar to `conda activate <environment>` (at this point you no longer need the `pixi run` prefix)
+- To delete an environment: `rm -rf .pixi/envs/<environment_name>`
+
+</details>
+
 ### Run grave with test data
 
-Run with the provided test data: `pixi run grave-test`
+Run with the provided test data: `pixi run test`
 
 >[!TIP]
 > All `pixi run` commands assume the `default` environment. To use the `apptainer` environment, add `-e apptainer`, e.g.:<br><br>
->`pixi run -e apptainer grave-test`
+>`pixi run -e apptainer test`
 
 ### Run grave with your data
 
 1. [Input file setup](#file-setup)
-2. Run with defaults: `pixi run grave` (equivalent to `pixi run nextflow main.nf`). Or run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile dardelSlurm`
+2. Run with defaults: `pixi run grave` (equivalent to `pixi run nextflow main.nf -profile apptainer`). Or run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile apptainer,dardelSlurm`
 
 >[!TIP]
 >For help with command line options: `pixi run help`<br><br>
->An example shell script for running `grave` on a cluster with SLURM is provided in the repo
+>An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `example-cluster-job-script.sh`
 
 ### File setup
 
-1. Add the [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`
+1. Generate or provide a [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`
 2. Fill out a `samplesheet.csv` including file system paths to the reads. By default `grave` looks for this in `data`. [See layout description below](#samplesheet-layout)
 3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples)
 
@@ -88,7 +104,7 @@ Run with the provided test data: `pixi run grave-test`
 
 ##### Filtered graphs
 
-- The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in `x` haplotypes
+- The other method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes
 
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
 
@@ -128,12 +144,12 @@ Run with the provided test data: `pixi run grave-test`
 
 - Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files. By default `grave` looks for these in the `data/paths` directory
 
-- Each `.paths` file contains a list reference paths from one reference sample, with one path name per line
+- Each `.paths` file contains a list of reference paths from one reference sample, with one path name per line
 
 - __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
 
 >[!TIP]
-> `vg` is packaged in the default pixi environment, to see the reference samples in your graph run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`<br><br>
+> `vg` is packaged in the pixi environment, to see the reference samples in your graph run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`<br><br>
 > For a list of all reference path names from, for example GRCh38, run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | tail -n+2 | awk '$3 == "GRCh38"' | cut -f1 > GRCh38.paths`
 
 - For each `.paths` file provided, `grave` will run pipeline steps relative to that sample separately from the others, e.g., `surject` will produce a separate `.bam` file per reference sample, such that surjecting `unknownSimian.1.gam` to `chimp.paths` and `gorilla.paths` will produce:

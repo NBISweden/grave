@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [1.3.1] -
+## [1.3.1] - 20250819
 
 ### Housekeeping
 

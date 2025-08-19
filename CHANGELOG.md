@@ -30,6 +30,13 @@
 
 - Added `--tracing` parameter to enable comprehensive reports for the workflow, including timeline, report, trace, and dag files (stored in `${projectDir}/tracing`). Off by default.
 
+### Bug fixes
+
+`FASTQ_MERGE_DEDUP`: fixed potential issue that would arise if sample names contain ".", and generally cleaned the library count variables
+
+`FASTQ_MERGE_DEDUP`: fixed bug for modern samples with multiple libraries (only first library was taken due to syntax error)
+
+
 ## [1.3.0] - 2025-08-18
 
 ### Added

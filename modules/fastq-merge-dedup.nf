@@ -120,9 +120,9 @@ process FASTQ_MERGE_DEDUP {
 
 					then
 
-						mv ${fastqs[0]} ${meta.id}.smFastp.1.fq.gz
+						mv *.fastp.1.fq.gz ${meta.id}.smFastp.1.fq.gz
 
-						mv ${fastqs[1]} ${meta.id}.smFastp.2.fq.gz
+						mv *.fastp.2.fq.gz ${meta.id}.smFastp.2.fq.gz
 
 						echo "Sample '${meta.id}' had one library, so deduplication has already been run. See the report at 'results/quality_reports/fastp-library-level/${meta.id}.*.fastp.html.gz'" > skipped-samples.txt
 
@@ -132,9 +132,9 @@ process FASTQ_MERGE_DEDUP {
 
 					then
 
-						cat ${fastqs[0]} > ${meta.id}.cat.1.fq.gz
+						cat *.fastp.1.fq.gz > ${meta.id}.cat.1.fq.gz
 
-						cat ${fastqs[1]} > ${meta.id}.cat.2.fq.gz
+						cat *.fastp.2.fq.gz > ${meta.id}.cat.2.fq.gz
 
 						fastp --in1 ${meta.id}.cat.1.fq.gz --in2 ${meta.id}.cat.2.fq.gz --out1 ${meta.id}.smFastp.1.fq.gz --out2 ${meta.id}.smFastp.2.fq.gz --html ${meta.id}.smFastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --overrepresentation_analysis --thread ${task.cpus}
 

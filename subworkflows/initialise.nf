@@ -216,7 +216,7 @@ workflow INITIALISE {
 				}
 
 				if (!foundFilteredGbz.isEmpty()) {
-					error ("ERROR: The '.gbz' file found in '${params.graphDir}' looks like a filtered graph. For 'haplo' mode provide a clipped unfiltered graph.")
+					error ("ERROR: The '.gbz' file found in '${params.graphDir}' looks like a filtered graph by its name structure. For 'haplo' mode provide a clipped unfiltered graph.")
 				}
 
 				// Dist and min files suggest wrong inputs have been provided, so these will throw an error.
@@ -244,7 +244,7 @@ workflow INITIALISE {
 				}
 
 				if (foundFilteredGbz.isEmpty()) {
-					error ("ERROR: The .gbz file found in '${params.graphDir}' does not look like a filtered graph. For 'filter' mode provide the clipped filtered graph.")
+					error ("ERROR: The .gbz file found in '${params.graphDir}' does not look like a filtered graph by its name structure. For 'filter' mode provide the clipped filtered graph.")
 				}
 
 				if (!foundDist.isEmpty()) {

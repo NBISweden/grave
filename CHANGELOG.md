@@ -14,20 +14,21 @@
 - `pixi.toml 1.1` nextflow: 24.10.4 -> 25.04.6
 	- Nextflow update required syntax change for publishing outputs in `main.nf` + removal of topic feature flag in `grave.nf`. Small tweaks made to initialise subworkflow & README.md to reflect update
 - `pixi.toml 1.1` vg: 1.63.0 -> 1.67.0 (updated bioconda recipe)
-- Module containers: vg containers to 1.67.0 TODO: bump once channel is updated
+
+- Module containers: vg version to 1.67.0 in containers
 
 ### Configs
 
 - Moved params to `nextflow.config` following nf-core best practices
 - Same for base profiles. This means there is now an `apptainer` profile, replacing `containers.config`. Other base profiles added are debug and singularity. `README.md` updated to reflect this
 
-
 ### Documentation
 
-- Extra guidance on `pixi`, general improvements
+- Extra guidance/background on `pixi` usage, general improvements
 
+### Pipeline debugging/tracing
 
-
+- Added `--tracing` parameter to enable comprehensive reports for the workflow, including timeline, report, trace, and dag files (stored in `${projectDir}/tracing`). Off by default.
 
 ## [1.3.0] - 2025-08-18
 

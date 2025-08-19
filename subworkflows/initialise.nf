@@ -92,8 +92,9 @@ workflow INITIALISE {
 				println ("--maxComplexGap [${params.maxComplexGap}] 					Maximum distance between polymorphisms on the same read.")
 				println ("--minFraction [${params.minFraction}] 					Require at least this fraction of observations supporting an alternate allele within a single individual in the in order to evaluate the position.")
 				println (" ")
-				println ("Help message:")
+				println ("Help:")
 				println (" ")
+				println ("--tracing [${params.tracing}] 					Enable trace reports for the workflow, including timeline, report, trace, and dag files (in ${projectDir}/tracing).")
 				error ("--help 							Print this message.")
 			}
 

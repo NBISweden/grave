@@ -5,16 +5,15 @@
 
 ### Housekeeping
 
-- Added dag that was supposed to be in last release
-- Merged PR #4 (fastqc should allow for `fq.gz` & `fastq.gz`)
+- Updated dag that was supposed to be in last release
+- Merged PR #4 (fastqc module now allows for `fq.gz` or `fastq.gz` extensions)
 
 ### Software updates
 
 - `pixi.toml 1.1` Apptainer: 1.3.6 -> 1.4.1
 - `pixi.toml 1.1` nextflow: 24.10.4 -> 25.04.6
-	- Nextflow update required syntax change for publishing outputs (`main.nf`) + removal of topic feature flag in `grave.nf`, tweaks to initialise subworkflow & README.md
-
-- `pixi.toml 1.1` vg: 1.63.0 -> 1.67.0 (updated bioconda recipe) TODO: bump once channel is updated
+	- Nextflow update required syntax change for publishing outputs in `main.nf` + removal of topic feature flag in `grave.nf`. Small tweaks made to initialise subworkflow & README.md to reflect update
+- `pixi.toml 1.1` vg: 1.63.0 -> 1.67.0 (updated bioconda recipe)
 - Module containers: vg containers to 1.67.0 TODO: bump once channel is updated
 
 ### Configs

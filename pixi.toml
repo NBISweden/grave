@@ -21,7 +21,7 @@ filter = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/t
 nextflow="==25.04.6"
 graphviz=">=12.2.1"
 msmtp-sendmail=">=1.8.28"
-vg="==1.63.1"
+vg="==1.67.0"
 
 [feature.apptainer.dependencies]
 apptainer="==1.4.1"

@@ -5,7 +5,7 @@ process PANGENOME_MAP {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/kmc_vg:71fb384e609a2165'
+	container 'oras://community.wave.seqera.io/library/kmc_vg:bb996933cffd072c'
 
 	// I/O & script
 

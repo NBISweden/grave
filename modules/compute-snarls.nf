@@ -5,7 +5,7 @@ process COMPUTE_SNARLS {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/vg:1.63.1--77c63f4a6f8f9d7a'
+	container 'oras://community.wave.seqera.io/library/vg:1.67.0--6a1814b7314a4bc7'
 	storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes/snarls") }
 
 	// I/O & script

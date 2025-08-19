@@ -5,7 +5,7 @@ process PROCESS_GRAPH {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_low'
-	container 'oras://community.wave.seqera.io/library/samtools_vg:708cddc079bf2492'
+	container 'oras://community.wave.seqera.io/library/samtools_vg:7cf605b7343fd181'
 
 	// I/O & script
 

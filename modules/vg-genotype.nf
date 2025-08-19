@@ -7,7 +7,7 @@ process VG_GENOTYPE {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:5fc5e308ca96cd58'
+	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:67444bca9edbce2a'
 
 	// I/O & script
 

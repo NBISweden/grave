@@ -7,7 +7,7 @@ process VG_DECONSTRUCT {
 	debug false
 	tag "${graph.baseName}_graph"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/bcftools_htslib_vcfbub_vg:6b57aa764c6e5ab4'
+	container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:67444bca9edbce2a'
 
 	// I/O & script
 

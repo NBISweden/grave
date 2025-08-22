@@ -1,6 +1,23 @@
 # Changelog
 
 
+## [1.3.2] -
+
+### Housekeeping
+
+- Cleaned up variable syntax for clarity and consistency
+
+### Vg command updates
+
+- For complex graphs, `vg index` may cause memory issues. Users can switch on `--noNestedDistance` to add this option to the initial vg indexing commands and produce a limited version of the distance index.
+
+### Dedup branch
+
+-
+
+
+
+
 ## [1.3.1] - 20250819
 
 ### Housekeeping

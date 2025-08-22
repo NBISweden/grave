@@ -31,7 +31,7 @@ process MAKE_HAPL {
 
 	# Create common indexes for all sample types
 
-		vg index --threads ${task.cpus} --dist-name ${distname} ${graph}
+		vg index --threads ${task.cpus} ${args} --dist-name ${distname} ${graph}
 		vg gbwt --num-threads ${task.cpus} --r-index ${rindexname} --gbz-input ${graph}
 
 	# Type specific ".hapl" production

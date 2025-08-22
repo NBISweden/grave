@@ -27,7 +27,7 @@ process MAKE_FILTER {
 
 	# Create common indexes for all sample types
 
-		vg index --threads ${task.cpus} --dist-name ${basename}.dist ${graph}
+		vg index --threads ${task.cpus} ${args} --dist-name ${basename}.dist ${graph}
 
 	# Type specific ".min" production
 

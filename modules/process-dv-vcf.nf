@@ -53,29 +53,29 @@ process PROCESS_DEEPVARIANT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Loop through each reference sample
 
-			while read prefix
+			while read line
 
 				do
 	
 					# Zip raw VCF
 
-						bgzip --threads ${task.cpus} ${meta.id}.\$prefix.raw.vcf
+						bgzip --threads ${task.cpus} ${meta.id}.\$line.raw.vcf
 
 					# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
+						bcftools norm -f \$line.fasta ${meta.id}.\$line.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$line.norm.vcf.gz
 
 					# Clean up
 
 						if [ "${params.keepRawVcf}" != "true" ]
 							then
-								rm ${meta.id}.\$prefix.raw.vcf.gz
+								rm ${meta.id}.\$line.raw.vcf.gz
 						fi
 
 				done < referenceSamplePrefixes.txt

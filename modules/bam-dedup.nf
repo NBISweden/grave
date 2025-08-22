@@ -40,8 +40,8 @@ process BAM_DEDUP {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.\$prefix.sort.bam ${meta.id}.\$prefix.sort.dedup.bam
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					sambamba markdup --remove-duplicates -t ${task.cpus} ${meta.id}.\$PREFIX.sort.bam ${meta.id}.\$PREFIX.sort.dedup.bam
 				done
 
 		"""

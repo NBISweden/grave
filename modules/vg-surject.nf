@@ -40,8 +40,8 @@ process VG_SURJECT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$prefix.sort.bam
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$PREFIX.sort.bam
 				done
 
 		"""
@@ -62,8 +62,8 @@ process VG_SURJECT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$prefix.sort.bam
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --interleaved --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$PREFIX.sort.bam
 				done
 
 		"""
@@ -84,8 +84,8 @@ process VG_SURJECT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$prefix.sort.bam
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --sample ${meta.id} --bam-output ${mapped_gam} | samtools sort > ${meta.id}.\$PREFIX.sort.bam
 				done
 
 		"""

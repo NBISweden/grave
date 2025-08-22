@@ -47,22 +47,22 @@ process DEEPVARIANT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Run DeepVariant against each reference sample
 
-			while read prefix
+			while read line
 
 				do
 
 					/opt/deepvariant/bin/run_deepvariant \
 						--num_shards ${task.cpus} \
 						--sample_name ${meta.id} \
-						--ref \$prefix.fasta \
-						--reads ${meta.id}.\$prefix.sort.dedup.bam \
-						--output_vcf ${meta.id}.\$prefix.raw.vcf \
+						--ref \$line.fasta \
+						--reads ${meta.id}.\$line.sort.dedup.bam \
+						--output_vcf ${meta.id}.\$line.raw.vcf \
 						--model_type ${params.deepVariantModelType}
 
 				done < referenceSamplePrefixes.txt

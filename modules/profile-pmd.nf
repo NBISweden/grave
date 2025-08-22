@@ -29,13 +29,13 @@ process PROFILE_PMD {
 
 		# Find system Java max heap size & convert to GB
 
-			max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
+			MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
 
-			max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
+			MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
 
 		# Run PMD profiling
 
-			damageprofiler -Xms2g -Xmx\${max_heap_gb}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
@@ -46,21 +46,21 @@ process PROFILE_PMD {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Find system Java max heap size & convert to GB
 
-			max_heap_bytes=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
+			MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
 
-			max_heap_gb=\$(expr \$max_heap_bytes / 1024 / 1024 / 1024)
+			MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
 
 		# Use path file basenames as keys to pair surjected BAMs to relevant FASTAs
 
-			while read prefix
+			while read line
 				do
-					damageprofiler -Xms2g -Xmx\${max_heap_gb}g -i ${meta.id}.\$prefix.sort.dedup.bam -r \$prefix.fasta -o ${meta.id}_surjected_to_\${prefix}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+					damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.\$line.sort.dedup.bam -r \$line.fasta -o ${meta.id}_surjected_to_\${line}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 				done < referenceSamplePrefixes.txt
 
 		# Clean up

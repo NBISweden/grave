@@ -72,47 +72,47 @@ process FREEBAYES {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Run FreeBayes workflow against each reference sample
 
-			while read prefix
+			while read line
 
 				do
 
 					# Generate equal coverage regions for parallelization
 
-						bamtools coverage -in ${meta.id}.\$prefix.sort.dedup.bam | coverage_to_regions.py \$prefix.fasta.fai 500 > \$prefix.regions
+						bamtools coverage -in ${meta.id}.\$line.sort.dedup.bam | coverage_to_regions.py \$line.fasta.fai 500 > \$line.regions
 
 					# Run FreeBayes
 
-						freebayes-parallel \$prefix.regions \
+						freebayes-parallel \$line.regions \
 							${task.cpus} \
 							--pooled-continuous \
 							--genotype-qualities \
-							--fasta-reference \$prefix.fasta \
+							--fasta-reference \$line.fasta \
 							--min-alternate-count ${params.minimumAlleleSupport} \
 							--min-alternate-fraction ${params.minFraction} \
 							--ploidy ${params.samplePloidy} \
 							--max-complex-gap ${params.maxComplexGap} \
-							${meta.id}.\$prefix.sort.dedup.bam | \
+							${meta.id}.\$line.sort.dedup.bam | \
 							bgzip --threads ${task.cpus} > \
-							${meta.id}.\$prefix.raw.vcf.gz
+							${meta.id}.\$line.raw.vcf.gz
 
 					# Norm and sort
 
-						bcftools norm -f \$prefix.fasta ${meta.id}.\$prefix.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.norm.vcf.gz
+						bcftools norm -f \$line.fasta ${meta.id}.\$line.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$line.norm.vcf.gz
 
 					# Clean up
 
 						if [ "${params.keepRawVcf}" != "true" ]
 							then
-								rm ${meta.id}.\$prefix.raw.vcf.gz
+								rm ${meta.id}.\$line.raw.vcf.gz
 						fi
 
-						rm \$prefix.regions
+						rm \$line.regions
 
 				done < referenceSamplePrefixes.txt
 

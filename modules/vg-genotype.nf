@@ -81,8 +81,8 @@ process VG_GENOTYPE {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Compute read support
@@ -91,40 +91,40 @@ process VG_GENOTYPE {
 
 		# Loop through each reference sample
 
-			while read prefix
+			while read line
 
 				do
 
 					# References will have PanSN format, raw VCFs produced by vg call won't. Convert references to align with VCF naming & reindex
 
-						sed -i 's/.*#/>/g' \$prefix.fasta
+						sed -i 's/.*#/>/g' \$line.fasta
 
 					# Remove link to original index & recreate
 
-						rm \$prefix.fasta.fai && samtools faidx \$prefix.fasta
+						rm \$line.fasta.fai && samtools faidx \$line.fasta
 
 					# Genotype against a specific reference sample in the graph
 
-						vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --ref-sample \$prefix --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.raw.vcf.gz
+						vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --ref-sample \$line --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.\$line.raw.vcf.gz
 
 					# Index raw VCF
 
-						tabix -p vcf ${meta.id}.\$prefix.raw.vcf.gz
+						tabix -p vcf ${meta.id}.\$line.raw.vcf.gz
 
 					# Pop bubbles
 
-						vcfbub --input ${meta.id}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$prefix.filtered.vcf.gz
+						vcfbub --input ${meta.id}.\$line.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$line.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$line.filtered.vcf.gz
 
 					# Clean up
 
 						if [ "${params.keepRawVcf}" != "true" ]
 							then
-								rm ${meta.id}.\$prefix.raw.vcf.gz ${meta.id}.\$prefix.raw.vcf.gz.tbi
+								rm ${meta.id}.\$line.raw.vcf.gz ${meta.id}.\$line.raw.vcf.gz.tbi
 							else
-								rm ${meta.id}.\$prefix.raw.vcf.gz.tbi
+								rm ${meta.id}.\$line.raw.vcf.gz.tbi
 						fi
 
-						rm \$prefix.fasta*
+						rm \$line.fasta*
 
 				done < referenceSamplePrefixes.txt
 

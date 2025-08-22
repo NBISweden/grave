@@ -65,15 +65,15 @@ process VG_DECONSTRUCT {
 
 			for i in *.paths
 				do
-					prefix=`echo \$i | sed 's/\\.paths//'`
-					echo \$prefix >> referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+					echo \$PREFIX >> referenceSamplePrefixes.txt
 				done
 
 		# Make raw VCFs relative to each provided reference sample
 
-			while read prefix
+			while read line
 				do
-					vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --path-prefix \$prefix --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.\$prefix.raw.vcf.gz
+					vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --path-prefix \$line --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.\$line.raw.vcf.gz
 				done < referenceSamplePrefixes.txt
 
 		# Index raw VCFs
@@ -85,17 +85,17 @@ process VG_DECONSTRUCT {
 
 		# Pop bubbles and clean up raw VCF unless overridden
 
-			while read prefix
+			while read line
 
 				do
 
-					vcfbub --input ${basename}.\$prefix.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$prefix.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.\$prefix.filtered.vcf.gz
+					vcfbub --input ${basename}.\$line.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$line.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.\$line.filtered.vcf.gz
 
 					if [ "${params.keepRawVcf}" != "true" ]
 						then
-							rm ${basename}.\$prefix.raw.vcf.gz ${basename}.\$prefix.raw.vcf.gz.tbi
+							rm ${basename}.\$line.raw.vcf.gz ${basename}.\$line.raw.vcf.gz.tbi
 						else
-							rm ${basename}.\$prefix.raw.vcf.gz.tbi
+							rm ${basename}.\$line.raw.vcf.gz.tbi
 					fi
 
 				done < referenceSamplePrefixes.txt

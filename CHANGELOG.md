@@ -9,7 +9,9 @@
 
 ### Vg command updates
 
-- For complex graphs, `vg index` may cause memory issues. Users can switch on `--noNestedDistance` to add this option to the initial vg indexing commands and produce a limited version of the distance index.
+- For complex graphs, `vg index` may cause memory issues. Users can switch on `--noNestedDistance` to add this option to the initial vg indexing commands and produce a limited version of the distance index. Note this currently wouldn't help for the pangenome-map module, in which case we'd consider upgrading that module to a `process_high` label
+
+- `vg filter` - removed unused `ext.args`
 
 ### Dedup branch
 

@@ -1,24 +1,20 @@
 # Changelog
 
 
-## [1.3.2] -
+## [1.3.2] - 20250829
 
 ### Housekeeping
 
 - Cleaned up variable syntax for clarity and consistency
+- Ensure no memory issues on laptops for `pixi run test` (hash based deduplication memory can spike on FASTP)
+- Aligned index kmer sizes in params.
+- Converted slurm example script to a pipeline agnostic template
 
 ### Vg command updates
 
 - For complex graphs, `vg index` may cause memory issues. Users can switch on `--noNestedDistance` to add this option to the initial vg indexing commands and produce a limited version of the distance index. Note this currently wouldn't help for the pangenome-map module, in which case we'd consider upgrading that module to a `process_high` label
 
 - `vg filter` - removed unused `ext.args`
-
-### Dedup branch
-
--
-
-
-
 
 ## [1.3.1] - 20250819
 

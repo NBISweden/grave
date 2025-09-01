@@ -91,9 +91,9 @@ Main workflow
 
 				FASTQ_MERGE_DEDUP(
 					FASTP.out.ch_fastp_reads
-						.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), fastqs] } // Create metadata subset to group on
+						.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), meta.subMap('repeat'), fastqs] } // Create metadata subset to group on, split out repeat numbers
 						.groupTuple() // Group by sample
-						.map{ meta, fastqs -> [meta, fastqs.flatten()] } // Flatten any nested lists
+						.map{ meta, repeat, fastqs -> [meta, repeat.flatten(), fastqs.flatten()] } // Flatten any nested lists
 				)
 
 			// Map reads to pangenome graph

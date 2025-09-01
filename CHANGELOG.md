@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.3] - 20250901
+
+### Bug fixes
+
+- Fastq merge dedup had a bug whereby it expected library names as integers. Old approach accounted for this with an awk + read line operation
+- Replaced by providing the library names within the metamap as a new flattened list, and using these instead
+
+- Temporarily commented out sections applying scratch space in HPC profiles. Running into an issue I haven't yet diagnosed -> causes file not found errors. This is since the Nextflow version bump.
 
 ## [1.3.2] - 20250829
 

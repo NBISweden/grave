@@ -7,7 +7,7 @@
 
 ## Description
 
-`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview).
+`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview). A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
 
 As input it takes a pangenome graph in `.gbz` format and either paired-end or merged FASTQ data (from samples listed in a `.csv` samplesheet).
 

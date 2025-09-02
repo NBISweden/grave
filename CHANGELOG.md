@@ -17,6 +17,19 @@
 
 - Improvements to help message
 
+## Profile improvements
+
+- Added options to go directly to nf-core profiles for rackham and dardel rather than the custom ones
+
+- Re-enabled scratch space in rackhamSlurm profile, draft fix on the bind mount issue
+
+
+## Software updates
+
+- TODO: bump vg
+
+
+
 
 
 

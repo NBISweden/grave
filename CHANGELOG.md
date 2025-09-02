@@ -11,6 +11,8 @@
 
 - Changed default for `--minimumScorePrimaryAlign` from 0.90 to 0.80, to be more inclusive of aDNA reads with potentially lower fraction identity
 
+- Added `--deconstructNestedSnarls` parameter. When false, vg deconstruct outputs only top-level sites (non-nested sites). Setting to true provides `--all-snarls` to vg deconstruct, which will output a site for all snarls spanned by a reference path.
+
 ## Documentation
 
 - Started wiki on the repo for adding rationale to complex sections + explanation of behaviour

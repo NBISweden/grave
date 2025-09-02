@@ -77,6 +77,7 @@ workflow INITIALISE {
 				println (" ")
 				println ("General variant calling parameters:")
 				println (" ")
+				println ("--deconstructNestedSnarls [${params.deconstructNestedSnarls}]			When false, vg deconstruct outputs only top-level sites, not nested sites. Setting to true will output a site for all snarls spanned by a reference path (true/false)")
 				println ("--maxNestLevel [${params.maxNestLevel}]					During VCF processing (for graph based genotyping & vg call), remove nested variants with nest level over INT. Does not affect raw VCF output.")
 				println ("--maxRefLength [${params.maxRefLength}] 				During VCF processing (for graph based genotyping & vg call), remove variants over INT in length. Does not affect raw VCF output.")
 				println ("--samplePloidy [${params.samplePloidy}] 					Sample ploidy.")

@@ -37,7 +37,7 @@ process VG_DECONSTRUCT {
 
 		# Make raw VCF of graph snarls relative to all reference paths
 
-			vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.raw.vcf.gz
+			vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} ${args} --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.raw.vcf.gz
 
 		# Index raw VCF
 
@@ -73,7 +73,7 @@ process VG_DECONSTRUCT {
 
 			while read line
 				do
-					vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} --path-prefix \$line --all-snarls --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.\$line.raw.vcf.gz
+					vg deconstruct -t ${task.cpus} ${graph} --snarls ${snarls} ${args} --path-prefix \$line --gbz-translation | bgzip --threads ${task.cpus} > ${basename}.\$line.raw.vcf.gz
 				done < referenceSamplePrefixes.txt
 
 		# Index raw VCFs

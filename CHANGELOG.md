@@ -1,5 +1,26 @@
 # Changelog
 
+
+## [1.3.4] - 2025
+
+## Parameter updates
+
+- Replaced `--gamFilterMore` with two parameters:
+	- `--gamDiscardUnmapped` (default false): when true, unmapped reads are discarded when filtering GAM files
+	- `--gamFilterMapQ` (default false): when true, applies MAPQ filtering when processing GAM files. Threshold value is set by `--minimumMapQFilter`
+
+- Changed default for `--minimumScorePrimaryAlign` from 0.90 to 0.80, to be more inclusive of aDNA reads with potentially lower fraction identity
+
+## Documentation
+
+- Started wiki on the repo for adding rationale to complex sections + explanation of behaviour
+
+- Improvements to help message
+
+
+
+
+
 ## [1.3.3] - 20250901
 
 ### Bug fixes

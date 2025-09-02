@@ -22,6 +22,7 @@ process PANGENOME_MAP {
 
 	script:
 	def args = task.ext.args ?: ''
+	def args2 = task.ext.args2 ?: ''
 	def memory = task.memory.toGiga()
 	def basename = graph.baseName - '.gbz'
 
@@ -44,7 +45,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -72,7 +73,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -104,7 +105,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${basename}.${meta.id}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.id}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -132,7 +133,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -160,7 +161,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.id}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -188,7 +189,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
+			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.id}.gam > ${meta.id}.filtered.gam
 
 		# Remove raw GAM unless overridden
 

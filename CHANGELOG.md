@@ -12,6 +12,7 @@
 - Changed default for `--minimumScorePrimaryAlign` from 0.90 to 0.80, to be more inclusive of aDNA reads with potentially lower fraction identity
 
 - Added `--deconstructNestedSnarls` parameter. When false, vg deconstruct outputs only top-level sites (non-nested sites). Setting to true provides `--all-snarls` to vg deconstruct, which will output a site for all snarls spanned by a reference path.
+	- Set this new param to true, and raised GitHub issue for further development. To get this working, will need to move `vcfbub` to a new module. Setting to false results in no LV tag in the output VCF, causing a vcfbub error.
 
 ## Documentation
 

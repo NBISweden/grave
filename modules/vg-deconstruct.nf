@@ -43,7 +43,7 @@ process VG_DECONSTRUCT {
 
 			tabix -p vcf ${basename}.raw.vcf.gz
 
-		# Pop bubbles (remove nested variants with nest level over 'maxNestLevel', plus any over 'maxRefLength' in length, then normalise VCF
+		# Pop bubbles
 
 			vcfbub --input ${basename}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f ${reference_fasta} | bcftools sort | bgzip --threads ${task.cpus} > ${basename}.filtered.vcf.gz
 

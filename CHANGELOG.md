@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [1.3.4] - 2025
+## [1.3.4] - 20250912
 
 ## Parameter updates
 
@@ -12,7 +12,7 @@
 - Changed default for `--minimumScorePrimaryAlign` from 0.90 to 0.80, to be more inclusive of aDNA reads with potentially lower fraction identity
 
 - Added `--deconstructNestedSnarls` parameter. When false, vg deconstruct outputs only top-level sites (non-nested sites). Setting to true provides `--all-snarls` to vg deconstruct, which will output a site for all snarls spanned by a reference path.
-	- Set this new param to true, and raised GitHub issue for further development. To get this working, will need to move `vcfbub` to a new module. Setting to false results in no LV tag in the output VCF, causing a vcfbub error.
+	- Note: incomplete feature! Currently setting the default to `true`, and raised GitHub issue for further development. To get this working, will need to move `vcfbub` to a new module. Setting to false results in no LV tag in the output VCF, causing a vcfbub error.
 
 ## Documentation
 
@@ -25,17 +25,6 @@
 - Added options to go directly to nf-core profiles for rackham and dardel rather than the custom ones
 
 - Re-enabled scratch space in rackhamSlurm profile, draft fix on the bind mount issue
-
-
-## Software updates
-
-- TODO: bump vg
-
-
-
-
-
-
 
 ## [1.3.3] - 20250901
 

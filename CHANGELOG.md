@@ -1,9 +1,19 @@
 # Changelog
 
+## [1.4.0] - 20250
+
+- Deduplication overhaul
+
+
+### Software updates
+
+- TODO: bump vg
+
+
 
 ## [1.3.4] - 20250912
 
-## Parameter updates
+### Parameter updates
 
 - Replaced `--gamFilterMore` with two parameters:
 	- `--gamDiscardUnmapped` (default false): when true, unmapped reads are discarded when filtering GAM files
@@ -14,13 +24,13 @@
 - Added `--deconstructNestedSnarls` parameter. When false, vg deconstruct outputs only top-level sites (non-nested sites). Setting to true provides `--all-snarls` to vg deconstruct, which will output a site for all snarls spanned by a reference path.
 	- Note: incomplete feature! Currently setting the default to `true`, and raised GitHub issue for further development. To get this working, will need to move `vcfbub` to a new module. Setting to false results in no LV tag in the output VCF, causing a vcfbub error.
 
-## Documentation
+### Documentation
 
 - Started wiki on the repo for adding rationale to complex sections + explanation of behaviour
 
 - Improvements to help message
 
-## Profile improvements
+### Profile improvements
 
 - Added options to go directly to nf-core profiles for rackham and dardel rather than the custom ones
 

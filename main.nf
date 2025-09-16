@@ -46,7 +46,8 @@ Contributors:
 			alignment_stats = GRAVE.out.ch_alignment_stats
 			mapped_gam = GRAVE.out.ch_mapped_gam
 			raw_gam = GRAVE.out.ch_raw_gam
-			mapped_bams = GRAVE.out.ch_sample_dedup_bams
+			deduplicated_bams = GRAVE.out.ch_sample_dedup_bams
+			dedup_metrics = GRAVE.out.ch_dedup_metrics
 			post_mortem_damage = GRAVE.out.ch_pmd_profiles
 			vg_graph_deconstruct_filtered_vcf = GRAVE.out.ch_vg_deconstruct_filtered_vcf
 			vg_graph_deconstruct_raw_vcf = GRAVE.out.ch_vg_deconstruct_raw_vcf
@@ -103,11 +104,10 @@ Contributors:
 		}
 
 		alignment_stats {
-			path 'statistics/mapped_samples'
+			path 'statistics/alignments'
 			mode 'copy'
 			overwrite false
 		}
-
 
 		mapped_gam {
 			path 'mapped_files/gams'
@@ -123,8 +123,14 @@ Contributors:
 
 		}
 
-		mapped_bams {
+		deduplicated_bams {
 			path 'mapped_files/bams'
+			mode 'copy'
+			overwrite false
+		}
+
+		dedup_metrics {
+			path 'statistics/deduplication'
 			mode 'copy'
 			overwrite false
 		}

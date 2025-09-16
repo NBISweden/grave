@@ -14,20 +14,33 @@ process FASTP {
 
 	output:
 	tuple val(meta), path("*.fastp*fq.gz"), emit: ch_fastp_reads
-	path "*.fastp.html.gz", emit: ch_library_fastp_report
+	tuple path("*.fastp.html.gz"), path("*.fastp.json"), emit: ch_library_fastp_report
 	tuple val(task.process), val('fastp'), eval('fastp --version 2>&1 | sed "s/fastp //"'), topic: versions
 
 	script:
 	def args = task.ext.args ?: ''
+	def args2 = task.ext.args2 ?: ''
 
 	if (meta.type == "ancient" && meta.merged == false)
 		"""
 
-		# Ancient DNA read QC, merge reads (unmerged read discard behaviour controlled by args + param "discardUnmerged")
+		# Merge and QC paired-end ancient DNA
 
-			fastp --in1 ${reads[0]} --in2 ${reads[1]} --merge --merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz ${args} --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
-
-			rm fastp.json
+			fastp \
+				--in1 ${reads[0]} \
+				--in2 ${reads[1]} \
+				--merge \
+				--merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz \
+				--html ${meta.id}.${meta.repeat}.fastp.html \
+				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--dup_calc_accuracy ${params.dupCalcAccuracy} \
+				--overrepresentation_analysis \
+				--length_required ${params.readDiscardLength} \
+				--thread ${task.cpus} \
+				${args} \
+				${args2} \
+				--detect_adapter_for_pe \
+				--correction
 
 			gzip ${meta.id}.${meta.repeat}.fastp.html
 
@@ -36,11 +49,22 @@ process FASTP {
 	else if (meta.type == "modern" && meta.merged == false)
 		"""
 
-		# Modern DNA read QC
+		# QC paired-end modern DNA
 
-			fastp --in1 ${reads[0]} --in2 ${reads[1]} --out1 ${meta.id}.${meta.repeat}.fastp.1.fq.gz --out2 ${meta.id}.${meta.repeat}.fastp.2.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --detect_adapter_for_pe --dedup --dup_calc_accuracy ${params.dupCalcAccuracy} --correction --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
-
-			rm fastp.json
+			fastp \
+				--in1 ${reads[0]} \
+				--in2 ${reads[1]} \
+				--out1 ${meta.id}.${meta.repeat}.fastp.1.fq.gz \
+				--out2 ${meta.id}.${meta.repeat}.fastp.2.fq.gz \
+				--html ${meta.id}.${meta.repeat}.fastp.html \
+				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--dup_calc_accuracy ${params.dupCalcAccuracy} \
+				--overrepresentation_analysis \
+				--length_required ${params.readDiscardLength} \
+				--thread ${task.cpus} \
+				${args2} \
+				--detect_adapter_for_pe \
+				--correction
 
 			gzip ${meta.id}.${meta.repeat}.fastp.html
 
@@ -49,9 +73,18 @@ process FASTP {
 	else if (meta.merged == true) // Same settings for ancient and modern
 		"""
 
-			fastp --in1 ${reads[0]} --out1 ${meta.id}.${meta.repeat}.fastp.fq.gz --html ${meta.id}.${meta.repeat}.fastp.html --dedup --dup_calc_accuracy ${params.dupCalcAccuracy}  --overrepresentation_analysis --length_required ${params.readDiscardLength} --thread ${task.cpus}
+		# QC merged reads
 
-			rm fastp.json
+			fastp \
+				--in1 ${reads[0]} \
+				--out1 ${meta.id}.${meta.repeat}.fastp.fq.gz \
+				--html ${meta.id}.${meta.repeat}.fastp.html \
+				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--dup_calc_accuracy ${params.dupCalcAccuracy} \
+				--overrepresentation_analysis \
+				--length_required ${params.readDiscardLength} \
+				--thread ${task.cpus} \
+				${args2}
 
 			gzip ${meta.id}.${meta.repeat}.fastp.html
 

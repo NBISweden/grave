@@ -158,6 +158,7 @@ Main workflow
 				ch_mapped_gam = PANGENOME_MAP.out.ch_mapped_gam
 				ch_raw_gam = PANGENOME_MAP.out.ch_raw_gam
 				ch_sample_dedup_bams = BAM_DEDUP.out.ch_sample_dedup_indexed_bams
+				ch_dedup_metrics = BAM_DEDUP.out.ch_dedup_metrics
 				ch_pmd_profiles = PROFILE_PMD.out.ch_pmd_profiles
 				ch_vg_deconstruct_filtered_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_filtered_vcf
 				ch_vg_deconstruct_raw_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_raw_vcf

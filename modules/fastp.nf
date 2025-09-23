@@ -3,7 +3,7 @@ process FASTP {
 	// Directives
 
 	debug false
-	tag "${meta.id}.${meta.repeat}"
+	tag "${meta.read_group}"
 	label 'process_low'
 	container 'oras://community.wave.seqera.io/library/fastp:0.24.0--0397de619771c7ae'
 
@@ -30,9 +30,9 @@ process FASTP {
 				--in1 ${reads[0]} \
 				--in2 ${reads[1]} \
 				--merge \
-				--merged_out ${meta.id}.${meta.repeat}.fastp.fq.gz \
-				--html ${meta.id}.${meta.repeat}.fastp.html \
-				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--merged_out ${meta.read_group}.fastp.fq.gz \
+				--html ${meta.read_group}.fastp.html \
+				--json ${meta.read_group}.fastp.json \
 				--dup_calc_accuracy ${params.dupCalcAccuracy} \
 				--overrepresentation_analysis \
 				--length_required ${params.readDiscardLength} \
@@ -42,7 +42,7 @@ process FASTP {
 				--detect_adapter_for_pe \
 				--correction
 
-			gzip ${meta.id}.${meta.repeat}.fastp.html
+			gzip ${meta.read_group}.fastp.html
 
 		"""
 
@@ -54,10 +54,10 @@ process FASTP {
 			fastp \
 				--in1 ${reads[0]} \
 				--in2 ${reads[1]} \
-				--out1 ${meta.id}.${meta.repeat}.fastp.1.fq.gz \
-				--out2 ${meta.id}.${meta.repeat}.fastp.2.fq.gz \
-				--html ${meta.id}.${meta.repeat}.fastp.html \
-				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--out1 ${meta.read_group}.fastp.1.fq.gz \
+				--out2 ${meta.read_group}.fastp.2.fq.gz \
+				--html ${meta.read_group}.fastp.html \
+				--json ${meta.read_group}.fastp.json \
 				--dup_calc_accuracy ${params.dupCalcAccuracy} \
 				--overrepresentation_analysis \
 				--length_required ${params.readDiscardLength} \
@@ -66,7 +66,7 @@ process FASTP {
 				--detect_adapter_for_pe \
 				--correction
 
-			gzip ${meta.id}.${meta.repeat}.fastp.html
+			gzip ${meta.read_group}.fastp.html
 
 		"""
 
@@ -77,16 +77,16 @@ process FASTP {
 
 			fastp \
 				--in1 ${reads[0]} \
-				--out1 ${meta.id}.${meta.repeat}.fastp.fq.gz \
-				--html ${meta.id}.${meta.repeat}.fastp.html \
-				--json ${meta.id}.${meta.repeat}.fastp.json \
+				--out1 ${meta.read_group}.fastp.fq.gz \
+				--html ${meta.read_group}.fastp.html \
+				--json ${meta.read_group}.fastp.json \
 				--dup_calc_accuracy ${params.dupCalcAccuracy} \
 				--overrepresentation_analysis \
 				--length_required ${params.readDiscardLength} \
 				--thread ${task.cpus} \
 				${args2}
 
-			gzip ${meta.id}.${meta.repeat}.fastp.html
+			gzip ${meta.read_group}.fastp.html
 
 		"""
 

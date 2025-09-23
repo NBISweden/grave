@@ -58,7 +58,7 @@ workflow INITIALISE {
 				println (" ")
 				println ("FASTP parameters:")
 				println (" ")
-				println ("--discardUnmerged [${params.discardUnmerged}]				Discard unmerged reads when merging aDNA paired-end FASTQ files (true/false). If retained, unmerged reads are later combined with merged in a single FASTQ.")
+				println ("--discardUnmerged [${params.discardUnmerged}]				Discard unmerged reads when merging aDNA paired-end FASTQ files (true/false). If retained, unmerged reads are combined with merged in a single FASTQ.")
 				println ("--fastpDedup [${params.fastpDedup}]					If true, duplicate reads detected by exact hash matching algorithm are removed by FASTP (true/false).")
 				println ("--dupCalcAccuracy [${params.dupCalcAccuracy}]					Accuracy level to calculate duplication rate (1~6). Higher level uses more memory to avoid hash collision (1G, 2G, 4G, 8G, 16G, 24G). If --fastpDedup = true, 3+ recommended. If false, 1 recommended.")
 				println ("--readDiscardLength [${params.readDiscardLength}]				Reads shorter than INT will be discarded.")
@@ -295,8 +295,8 @@ workflow INITIALISE {
 
 		// Import samplesheet
 
-			// Initialise empty set for detecting duplicate repeat numbers
-			def uniqueRepeats = new HashSet<String>()
+			// Initialise empty set for detecting duplicate read groups
+			def uniqueReadGroups = new HashSet<String>()
 
 			Channel
 				.fromPath("${params.samplesheet}", checkIfExists: true)
@@ -305,17 +305,21 @@ workflow INITIALISE {
 
 					// Populate metadata
 					def meta = [
-						id: row.id,
-						repeat: row.repeat,
-						type: row.type.toLowerCase(),
+						id: row.sample_id,
+						library: row.library_id,
+						repeat: row.repeat_number,
+						type: row.sample_type.toLowerCase(),
 						merged: row.merged.toLowerCase()
 					]
 
-					// Check no duplicate "sample + repeat" combinations
-					def key = "${meta.id}${meta.repeat}"
-					if (!uniqueRepeats.add(key)) {
-						error ("Error: found duplicate repeat numbers for sample '${meta.id}' in the samplesheet.")
+					// Check no duplicate "read group" combinations
+					def key = "${meta.id}${meta.library}${meta.repeat}"
+					if (!uniqueReadGroups.add(key)) {
+						error ("Error: found a duplicate for sample '${meta.id}' in the samplesheet. Each row should have a unique combination of 'sample_id', 'library_id' and 'repeat_number'.")
 					}
+
+					// Create read group meta field
+					meta.read_group = "${meta.id}.${meta.library}.${meta.repeat}"
 
 					// Check that merge information is true or false, convert to boolean
 					if (!['true', 'false'].contains(meta.merged)) {
@@ -325,7 +329,7 @@ workflow INITIALISE {
 
 					// Check sample types are correctly stated
 					if (!['ancient', 'modern'].contains(meta.type)) {
-						error ("Error: for '${meta.id}_repeat_${meta.repeat}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
+						error ("Error: for '${meta.read_group}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
 					}
 
 					// Initial checks passed, add FASTQ paths
@@ -333,15 +337,15 @@ workflow INITIALISE {
 						if (row.fastq_1 && !row.fastq_2) {
 							return [meta, [file(row.fastq_1)]]
 						} else if (!row.fastq_1) {
-							error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
+							error ("Error caused by sample: '${meta.read_group}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
 						} else {
-							error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. The 'merged' field is true, but a second FASTQ file was unexpectedly provided.")
+							error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting one merged FASTQ, but a second file was also provided.")
 						}
 					} else if (!meta.merged) {
 						if (row.fastq_1 && row.fastq_2) {
 							return [meta, [file(row.fastq_1), file(row.fastq_2)]]
 						} else {
-							error ("Error caused by sample: '${meta.id}_repeat_${meta.repeat}'. In the samplesheet one or more FASTQ files appear to be missing.")
+							error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting two FASTQ files, received one or none.")
 						}
 					}
 				}

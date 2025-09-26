@@ -116,19 +116,21 @@ Run with the provided test data: `pixi run test`
 
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
+| sample_id     | library_id | repeat_number | sample_type | merged | fastq1                | fastq2               |
+|---------------|------------|---------------|-------------|--------|-----------------------|----------------------|
+| ancientHuman1 |      1     |      1        |   ancient   | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| ancientHuman1 |      1     |      2        |   ancient   | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| ancientHuman1 |      2     |      1        |   ancient   | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| modernHuman7  |      1     |      1        |   modern    | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
+| mergedInput   |      1     |      1        |   ancient   | true   | /path/to/merged.fq.gz |                      |
 
-| id            | repeat | type    | merged | fastq1                | fastq2               |
-|---------------|--------|---------|--------|-----------------------|----------------------|
-| ancientHuman1 |   1    | ancient | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| ancientHuman1 |   2    | ancient | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| modernHuman7  |   1    | modern  | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |
-| mergedInput   |   1    | ancient | true   | /path/to/merged.fq.gz |                      |
+- `sample_id`: unique sample identifier
 
-- `id`: sample name
+- `library_id`: unique library identifier
 
-- `repeat`: unique identifier for repeat runs on the same sample
+- `repeat_number`: repeat number of the library
 
-- `type`: sample is ancient or modern - **Note:** _this affects how the sample will be processed_
+- `sample_type`: sample is ancient or modern - **Note:** _this affects how the sample will be processed_
 
 - `merged`: whether the reads have already been merged (e.g., some ancient samples)
 

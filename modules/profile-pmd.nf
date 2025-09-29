@@ -12,7 +12,7 @@ process PROFILE_PMD {
 	input:
 	path ref_path_files
 	tuple path(reference_fasta), path(fasta_index)
-	tuple val(meta), path(surjected_bam), path(bam_index)
+	tuple val(meta), path(bams)
 
 	output:
 	path "*_pmd", emit: ch_pmd_profiles
@@ -35,20 +35,12 @@ process PROFILE_PMD {
 
 		# Run PMD profiling
 
-			damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.sort.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
+			damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.dedup.bam -r ${reference_fasta} -o ${meta.id}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
 		"""
 
 	else if (params.multiRef)	// When multi ref samples, run damageprofiler on each specific pair
 		"""
-
-		# Get reference sample prefixes from '.paths' files
-
-			for i in *.paths
-				do
-					PREFIX=`echo \$i | sed 's/\\.paths//'`
-					echo \$PREFIX >> referenceSamplePrefixes.txt
-				done
 
 		# Find system Java max heap size & convert to GB
 
@@ -56,16 +48,15 @@ process PROFILE_PMD {
 
 			MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
 
-		# Use path file basenames as keys to pair surjected BAMs to relevant FASTAs
+		# Loop over each surjection target
 
-			while read line
+			for i in *.paths
 				do
-					damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.\$line.sort.dedup.bam -r \$line.fasta -o ${meta.id}_surjected_to_\${line}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
-				done < referenceSamplePrefixes.txt
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
 
-		# Clean up
+					damageprofiler -Xms2g -Xmx\${MAX_HEAP_GB}g -i ${meta.id}.\$PREFIX.dedup.bam -r \$PREFIX.fasta -o ${meta.id}_surjected_to_\${PREFIX}_pmd -t 20 -l 100 -yaxis_dp_max 0.3
 
-			rm referenceSamplePrefixes.txt
+				done
 
 		"""
 

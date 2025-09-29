@@ -12,7 +12,7 @@ process FREEBAYES {
 	input:
 	path ref_path_files
 	tuple path(reference_fasta), path(fasta_index)
-	tuple val(meta), path(surjected_bam), path(bam_index)
+	tuple val(meta), path(bams)
 
 	output:
 	path("*.norm.vcf.gz"), emit: ch_freebayes_norm_vcf
@@ -33,20 +33,19 @@ process FREEBAYES {
 
 		# Generate equal coverage regions for parallelization
 
-			bamtools coverage -in ${surjected_bam} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions
+			bamtools coverage -in ${bams} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions
 
 		# Run FreeBayes against the single reference sample
 
 			freebayes-parallel ${reference_fasta}.regions \
 				${task.cpus} \
-				--pooled-continuous \
 				--genotype-qualities \
 				--fasta-reference ${reference_fasta} \
 				--min-alternate-count ${params.minimumAlleleSupport} \
 				--min-alternate-fraction ${params.minFraction} \
 				--ploidy ${params.samplePloidy} \
 				--max-complex-gap ${params.maxComplexGap} \
-				${surjected_bam} | \
+				${bams} | \
 				bgzip --threads ${task.cpus} > \
 				${meta.id}.raw.vcf.gz
 
@@ -84,20 +83,19 @@ process FREEBAYES {
 
 					# Generate equal coverage regions for parallelization
 
-						bamtools coverage -in ${meta.id}.\$line.sort.dedup.bam | coverage_to_regions.py \$line.fasta.fai 500 > \$line.regions
+						bamtools coverage -in ${meta.id}.\$line.dedup.bam | coverage_to_regions.py \$line.fasta.fai 500 > \$line.regions
 
 					# Run FreeBayes
 
 						freebayes-parallel \$line.regions \
 							${task.cpus} \
-							--pooled-continuous \
 							--genotype-qualities \
 							--fasta-reference \$line.fasta \
 							--min-alternate-count ${params.minimumAlleleSupport} \
 							--min-alternate-fraction ${params.minFraction} \
 							--ploidy ${params.samplePloidy} \
 							--max-complex-gap ${params.maxComplexGap} \
-							${meta.id}.\$line.sort.dedup.bam | \
+							${meta.id}.\$line.dedup.bam | \
 							bgzip --threads ${task.cpus} > \
 							${meta.id}.\$line.raw.vcf.gz
 

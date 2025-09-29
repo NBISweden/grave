@@ -15,6 +15,8 @@ help = { cmd = "nextflow main.nf --help" }
 dag = { cmd = "nextflow main.nf --graphDir ./data/test -preview -with-dag flowchart.png" }
 grave = { cmd = "nextflow main.nf -profile apptainer" }
 test = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths -profile apptainer,standard" }
+testMulti = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --multiRef -profile apptainer,standard" }
+testMapOnly = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphDeconstruct false --vgGenotype false --freeBayes false --deepVariant false --profilePMD false -profile apptainer,standard" }
 filter = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphMode filter -profile apptainer,standard" }
 
 [dependencies]

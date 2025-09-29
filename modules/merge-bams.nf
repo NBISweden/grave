@@ -5,7 +5,7 @@ process MERGE_BAMS {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/gatk4_samtools:c86a632704269f7d'
+	container 'oras://community.wave.seqera.io/library/samtools:1.22.1--9a10f06c24cdf05f'
 
 	// I/O & script
 

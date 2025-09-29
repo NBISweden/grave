@@ -31,7 +31,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 
 			vg surject -t ${task.cpus} -x ${graph} --bam-output ${mapped_gam} | \
 			samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-			samtools sort --threads ${task.cpus} --output-fmt BAM -N - > \
+			samtools sort --threads ${task.cpus} --output-fmt BAM - > \
 			${meta.read_group}.bam
 
 		"""
@@ -43,7 +43,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 
 			vg surject -t ${task.cpus} -x ${graph} --interleaved --bam-output ${mapped_gam} | \
 			samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-			samtools sort --threads ${task.cpus} --output-fmt BAM -N - > \
+			samtools sort --threads ${task.cpus} --output-fmt BAM - > \
 			 ${meta.read_group}.bam
 
 		"""
@@ -58,7 +58,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 					PREFIX=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --bam-output ${mapped_gam} | \
 					samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-					samtools sort --threads ${task.cpus} --output-fmt BAM -N - > \
+					samtools sort --threads ${task.cpus} --output-fmt BAM - > \
 					${meta.read_group}.\$PREFIX.bam
 				done
 
@@ -74,7 +74,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 					PREFIX=`echo \$i | sed 's/\\.paths//'`
 					vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --interleaved --bam-output ${mapped_gam} | \
 					samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-					samtools sort --threads ${task.cpus} --output-fmt BAM -N - > \
+					samtools sort --threads ${task.cpus} --output-fmt BAM - > \
 					${meta.read_group}.\$PREFIX.bam
 				done
 

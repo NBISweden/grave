@@ -32,7 +32,7 @@ process MERGE_BAMS {
 				mv ${bams} ${meta.id}.merge.bam
 			else
 				echo "Merging ${readgroupCount} BAM files for sample ${meta.id}"
-				samtools merge --threads ${task.cpus} -N -p -o ${meta.id}.merge.bam ${bams}
+				samtools merge --threads ${task.cpus} -p -o ${meta.id}.merge.bam ${bams}
 			fi
 
 		"""
@@ -54,7 +54,7 @@ process MERGE_BAMS {
 					# Merge multiple BAM files
 					else
 						echo "Merging ${readgroupCount} BAM files per surjection target for sample ${meta.id}"
-						samtools merge --threads ${task.cpus} -N -p -o ${meta.id}.\$PREFIX.merge.bam ${meta.id}.*.\$PREFIX.bam
+						samtools merge --threads ${task.cpus} -p -o ${meta.id}.\$PREFIX.merge.bam ${meta.id}.*.\$PREFIX.bam
 					fi
 
 				done

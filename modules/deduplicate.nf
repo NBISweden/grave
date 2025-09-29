@@ -16,7 +16,6 @@ process DEDUPLICATE {
 	output:
 	tuple val(meta), path("${meta.id}*.dedup.bam"), emit: ch_deduplicated_bams
 	path "*.dedup_metrics.txt", emit: ch_dedup_metrics
-	//FIXME: check output of topic channel
 	tuple val(task.process), val('picard'), eval('picard MarkDuplicates --version 2>&1 | grep Version | sed "s/.*://"'), topic: versions
 
 	script:
@@ -40,7 +39,7 @@ process DEDUPLICATE {
 				--TAGGING_POLICY ${params.duplicateTaggingPolicy} \
 				--REMOVE_DUPLICATES ${params.removeDuplicates} \
 				--VALIDATION_STRINGENCY STRICT \
-				--ASSUME_SORT_ORDER queryname \
+				--ASSUME_SORT_ORDER coordinate \
 				${args}
 
 		"""
@@ -63,7 +62,7 @@ process DEDUPLICATE {
 				--TAGGING_POLICY ${params.duplicateTaggingPolicy} \
 				--REMOVE_DUPLICATES ${params.removeDuplicates} \
 				--VALIDATION_STRINGENCY STRICT \
-				--ASSUME_SORT_ORDER queryname
+				--ASSUME_SORT_ORDER coordinate
 
 		"""
 
@@ -93,7 +92,7 @@ process DEDUPLICATE {
 							--TAGGING_POLICY ${params.duplicateTaggingPolicy} \
 							--REMOVE_DUPLICATES ${params.removeDuplicates} \
 							--VALIDATION_STRINGENCY STRICT \
-							--ASSUME_SORT_ORDER queryname \
+							--ASSUME_SORT_ORDER coordinate \
 							${args}
 
 				done
@@ -126,7 +125,7 @@ process DEDUPLICATE {
 							--TAGGING_POLICY ${params.duplicateTaggingPolicy} \
 							--REMOVE_DUPLICATES ${params.removeDuplicates} \
 							--VALIDATION_STRINGENCY STRICT \
-							--ASSUME_SORT_ORDER queryname
+							--ASSUME_SORT_ORDER coordinate
 
 				done
 

@@ -45,7 +45,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -73,7 +73,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -105,7 +105,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -133,7 +133,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -161,7 +161,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 
@@ -189,7 +189,7 @@ process PANGENOME_MAP {
 
 		# Filter GAM
 
-			vg filter ${args} ${args2} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -D 999 -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+			vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
 		# Remove raw GAM unless overridden
 

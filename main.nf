@@ -40,7 +40,6 @@ Contributors:
 			graph_stats = GRAVE.out.ch_graph_stats
 			linear_references = GRAVE.out.ch_reference_fasta
 			fastp_libraries = GRAVE.out.ch_library_fastp_report
-			fastp_merged_samples = GRAVE.out.ch_sample_fastp_report
 			fastqc_raw = GRAVE.out.ch_fastqc_raw
 			fastqc_fastp = GRAVE.out.ch_fastqc_fastp
 			alignment_stats = GRAVE.out.ch_alignment_stats
@@ -58,7 +57,6 @@ Contributors:
 			deepvariant_report = GRAVE.out.ch_deepvariant_html
 			deepvariant_normalised_vcf = GRAVE.out.ch_deepvariant_norm_vcf
 			deepvariant_raw_vcf = GRAVE.out.ch_deepvariant_raw_vcf
-			skip_fastp_merge_samples = GRAVE.out.ch_skipped_samples
 			package_versions = GRAVE.out.ch_versions
 
 	}
@@ -81,12 +79,6 @@ Contributors:
 
 		fastp_libraries {
 			path 'quality_reports/fastp_library_level'
-			mode 'copy'
-			overwrite false
-		}
-
-		fastp_merged_samples {
-			path 'quality_reports/fastp_sample_level'
 			mode 'copy'
 			overwrite false
 		}
@@ -181,7 +173,7 @@ Contributors:
 		}
 
 		deepvariant_report {
-			path 'quality_reports/deepvariant'
+			path 'variant_calling/deepvariant'
 			mode 'copy'
 			overwrite false
 		}
@@ -197,12 +189,6 @@ Contributors:
 			mode 'copy'
 			overwrite false
 			enabled params.keepRawVcf
-		}
-
-		skip_fastp_merge_samples {
-			path 'quality_reports/fastp_sample_level'
-			mode 'copy'
-			overwrite false
 		}
 
 		package_versions {

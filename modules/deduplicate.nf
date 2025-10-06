@@ -5,7 +5,7 @@ process DEDUPLICATE {
 	debug false
 	tag "${meta.id}"
 	label 'process_medium'
-	container 'oras://community.wave.seqera.io/library/picard-slim:3.4.0--f911f8b2b8ec0b3f'
+	container 'oras://community.wave.seqera.io/library/picard-slim_samtools:990e1cb8163120a6'
 
 	// I/O & script
 
@@ -14,7 +14,7 @@ process DEDUPLICATE {
 	tuple val(meta), path(bams)
 
 	output:
-	tuple val(meta), path("${meta.id}*.dedup.bam"), emit: ch_deduplicated_bams
+	tuple val(meta), path("${meta.id}*.dedup.bam"), path("${meta.id}*.dedup.bam.bai"), emit: ch_deduplicated_bams
 	path "*.dedup_metrics.txt", emit: ch_dedup_metrics
 	tuple val(task.process), val('picard'), eval('picard MarkDuplicates --version 2>&1 | grep Version | sed "s/.*://"'), topic: versions
 
@@ -42,6 +42,10 @@ process DEDUPLICATE {
 				--ASSUME_SORT_ORDER coordinate \
 				${args}
 
+		# Index BAM
+
+			samtools index ${meta.id}.dedup.bam
+
 		"""
 
 	else if (!params.multiRef && meta.type == "modern") // Use only 5' mapping positions
@@ -63,6 +67,10 @@ process DEDUPLICATE {
 				--REMOVE_DUPLICATES ${params.removeDuplicates} \
 				--VALIDATION_STRINGENCY STRICT \
 				--ASSUME_SORT_ORDER coordinate
+
+		# Index BAM
+
+			samtools index ${meta.id}.dedup.bam
 
 		"""
 
@@ -95,6 +103,10 @@ process DEDUPLICATE {
 							--ASSUME_SORT_ORDER coordinate \
 							${args}
 
+					# Index BAM
+
+						samtools index ${meta.id}.\$PREFIX.dedup.bam
+
 				done
 
 		"""
@@ -126,6 +138,10 @@ process DEDUPLICATE {
 							--REMOVE_DUPLICATES ${params.removeDuplicates} \
 							--VALIDATION_STRINGENCY STRICT \
 							--ASSUME_SORT_ORDER coordinate
+
+					# Index BAM
+
+						samtools index ${meta.id}.\$PREFIX.dedup.bam
 
 				done
 

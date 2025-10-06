@@ -116,6 +116,7 @@ Run with the provided test data: `pixi run test`
 
 >[!TIP]
 > The table below is for example purposes - the samplesheet must be in `.csv` format
+
 | sample_id     | library_id | repeat_number | sample_type | merged | fastq1                | fastq2               |
 |---------------|------------|---------------|-------------|--------|-----------------------|----------------------|
 | ancientHuman1 |      1     |      1        |   ancient   | false  | /path/to/read1.fq.gz  | /path/to/read2.fq.gz |

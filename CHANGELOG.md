@@ -36,7 +36,7 @@
 - Picard settings allow for ancient DNA to use 3' and 5' information when identifying duplicates, mimicing `dedup` behaviour
 - Since GAMs are split, implemented new merging logic for GAMs prior to `vg call`
 
-## Removed
+### Removed
 
 - `deconstructNestedSnarls` - this was a bugged parameter, removed to avoid confusion for now.
 

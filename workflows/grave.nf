@@ -14,14 +14,14 @@ Main workflow
 	include { MAKE_FILTER } from '../modules/make-filter.nf'
 	include { PROCESS_GRAPH } from '../modules/process-graph.nf'
 	include { COMPUTE_SNARLS } from '../modules/compute-snarls.nf'
+	include { VG_DECONSTRUCT } from '../modules/vg-deconstruct.nf'
 	include { FASTP } from '../modules/fastp.nf'
 	include { FASTQC as QC_RAW; FASTQC as QC_FASTP } from '../modules/fastqc.nf'
-	include { FASTQ_MERGE_DEDUP } from '../modules/fastq-merge-dedup.nf'
 	include { PANGENOME_MAP } from '../modules/pangenome-map.nf'
-	include { VG_SURJECT } from '../modules/vg-surject.nf'
-	include { BAM_DEDUP } from '../modules/bam-dedup.nf'
+	include { GAM_TO_TAGGED_SORTED_BAM } from '../modules/gam-to-tagged-sorted-bam.nf'
+	include { MERGE_BAMS } from '../modules/merge-bams.nf'
+	include { DEDUPLICATE } from '../modules/deduplicate.nf'
 	include { PROFILE_PMD } from '../modules/profile-pmd.nf'
-	include { VG_DECONSTRUCT } from '../modules/vg-deconstruct.nf'
 	include { VG_GENOTYPE } from '../modules/vg-genotype.nf'
 	include { FREEBAYES } from '../modules/freebayes.nf'
 	include { DEEPVARIANT } from '../modules/deepvariant.nf'
@@ -75,6 +75,10 @@ Main workflow
 
 				COMPUTE_SNARLS(ch_gbz_graph)
 
+			// Graph based variant calling
+
+				VG_DECONSTRUCT(ch_gbz_graph, COMPUTE_SNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas)
+
 			// Run quality filtering on input reads
 
 				FASTP(ch_samplesheet)
@@ -87,58 +91,51 @@ Main workflow
 
 				QC_FASTP(FASTP.out.ch_fastp_reads)
 
-			// Merge and deduplicate FASTQs per sample
+			// Map reads to pangenome graph (GAM output)
 
-				FASTQ_MERGE_DEDUP(
-					FASTP.out.ch_fastp_reads
-						.map{ meta, fastqs -> [meta.subMap('id', 'type', 'merged'), meta.subMap('repeat'), fastqs] } // Create metadata subset to group on, split out repeat numbers
-						.groupTuple() // Group by sample
-						.map{ meta, repeat, fastqs -> [meta, repeat.flatten(), fastqs.flatten()] } // Flatten any nested lists
-				)
-
-			// Map reads to pangenome graph
-
-				PANGENOME_MAP(FASTQ_MERGE_DEDUP.out.ch_sample_fastqs, ch_indexed_graph)
+				PANGENOME_MAP(FASTP.out.ch_fastp_reads, ch_indexed_graph)
 
 			// Merge GAMs at sample level and genotype against graph variants
 
 				VG_GENOTYPE(
 					ch_gbz_graph.collect(),
-					COMPUTE_SNARLS.out.ch_snarls.collect(),
 					ch_ref_path_files.collect(),
+					COMPUTE_SNARLS.out.ch_snarls.collect(),
 					PROCESS_GRAPH.out.ch_reference_fastas.collect(),
 					PANGENOME_MAP.out.ch_mapped_gam
 						.map{ meta, gam -> [meta.subMap('id'), gam] }
 						.groupTuple()
 				)
 
-			// Secondary deduplication on surjected BAMs per sample
+			// Surject to BAM, add read groups and sort
 
-				BAM_DEDUP(ch_ref_path_files.collect(), VG_SURJECT.out.ch_surjected_bams)
+				GAM_TO_TAGGED_SORTED_BAM(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANGENOME_MAP.out.ch_mapped_gam)
+
+			// Merge BAMs at sample level
+
+				MERGE_BAMS(
+					ch_ref_path_files.collect(),
+					GAM_TO_TAGGED_SORTED_BAM.out.ch_surjected_bams
+						.map{ meta, bams -> [meta.subMap('id','type'), meta.subMap('read_group'), bams] } // Extract sample & type metadata to group on
+						.groupTuple() // Group by sample
+						.map{ meta, readgroup, bams -> [meta, readgroup, bams.flatten()] } // Flatten nested lists (multi ref)
+				)
+
+			// Deduplicate BAMs
+
+				DEDUPLICATE(ch_ref_path_files.collect(), MERGE_BAMS.out.ch_merged_bams)
 
 			// Post-mortem damage assessment of reads
 
-				PROFILE_PMD(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), BAM_DEDUP.out.ch_sample_dedup_indexed_bams)
+				PROFILE_PMD(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), DEDUPLICATE.out.ch_deduplicated_bams)
 
-			// Graph based variant calling
+			// BAM variant callers
 
-				VG_DECONSTRUCT(ch_gbz_graph, COMPUTE_SNARLS.out.ch_snarls, ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas)
+				FREEBAYES(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), DEDUPLICATE.out.ch_deduplicated_bams)
 
-			// Mapping based variant calling
-
-				VG_GENOTYPE(ch_gbz_graph.collect(), COMPUTE_SNARLS.out.ch_snarls.collect(), ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), PANGENOME_MAP.out.ch_mapped_gam)
-
-				DEEPVARIANT(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), BAM_DEDUP.out.ch_sample_dedup_indexed_bams)
+				DEEPVARIANT(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), DEDUPLICATE.out.ch_deduplicated_bams)
 
 				PROCESS_DEEPVARIANT(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), DEEPVARIANT.out.ch_raw_deepvariant_vcf)
-
-				FREEBAYES(ch_ref_path_files.collect(), PROCESS_GRAPH.out.ch_reference_fastas.collect(), BAM_DEDUP.out.ch_sample_dedup_indexed_bams)
-
-			// Report skipped single library samples, as they were already deduplicated
-
-				FASTQ_MERGE_DEDUP.out.ch_skipped_samples
-					.collectFile(name: 'skipped-samples.txt')
-					.set { ch_skipped_samples }
 
 			// Report package versions
 
@@ -159,14 +156,13 @@ Main workflow
 				ch_graph_stats = PROCESS_GRAPH.out.ch_graph_stats
 				ch_reference_fasta = PROCESS_GRAPH.out.ch_reference_fastas
 				ch_library_fastp_report = FASTP.out.ch_library_fastp_report
-				ch_sample_fastp_report = FASTQ_MERGE_DEDUP.out.ch_sample_fastp_report
 				ch_fastqc_raw = QC_RAW.out.ch_fastqc
 				ch_fastqc_fastp = QC_FASTP.out.ch_fastqc
 				ch_alignment_stats = PANGENOME_MAP.out.ch_alignment_stats
 				ch_mapped_gam = PANGENOME_MAP.out.ch_mapped_gam
 				ch_raw_gam = PANGENOME_MAP.out.ch_raw_gam
-				ch_sample_dedup_bams = BAM_DEDUP.out.ch_sample_dedup_indexed_bams
-				ch_dedup_metrics = BAM_DEDUP.out.ch_dedup_metrics
+				ch_sample_dedup_bams = DEDUPLICATE.out.ch_deduplicated_bams
+				ch_dedup_metrics = DEDUPLICATE.out.ch_dedup_metrics
 				ch_pmd_profiles = PROFILE_PMD.out.ch_pmd_profiles
 				ch_vg_deconstruct_filtered_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_filtered_vcf
 				ch_vg_deconstruct_raw_vcf = VG_DECONSTRUCT.out.ch_vg_deconstruct_raw_vcf
@@ -177,7 +173,6 @@ Main workflow
 				ch_deepvariant_html = DEEPVARIANT.out.ch_deepvariant_html
 				ch_deepvariant_norm_vcf = PROCESS_DEEPVARIANT.out.ch_deepvariant_norm_vcf
 				ch_deepvariant_raw_vcf = PROCESS_DEEPVARIANT.out.ch_deepvariant_raw_vcf
-				ch_skipped_samples = ch_skipped_samples
 				ch_versions = ch_versions
 
 	}

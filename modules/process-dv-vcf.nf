@@ -29,19 +29,15 @@ process PROCESS_DEEPVARIANT {
 	if (!params.multiRef)	// Assume single reference sample
 		"""
 
-		# Zip raw VCF
-
-			bgzip --threads ${task.cpus} ${deepvariant_vcf}
-
 		# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-			bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
+			bcftools norm -f ${reference_fasta} ${deepvariant_vcf} | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
 
 		# Clean up
 
 			if [ "${params.keepRawVcf}" != "true" ]
 				then
-					rm ${meta.id}.raw.vcf.gz
+					rm ${deepvariant_vcf}
 			fi
 
 		"""
@@ -49,40 +45,26 @@ process PROCESS_DEEPVARIANT {
 	else if (params.multiRef)
 		"""
 
-		# Get reference sample prefixes from '.paths' files
-
-			for i in *.paths
-				do
-					PREFIX=`echo \$i | sed 's/\\.paths//'`
-					echo \$PREFIX >> referenceSamplePrefixes.txt
-				done
-
 		# Loop through each reference sample
 
-			while read line
+			for i in *.paths
 
 				do
-	
-					# Zip raw VCF
 
-						bgzip --threads ${task.cpus} ${meta.id}.\$line.raw.vcf
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
 
 					# Normalise and sort (no bubbles to pop in DeepVariant VC)
 
-						bcftools norm -f \$line.fasta ${meta.id}.\$line.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$line.norm.vcf.gz
+						bcftools norm -f \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.norm.vcf.gz
 
 					# Clean up
 
 						if [ "${params.keepRawVcf}" != "true" ]
 							then
-								rm ${meta.id}.\$line.raw.vcf.gz
+								rm ${meta.id}.\$PREFIX.raw.vcf.gz
 						fi
 
-				done < referenceSamplePrefixes.txt
-
-		# Clean up
-
-			rm referenceSamplePrefixes.txt
+				done
 
 		"""
 

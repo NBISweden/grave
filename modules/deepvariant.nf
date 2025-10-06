@@ -5,37 +5,41 @@ process DEEPVARIANT {
 	debug false
 	tag "${meta.id}"
 	label 'process_high'
-	container 'docker://google/deepvariant:1.6.1'
+	container 'docker://google/deepvariant:pangenome_aware_deepvariant-1.9.0'
 
 	// I/O & script
 
 	input:
+	path graph
 	path ref_path_files
 	tuple path(reference_fasta), path(fasta_index)
-	tuple val(meta), path(surjected_bam), path(bam_index)
+	tuple val(meta), path(bams), path(indexes)
 
 	output:
-	tuple val(meta), path("*.vcf"), emit: ch_raw_deepvariant_vcf
+	tuple val(meta), path("*.vcf.gz"), emit: ch_raw_deepvariant_vcf
 	tuple val(meta), path("*.html"), emit: ch_deepvariant_html
-	tuple val(task.process), val('deepvariant'), eval('/opt/deepvariant/bin/run_deepvariant --version 2>/dev/null | sed "s/.*version //"'), topic: versions
+	tuple val(task.process), val('pangenome_aware_deepvariant'), eval('/opt/deepvariant/bin/run_pangenome_aware_deepvariant --version --model_type=WGS --ref=dummy --reads=dummy --pangenome=dummy --output_vcf=dummy 2>/dev/null | sed "s/.*version //"'), topic: versions
 
 	when:
 	params.deepVariant == true
 
 	script:
 	def args = task.ext.args ?: ''
+	def basename = graph.baseName - '.gbz'
 
 	if (!params.multiRef)	// Assume single reference sample
 		"""
 
-		# Run DeepVariant against the single reference sample
+		# Run DeepVariant
 
-			/opt/deepvariant/bin/run_deepvariant \
+			/opt/deepvariant/bin/run_pangenome_aware_deepvariant \
 				--num_shards ${task.cpus} \
-				--sample_name ${meta.id} \
+				--sample_name_reads ${meta.id} \
 				--ref ${reference_fasta} \
-				--reads ${surjected_bam} \
-				--output_vcf ${meta.id}.raw.vcf \
+				--pangenome ${graph} \
+				--reads ${bams} \
+				--output_vcf ${meta.id}.raw.vcf.gz \
+				--vcf_stats_report \
 				--model_type ${params.deepVariantModelType}
 
 		"""
@@ -43,33 +47,25 @@ process DEEPVARIANT {
 	else if (params.multiRef)
 		"""
 
-		# Get reference sample prefixes from '.paths' files
-
-			for i in *.paths
-				do
-					PREFIX=`echo \$i | sed 's/\\.paths//'`
-					echo \$PREFIX >> referenceSamplePrefixes.txt
-				done
-
 		# Run DeepVariant against each reference sample
 
-			while read line
+			for i in *.paths
 
 				do
 
-					/opt/deepvariant/bin/run_deepvariant \
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
+
+					/opt/deepvariant/bin/run_pangenome_aware_deepvariant \
 						--num_shards ${task.cpus} \
-						--sample_name ${meta.id} \
-						--ref \$line.fasta \
-						--reads ${meta.id}.\$line.sort.dedup.bam \
-						--output_vcf ${meta.id}.\$line.raw.vcf \
+						--sample_name_reads ${meta.id} \
+						--ref \$PREFIX.fasta \
+						--pangenome ${graph} \
+						--reads ${meta.id}.\$PREFIX.dedup.bam \
+						--output_vcf ${meta.id}.\$PREFIX.raw.vcf.gz \
+						--vcf_stats_report \
 						--model_type ${params.deepVariantModelType}
 
-				done < referenceSamplePrefixes.txt
-
-		# Clean up
-
-			rm referenceSamplePrefixes.txt
+				done
 
 		"""
 

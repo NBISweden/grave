@@ -100,9 +100,17 @@ Main workflow
 
 				PANGENOME_MAP(FASTQ_MERGE_DEDUP.out.ch_sample_fastqs, ch_indexed_graph)
 
-			// Surject mapped reads to reference paths
+			// Merge GAMs at sample level and genotype against graph variants
 
-				VG_SURJECT(ch_gbz_graph.collect(), ch_ref_path_files.collect(), PANGENOME_MAP.out.ch_mapped_gam)
+				VG_GENOTYPE(
+					ch_gbz_graph.collect(),
+					COMPUTE_SNARLS.out.ch_snarls.collect(),
+					ch_ref_path_files.collect(),
+					PROCESS_GRAPH.out.ch_reference_fastas.collect(),
+					PANGENOME_MAP.out.ch_mapped_gam
+						.map{ meta, gam -> [meta.subMap('id'), gam] }
+						.groupTuple()
+				)
 
 			// Secondary deduplication on surjected BAMs per sample
 

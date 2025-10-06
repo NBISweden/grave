@@ -13,8 +13,8 @@ process VG_GENOTYPE {
 
 	input:
 	path graph
-	path snarls
 	path ref_path_files
+	path snarls
 	tuple path(reference_fasta), path(index)
 	tuple val(meta), path(gams)
 

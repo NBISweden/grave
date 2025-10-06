@@ -12,7 +12,7 @@ process PROFILE_PMD {
 	input:
 	path ref_path_files
 	tuple path(reference_fasta), path(fasta_index)
-	tuple val(meta), path(bams)
+	tuple val(meta), path(bams), path(indexes)
 
 	output:
 	path "*_pmd", emit: ch_pmd_profiles

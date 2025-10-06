@@ -1,14 +1,58 @@
 # Changelog
 
-## [1.4.0] - 20250
+## [1.4.0] - 20251006
 
-- Deduplication overhaul
+### Reorganisation & documentation
+
+- Params sections in `nextflow.config` clarified
+- Corresponding help message sections have been clarified, and help messages improved for some parameters
+- New dag
+- Updated samplesheet info in README
+
+### FASTP
+
+- exact hash deduplication now defaults to off, controlled with `--fastpDedup`
+- new parameter to control whether FASTP performs duplicate removal or not (even if turned off we get a rough duplication rate calculation)
+- json report now also published alongside html
+- improved help message on FASTP duplicate rate/removal params
+- keeping unmerged reads now outputs these alongside the merged, rather than into two extra files
+
+### FASTQC 
+
+- removed empty file check (unmerged reads used to cause this but are output into the merged readfile now)
+- html output
+- improved syntax for other file extensions
+
+### Deduplication overhaul
+
+- Changed samplesheet metadata requirements (library_id and repeat_number: together with sample id, we can now generate a unique read group identifier)
+- Removed all hash deduplication steps
+- Mapping now done at the library level
+- Surject now followed by readgroup annotation, sorting, BAM merging, and deduplication with Picard
+	- New deduplication metrics file in `results/statistics`
+	- `--removeDuplicates` (default `true`): If true, Picard MarkDuplicates will not write duplicate reads to the output. If false, they will be written, with duplicate flags set (true/false).
+	- `--duplicateTaggingPolicy` (default `DontTag`): Policy for tagging duplicates in the DT optional SAM/BAM field (`DontTag`, `OpticalOnly`, `All`). Irrelevant if `--removeDuplicates` is true. See Picard docs for more info.
+	- `--dedupConsiderBothEnds` (default `true`): If true, for appropriate samples Picard MarkDuplicates will consider both 5' and 3' ends of reads when identifying duplicates. If false, only the 5' end will be considered (true/false). Appropriate samples are "single ended reads" with both ends known, i.e. successfully merged aDNA reads.
+- Picard settings allow for ancient DNA to use 3' and 5' information when identifying duplicates, mimicing `dedup` behaviour
+- Since GAMs are split, implemented new merging logic for GAMs prior to `vg call`
+
+## Removed
+
+- `deconstructNestedSnarls` - this was a bugged parameter, removed to avoid confusion for now.
+
+### Pangenome map filter
+
+- Defraying of ambiguously aligned read ends is now turned off by default.
+	- To turn it on, use `--gamDefrayEnds`
+	- To control the maximum length of defray, use `--defrayEndsLength` (default 999)
+- MAPQ filter is now on by default (default 30)
+	- Control it with `--gamFilterMapQ`
+	- Threshold set by `--minimumMapQFilter`
 
 
-### Software updates
+### DeepVariant
 
-- TODO: bump vg
-
+- Updated module to use pangenome aware version, updated code and output processing accordingly
 
 
 ## [1.3.4] - 20250912

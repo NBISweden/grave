@@ -67,56 +67,46 @@ process FREEBAYES {
 	else if (params.multiRef)
 		"""
 
-		# Get reference sample prefixes from '.paths' files
-
-			for i in *.paths
-				do
-					PREFIX=`echo \$i | sed 's/\\.paths//'`
-					echo \$PREFIX >> referenceSamplePrefixes.txt
-				done
-
 		# Run FreeBayes workflow against each reference sample
 
-			while read line
+			for i in *.paths
 
 				do
+
+					PREFIX=`echo \$i | sed 's/\\.paths//'`
 
 					# Generate equal coverage regions for parallelization
 
-						bamtools coverage -in ${meta.id}.\$line.dedup.bam | coverage_to_regions.py \$line.fasta.fai 500 > \$line.regions
+						bamtools coverage -in ${meta.id}.\$PREFIX.dedup.bam | coverage_to_regions.py \$PREFIX.fasta.fai 500 > \$PREFIX.regions
 
 					# Run FreeBayes
 
-						freebayes-parallel \$line.regions \
+						freebayes-parallel \$PREFIX.regions \
 							${task.cpus} \
 							--genotype-qualities \
-							--fasta-reference \$line.fasta \
+							--fasta-reference \$PREFIX.fasta \
 							--min-alternate-count ${params.minimumAlleleSupport} \
 							--min-alternate-fraction ${params.minFraction} \
 							--ploidy ${params.samplePloidy} \
 							--max-complex-gap ${params.maxComplexGap} \
-							${meta.id}.\$line.dedup.bam | \
+							${meta.id}.\$PREFIX.dedup.bam | \
 							bgzip --threads ${task.cpus} > \
-							${meta.id}.\$line.raw.vcf.gz
+							${meta.id}.\$PREFIX.raw.vcf.gz
 
 					# Norm and sort
 
-						bcftools norm -f \$line.fasta ${meta.id}.\$line.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$line.norm.vcf.gz
+						bcftools norm -f \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.norm.vcf.gz
 
 					# Clean up
 
 						if [ "${params.keepRawVcf}" != "true" ]
 							then
-								rm ${meta.id}.\$line.raw.vcf.gz
+								rm ${meta.id}.\$PREFIX.raw.vcf.gz
 						fi
 
-						rm \$line.regions
+						rm \$PREFIX.regions
 
-				done < referenceSamplePrefixes.txt
-
-		# Clean up outside loop
-		
-			rm referenceSamplePrefixes.txt
+				done
 
 		"""
 

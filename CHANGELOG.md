@@ -9,7 +9,7 @@
 
 ### Parameters
 
-- Tweaked default minimum allele support to allow lienance for aDNA (matches EAGER)
+- Tweaked default minimum allele support to allow leniency for aDNA (matches EAGER)
 
 ### Others
 

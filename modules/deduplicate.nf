@@ -44,7 +44,7 @@ process DEDUPLICATE {
 
 		# Index BAM
 
-			samtools index ${meta.id}.dedup.bam
+			samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
 
 		"""
 
@@ -70,7 +70,7 @@ process DEDUPLICATE {
 
 		# Index BAM
 
-			samtools index ${meta.id}.dedup.bam
+			samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
 
 		"""
 
@@ -105,7 +105,7 @@ process DEDUPLICATE {
 
 					# Index BAM
 
-						samtools index ${meta.id}.\$PREFIX.dedup.bam
+						samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
 
 				done
 
@@ -141,7 +141,7 @@ process DEDUPLICATE {
 
 					# Index BAM
 
-						samtools index ${meta.id}.\$PREFIX.dedup.bam
+						samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
 
 				done
 

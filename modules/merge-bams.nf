@@ -25,7 +25,7 @@ process MERGE_BAMS {
 	if (!params.multiRef)
 		"""
 
-		# If only one BAM, skip for disk economy. Merge if multiple BAMS.
+		# Skip if only one BAM. Merge if multiple BAMS.
 
 			if (( ${readgroupCount} == 1 )); then
 				echo "Only one BAM file for sample ${meta.id}, skipping merge"

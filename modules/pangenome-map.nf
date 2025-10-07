@@ -23,6 +23,7 @@ process PANGENOME_MAP {
 	script:
 	def args = task.ext.args ?: ''
 	def args2 = task.ext.args2 ?: ''
+	def args3 = task.ext.args3 ?: ''
 	def memory = task.memory.toGiga()
 	def basename = graph.baseName - '.gbz'
 
@@ -41,7 +42,7 @@ process PANGENOME_MAP {
 
 		# Map reads to graph (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
 		# Filter GAM
 
@@ -69,7 +70,7 @@ process PANGENOME_MAP {
 
 		# Map merged reads (settings based on BWA aln)
 
-			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --max-fragment-length 301 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+			vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
 		# Filter GAM
 

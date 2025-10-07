@@ -1,5 +1,27 @@
 # Changelog
 
+
+## [1.4.1] - 20251007
+
+### Bug fix
+
+- Fixed missing `args3` in pangenome map module
+
+### Parameters
+
+- Tweaked default minimum allele support to allow lienance for aDNA (matches EAGER)
+
+### Others
+
+- Small fixes to docs
+- Added threads flag to samtools index
+- Minor annotation changes
+- Removed old `--max-fragment-length` argument in ancient DNA mapping script blocks - these will always be "single ended" at the mapping stage.
+
+### Wiki
+
+- Wiki boilerplate pushed
+
 ## [1.4.0] - 20251006
 
 ### Reorganisation & documentation

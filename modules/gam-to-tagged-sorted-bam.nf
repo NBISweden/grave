@@ -27,7 +27,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 	if (!params.multiRef && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// Default reference paths, GAM not interleaved
 		"""
 
-		# Surject GAM, add read group tags, sort by queryname
+		# Surject GAM, add read group tags, coordinate sort
 
 			vg surject -t ${task.cpus} -x ${graph} --bam-output ${mapped_gam} | \
 			samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
@@ -39,7 +39,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 	else if (!params.multiRef && meta.type == "modern" && meta.merged == false)	// Default reference paths, GAM interleaved
 		"""
 
-		# Surject GAM, add read group tags, sort by queryname (interleaved)
+		# Surject GAM, add read group tags, coordinate sort
 
 			vg surject -t ${task.cpus} -x ${graph} --interleaved --bam-output ${mapped_gam} | \
 			samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
@@ -51,7 +51,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 	else if (params.multiRef && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// User provided reference paths, GAM not interleaved
 		"""
 
-		# Surject GAM, add read group tags, sort by queryname (to each user provided list of reference paths)
+		# Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths)
 
 			for i in *.paths
 				do
@@ -67,7 +67,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 	else if  (params.multiRef && meta.type == "modern" && meta.merged == false)	// User provided reference paths, GAM interleaved
 		"""
 
-		# Surject GAM, add read group tags, sort by queryname (to each user provided list of reference paths, interleaved)
+		# Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths, interleaved)
 
 			for i in *.paths
 				do

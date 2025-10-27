@@ -1,4 +1,4 @@
-[project]
+[workspace]
 authors = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
 channels = ["conda-forge", "bioconda"]
 description = "Grave pixi environments"
@@ -20,7 +20,7 @@ testMapOnly = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./d
 filter = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphMode filter -profile apptainer,standard" }
 
 [dependencies]
-nextflow="==25.04.6"
+nextflow="==25.10.0"
 graphviz=">=12.2.1"
 msmtp-sendmail=">=1.8.28"
 vg="==1.67.0"

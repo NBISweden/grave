@@ -4,10 +4,6 @@ Main workflow
 ----------------------------------------------------------------------------------------
 */
 
-// Feature flags
-
-	nextflow.preview.output = true
-
 // Imports
 
 	include { MAKE_HAPL } from '../modules/make-hapl.nf'

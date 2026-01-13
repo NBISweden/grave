@@ -1,5 +1,5 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
-![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.0-brightgreen)
+![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
 
 # grave
 
@@ -66,7 +66,7 @@ Run with the provided test data: `pixi run test`
 
 >[!TIP]
 >For help with command line options: `pixi run help`<br><br>
->An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `example-cluster-job-script.sh`
+>An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `bin/example-cluster-job-script.sh`
 
 ### File setup
 

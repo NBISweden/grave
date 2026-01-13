@@ -1,6 +1,18 @@
 # Changelog
 
 
+## [2.0.0] - Unreleased
+
+### Refactored
+
+
+
+### Containers
+
+
+
+
+
 ## [1.4.1] - 20251007
 
 ### Bug fix

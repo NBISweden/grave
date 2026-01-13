@@ -1,26 +1,14 @@
-# Output files & directories
-
-.nextflow*
+# Nextflow
 work/
+.nextflow*
+
+# Grave
 results/
-report-*
-trace-*
+tests/data/graph/*_indexes
+
+# nf-test
+.nf-test.log
+
+# Other
 .DS_Store
-null/
-
-# Pixi
-
-.pixi
-*.egg-info
-
-# Input data + exceptions
-
-data/*
-!data/README.md
-!data/samplesheet.csv
-!data/test
-!data/paths/README.md
-*.snarls
-*.hapl
-*.min
-*.dist
+.vscode/

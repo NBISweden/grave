@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/nbisweden/grave/main/nextflow_schema.json",
+  "title": "nbisweden/grave pipeline parameters",
+  "description": "A workflow for mapping and variant calling aDNA against pangenome graphs",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "outputDir": {
+      "type": "string",
+      "default": "results"
+    },
+    "profilePMD": {
+      "type": "boolean",
+      "default": true
+    },
+    "graphDeconstruct": {
+      "type": "boolean",
+      "default": true
+    },
+    "vgGenotype": {
+      "type": "boolean",
+      "default": true
+    },
+    "freeBayes": {
+      "type": "boolean",
+      "default": true
+    },
+    "deepVariant": {
+      "type": "boolean"
+    },
+    "noNestedDistance": {
+      "type": "boolean"
+    },
+    "aDNAkmerHaplSubSam": {
+      "type": "integer",
+      "default": 21
+    },
+    "aDNAwindowHaplSubSam": {
+      "type": "integer",
+      "default": 11
+    },
+    "modernKmerHaplSubSam": {
+      "type": "integer",
+      "default": 29
+    },
+    "modernWindowHaplSubSam": {
+      "type": "integer",
+      "default": 11
+    },
+    "aDNAkmerMinimizer": {
+      "type": "integer",
+      "default": 21
+    },
+    "aDNAwindowMinimizer": {
+      "type": "integer",
+      "default": 11
+    },
+    "modernKmerMinimizer": {
+      "type": "integer",
+      "default": 29
+    },
+    "modernWindowMinimizer": {
+      "type": "integer",
+      "default": 11
+    },
+    "discardUnmerged": {
+      "type": "boolean"
+    },
+    "fastpDedup": {
+      "type": "boolean"
+    },
+    "dupCalcAccuracy": {
+      "type": "integer",
+      "default": 1
+    },
+    "readDiscardLength": {
+      "type": "integer",
+      "default": 30
+    },
+    "gamDefrayEnds": {
+      "type": "boolean"
+    },
+    "defrayEndsLength": {
+      "type": "integer",
+      "default": 999
+    },
+    "gamDiscardUnmapped": {
+      "type": "boolean"
+    },
+    "gamFilterMapQ": {
+      "type": "boolean",
+      "default": true
+    },
+    "minimumMapQFilter": {
+      "type": "integer",
+      "default": 30
+    },
+    "kffKmerMinimum": {
+      "type": "integer",
+      "default": 2
+    },
+    "minimumScorePrimaryAlign": {
+      "type": "number",
+      "default": 0.8
+    },
+    "keepRawGam": {
+      "type": "boolean"
+    },
+    "duplicateTaggingPolicy": {
+      "type": "string",
+      "default": "DontTag",
+      "enum": ["DontTag", "OpticalOnly", "All"]
+    },
+    "dedupConsiderBothEnds": {
+      "type": "boolean",
+      "default": true
+    },
+    "removeDuplicates": {
+      "type": "boolean",
+      "default": true
+    },
+    "maxNestLevel": {
+      "type": "integer",
+      "default": 0
+    },
+    "maxRefLength": {
+      "type": "integer",
+      "default": 100000
+    },
+    "samplePloidy": {
+      "type": "integer",
+      "default": 2
+    },
+    "minimumAlleleSupport": {
+      "type": "integer",
+      "default": 1
+    },
+    "keepRawVcf": {
+      "type": "boolean"
+    },
+    "minimumSiteSupport": {
+      "type": "integer",
+      "default": 4
+    },
+    "baselineErrorSmallVariants": {
+      "type": "number",
+      "default": 0.005
+    },
+    "baselineErrorLargeVariants": {
+      "type": "number",
+      "default": 0.01
+    },
+    "maxComplexGap": {
+      "type": "integer",
+      "default": 3
+    },
+    "minFraction": {
+      "type": "number",
+      "default": 0.05
+    },
+    "deepVariantModelType": {
+      "type": "string",
+      "default": "WGS"
+    },
+    "trace_timestamp": {
+      "type": "string",
+      "hidden": true
+    },
+    "tracing": {
+      "type": "boolean"
+    },
+    "help_full": {
+      "type": "boolean"
+    },
+    "validate_params": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_hidden": {
+      "type": "boolean"
+    },
+    "version": {
+      "type": "boolean"
+    },
+    "monochrome_logs": {
+      "type": "boolean"
+    },
+    "outdir": {
+      "type": "string",
+      "default": "results"
+    },
+    "paths_dir": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "core_workflow_settings": {
+      "title": "Core workflow settings",
+      "type": "object",
+      "description": "Settings that change the workflow mode",
+      "default": "",
+      "properties": {
+        "steps": {
+          "type": "string",
+          "description": "Desired workflow steps, csv string [preprocess,index,map]"
+        },
+        "reference_type": {
+          "type": "string",
+          "enum": ["unfiltered_graph", "filtered_graph", "linear"],
+          "description": "Align to a graph or to a linear reference genome"
+        },
+        "multiple_references": {
+          "type": "boolean",
+          "description": "Run graph analyses assuming multiple reference assemblies"
+        }
+      },
+      "required": ["steps"]
+    },
+    "inputs": {
+      "title": "Inputs",
+      "type": "object",
+      "description": "Input files",
+      "default": "",
+      "properties": {
+        "input": {
+          "type": "string",
+          "format": "file-path",
+          "mimetype": "csv",
+          "description": "Input samplesheet"
+        },
+        "reference": {
+          "type": "string",
+          "format": "file-path",
+          "pattern": "(?i)^.*\\.(gbz|fa|fas|fasta)(\\.gz)?$",
+          "description": "Reference graph (gbz) or FASTA for linear mode"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/core_workflow_settings"
+    },
+    {
+      "$ref": "#/$defs/inputs"
+    }
+  ]
+}

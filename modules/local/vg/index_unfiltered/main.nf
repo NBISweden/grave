@@ -1,16 +1,11 @@
 process INDEX_UNFILTERED_GRAPH {
 
-    // Directives
-
-    debug false
     tag "${graph.baseName}_graph"
     label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
         'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"
     storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes/hapl") }
-
-    // I/O & script
 
     input:
     path (graph)
@@ -30,30 +25,25 @@ process INDEX_UNFILTERED_GRAPH {
     def mhaplname = "${basename}.modern.hapl"
 
     """
-
     # Create common indexes for all sample types
-
-        vg index --threads ${task.cpus} ${args} --dist-name ${distname} ${graph}
-        vg gbwt --num-threads ${task.cpus} --r-index ${rindexname} --gbz-input ${graph}
+    vg index --threads ${task.cpus} ${args} --dist-name ${distname} ${graph}
+    vg gbwt --num-threads ${task.cpus} --r-index ${rindexname} --gbz-input ${graph}
 
     # Type specific ".hapl" production
-
-        if [ "${types}" == "ancient" ]
-            then
-                vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
-        elif [ "${types}" == "modern" ]
-            then
-                vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
-        elif [ "${types}" == "both" ]
-            then
-                vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
-                vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
-        fi
+    if [ "${types}" == "ancient" ]
+        then
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
+    elif [ "${types}" == "modern" ]
+        then
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+    elif [ "${types}" == "both" ]
+        then
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+    fi
 
     # Clean up
-
-        rm ${distname} ${rindexname}
-
+    rm ${distname} ${rindexname}
     """
 
 }

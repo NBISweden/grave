@@ -1,30 +1,23 @@
 process FASTQC {
 
-	// Directives
+    tag "${meta.read_group}"
+    label 'process_low'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/fastqc:0.12.1--hdfd78af_0' :
+        'biocontainers/fastqc:0.12.1--hdfd78af_0' }"
 
-	debug false
-	tag "${meta.read_group}"
-	label 'process_low'
-	container 'oras://community.wave.seqera.io/library/fastqc:0.12.1--0827550dd72a3745'
+    input:
+    tuple val(meta), path(reads)
 
-	// I/O & script
+    output:
+    tuple path("*fastqc.zip"), path("*.html"), emit: ch_fastqc
+    tuple val(task.process), val('fastqc'), eval('fastqc --version | sed "s/.* v//"'), topic: versions
 
-	input:
-	tuple val(meta), path(reads)
+    script:
+    def args = task.ext.args ?: ''
 
-	output:
-	tuple path("*fastqc.zip"), path("*.html"), emit: ch_fastqc
-	tuple val(task.process), val('fastqc'), eval('fastqc --version | sed "s/.* v//"'), topic: versions
-
-	script:
-	def args = task.ext.args ?: ''
-
-	"""
-
-	# Run FastQC
-
-		fastqc --format fastq --threads ${task.cpus} ${reads}
-
-	"""
+    """
+    fastqc --format fastq --threads ${task.cpus} ${reads} ${args}
+    """
 
 }

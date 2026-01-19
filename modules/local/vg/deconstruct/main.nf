@@ -1,8 +1,10 @@
-process VG_DECONSTRUCT {
+process GENOTYPE_GRAPH {
 
     tag "${graph.baseName}_graph"
     label 'process_medium'
-    container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:67444bca9edbce2a'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+            'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:6507ed0bc1467ab0' :
+            'community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:ef1929a49292252b' }"
 
     input:
     path graph

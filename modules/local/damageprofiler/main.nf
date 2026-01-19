@@ -1,8 +1,10 @@
-process PROFILE_PMD {
+process DAMAGE_PROFILER {
 
     tag "${meta.id}"
     label 'process_medium'
-    container 'oras://community.wave.seqera.io/library/damageprofiler_vg:3a747afa19c19206'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'oras://community.wave.seqera.io/library/damageprofiler_vg:ac59528479402a25' :
+        'community.wave.seqera.io/library/damageprofiler_vg:9c347a920a2599da' }"
 
     input:
     path ref_path_files
@@ -15,10 +17,11 @@ process PROFILE_PMD {
     tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 
     when:
-    def args = task.ext.args ?: ''
-    meta.type == 'ancient' && params.profilePMD == true
+    meta.type == 'ancient'
 
     script:
+    def args = task.ext.args ?: ''
+
     if (!params.multiple_references)	// Assume single reference sample
         """
         # Find system Java max heap size & convert to GB

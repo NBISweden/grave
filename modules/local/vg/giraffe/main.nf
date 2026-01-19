@@ -1,4 +1,4 @@
-process PANGENOME_MAP {
+process GIRAFFE {
 
     tag "${meta.read_group}"
     label 'process_medium'

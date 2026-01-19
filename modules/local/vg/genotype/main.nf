@@ -1,13 +1,15 @@
-process VG_GENOTYPE {
+process GENOTYPE_READS {
 
     tag "${meta.id}"
     label 'process_medium'
-    container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:67444bca9edbce2a'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+            'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:6507ed0bc1467ab0' :
+            'community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:ef1929a49292252b' }"
 
     input:
     path graph
-    path ref_path_files
     path snarls
+    path ref_path_files
     tuple path(reference_fasta), path(index)
     tuple val(meta), path(gams)
 

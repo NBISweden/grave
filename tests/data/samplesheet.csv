@@ -1,7 +1,7 @@
 sample_id,library_id,repeat_number,sample_type,merged,fastq_1,fastq_2
-ancientSimian,1,1,ancient,false,./data/test/ancientSimian_s1.fq.gz,./data/test/ancientSimian_s2.fq.gz
-modernHuman,1,1,modern,false,./data/test/modernHuman_s1.fq.gz,./data/test/modernHuman_s2.fq.gz
-ancientApe,1,1,ancient,false,./data/test/ancientApe_s1.fq.gz,./data/test/ancientApe_s2.fq.gz
-ancientApe,2,1,ancient,false,./data/test/ancientApe_lib2_s1.fq.gz,./data/test/ancientApe_lib2_s2.fq.gz
-ancientApe,2,2,ancient,false,./data/test/ancientApe_lib2_s1.repeat.fq.gz,./data/test/ancientApe_lib2_s2.repeat.fq.gz
-ancientMerged,1,1,ancient,true,./data/test/ancientMerged.fq.gz,
+ancientSimian,1,1,ancient,false,./tests/data/fastq/ancientSimian_s1.fq.gz,./tests/data/fastq/ancientSimian_s2.fq.gz
+modernHuman,1,1,modern,false,./tests/data/fastq/modernHuman_s1.fq.gz,./tests/data/fastq/modernHuman_s2.fq.gz
+ancientApe,1,1,ancient,false,./tests/data/fastq/ancientApe_s1.fq.gz,./tests/data/fastq/ancientApe_s2.fq.gz
+ancientApe,2,1,ancient,false,./tests/data/fastq/ancientApe_lib2_s1.fq.gz,./tests/data/fastq/ancientApe_lib2_s2.fq.gz
+ancientApe,2,2,ancient,false,./tests/data/fastq/ancientApe_lib2_s1.repeat.fq.gz,./tests/data/fastq/ancientApe_lib2_s2.repeat.fq.gz
+ancientMerged,1,1,ancient,true,./tests/data/fastq/ancientMerged.fq.gz,

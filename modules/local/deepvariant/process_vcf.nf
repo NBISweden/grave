@@ -2,7 +2,9 @@ process PROCESS_DEEPVARIANT {
 
     tag "${meta.id}"
     label 'process_low'
-    container 'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:67444bca9edbce2a'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+            'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:6507ed0bc1467ab0' :
+            'community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:ef1929a49292252b' }"
 
     input:
     path ref_path_files
@@ -14,9 +16,6 @@ process PROCESS_DEEPVARIANT {
     path "*.raw.vcf.gz", optional: true, emit: ch_deepvariant_raw_vcf
     tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
     tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
-
-    when:
-    params.deepVariant == true
 
     script:
     def args = task.ext.args ?: ''

@@ -1,8 +1,8 @@
-process DEEPVARIANT {
+process GRAPH_DEEPVARIANT {
 
     tag "${meta.id}"
     label 'process_high'
-    container 'docker://google/deepvariant:pangenome_aware_deepvariant-1.9.0'
+    container 'docker.io/google/deepvariant:pangenome_aware_deepvariant-1.9.0'
 
     input:
     path graph
@@ -14,9 +14,6 @@ process DEEPVARIANT {
     tuple val(meta), path("*.vcf.gz"), emit: ch_raw_deepvariant_vcf
     tuple val(meta), path("*.html"), emit: ch_deepvariant_html
     tuple val(task.process), val('pangenome_aware_deepvariant'), eval('/opt/deepvariant/bin/run_pangenome_aware_deepvariant --version --model_type=WGS --ref=dummy --reads=dummy --pangenome=dummy --output_vcf=dummy 2>/dev/null | sed "s/.*version //"'), topic: versions
-
-    when:
-    params.deepVariant == true
 
     script:
     def args = task.ext.args ?: ''

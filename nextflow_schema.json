@@ -12,23 +12,11 @@
       "type": "string",
       "default": "results"
     },
-    "profilePMD": {
+    "freebayes": {
       "type": "boolean",
       "default": true
     },
-    "graphDeconstruct": {
-      "type": "boolean",
-      "default": true
-    },
-    "vgGenotype": {
-      "type": "boolean",
-      "default": true
-    },
-    "freeBayes": {
-      "type": "boolean",
-      "default": true
-    },
-    "deepVariant": {
+    "deepvariant": {
       "type": "boolean"
     },
     "noNestedDistance": {

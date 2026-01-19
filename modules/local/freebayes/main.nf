@@ -2,7 +2,9 @@ process FREEBAYES {
 
     tag "${meta.id}"
     label 'process_high'
-    container 'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:cf23d815667a73b4'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:0a559cef58513a6f' :
+        'community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:4a6a1795bbef9fd5' }"
 
     input:
     path ref_path_files
@@ -16,9 +18,6 @@ process FREEBAYES {
     tuple val(task.process), val('freebayes'), eval('freebayes --version | sed "s/version.*v//"'), topic: versions
     tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
     tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
-
-    when:
-    params.freeBayes == true
 
     script:
     def args = task.ext.args ?: ''
@@ -83,7 +82,6 @@ process FREEBAYES {
                         rm ${meta.id}.\$PREFIX.raw.vcf.gz
                 fi
                 rm \$PREFIX.regions
-
             done
         """
 

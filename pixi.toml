@@ -1,32 +1,31 @@
 [workspace]
-authors = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
-channels = ["conda-forge", "bioconda"]
-description = "Grave pixi environments"
-name = "grave"
-platforms = ["linux-64"]
-version = "1.1.0"
-
-[system-requirements]
-linux="3.10"
-libc="2.17"
-
-[tasks]
-help = { cmd = "nextflow main.nf --help" }
-dag = { cmd = "nextflow main.nf --graphDir ./data/test -preview -with-dag flowchart.png" }
-grave = { cmd = "nextflow main.nf -profile apptainer" }
-test = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths -profile apptainer,standard" }
-testMulti = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --multiRef -profile apptainer,standard" }
-testMapOnly = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphDeconstruct false --vgGenotype false --freeBayes false --deepVariant false --profilePMD false -profile apptainer,standard" }
-filter = { cmd = "nextflow main.nf --graphDir ./data/test --samplesheet ./data/test/samplesheet.csv --pathsDir ./data/test/paths --graphMode filter -profile apptainer,standard" }
+name              = "grave pixi workspace"
+version           = "2.0.0"
+description       = "A workflow for mapping and variant calling aDNA against pangenome graphs"
+authors           = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
+channels          = ["conda-forge", "bioconda"]
+platforms         = ["linux-64", "osx-64", "osx-arm64"]
 
 [dependencies]
-nextflow="==25.10.0"
-graphviz=">=12.2.1"
-msmtp-sendmail=">=1.8.28"
-vg="==1.67.0"
+nextflow          = "==25.10.2"
+nf-core           = ">=3.5.1,<4"
+nf-test           = ">=0.9.3"
 
-[feature.apptainer.dependencies]
-apptainer="==1.4.1"
+[target.linux-64.dependencies]
+vg                = "==1.70.0"
+
+[feature.apptainer.target.linux-64.dependencies]
+apptainer         = "==1.4.5"
 
 [environments]
-apptainer = ["apptainer"]
+apptainer         = ["apptainer"]
+
+[tasks]
+test-docker       = "nextflow main.nf -profile docker,test"
+test-apptainer    = "nextflow main.nf -profile apptainer,test"
+test-singularity  = "nextflow main.nf -profile singularity,test"
+test-conda        = "nextflow main.nf -profile conda,test"
+test-linear       = "nextflow main.nf -profile docker,test_linear"
+
+[activation.env]
+NXF_SYNTAX_PARSER = "v1"

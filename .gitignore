@@ -5,6 +5,7 @@ work/
 # Grave
 results/
 tests/data/graph/*_indexes
+tests/data/linear/*_indexes
 
 # nf-test
 .nf-test.log

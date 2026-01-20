@@ -1,7 +1,8 @@
 include { INDEX_UNFILTERED_GRAPH } from '../../../modules/local/vg/index_unfiltered/main'
 include { INDEX_FILTERED_GRAPH   } from '../../../modules/local/vg/index_filtered/main'
-// TODO include { INDEX_LINEAR_ASSEMBLY  } from ''
+include { BWA_INDEX              } from '../../../modules/nf-core/bwa/index/main'
 include { GRAPH_STATISTICS       } from '../../../modules/local/vg/stats/main'
+include { SAMTOOLS_FAIDX         } from '../../../modules/nf-core/samtools/faidx/main'
 include { GRAPH_EXTRACT          } from '../../../modules/local/vg/paths/main'
 include { COMPUTE_SNARLS         } from '../../../modules/local/vg/snarls/main'
 
@@ -16,7 +17,7 @@ workflow REFERENCE_UTILITIES {
 
     main:
     indexed_reference = channel.empty()
-    graph_stats = channel.empty()
+    stats = channel.empty()
     reference_fastas = channel.empty()
     snarls = channel.empty()
 
@@ -27,8 +28,10 @@ workflow REFERENCE_UTILITIES {
                 reference,
                 sample_types
             )
-            reference.combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes).collect()
-                .map {element ->
+            reference
+                .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
+                .collect()
+                .map { element ->
                     def ref = element[0]
                     def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
                     return [ref: ref, indexes: indexes]
@@ -39,15 +42,29 @@ workflow REFERENCE_UTILITIES {
                 reference,
                 sample_types
             )
-            reference.combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes).collect()
-                .map {element ->
+            reference
+                .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
+                .collect()
+                .map { element ->
                     def ref = element[0]
                     def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
                     return [ref: ref, indexes: indexes]
                 }
                 .set { indexed_reference }
         } else if ( reference_type == "linear" ) {
-            error "ERROR: WORK IN PROGRESS for reference of type: ${reference_type}"
+            // Index the reference
+            BWA_INDEX (
+                reference
+            )
+            reference
+                .combine(BWA_INDEX.out.ch_bwa_index)
+                .collect()
+                .map { element ->
+                    def ref = element[0]
+                    def indexes = element[1..-1]
+                    return [ref: ref, indexes: indexes]
+                }
+                .set { indexed_reference }
         }
     }
 
@@ -56,7 +73,16 @@ workflow REFERENCE_UTILITIES {
         GRAPH_STATISTICS (
             reference
         )
-        graph_stats = GRAPH_STATISTICS.out.ch_graph_stats
+        stats = GRAPH_STATISTICS.out.ch_graph_stats
+    }
+
+    // When reference is linear, produce statistics
+    if ( reference_type == "linear") {
+        SAMTOOLS_FAIDX (
+            reference,
+            false
+        )
+        stats = SAMTOOLS_FAIDX.out.ch_fai
     }
 
     // When reference is a graph, extract linear references if required by downstream modules
@@ -82,7 +108,7 @@ workflow REFERENCE_UTILITIES {
 
     emit:
     indexed_reference
-    graph_stats
+    stats
     reference_fastas
     snarls
 

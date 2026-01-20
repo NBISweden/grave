@@ -204,11 +204,8 @@ def validateInputParameters() {
         // Handle compressed input
         def name_sections  = reference_name.tokenize('.')
         def ext            = name_sections.last()
-        if ( ext == 'gz' && name_sections.size() > 2 ) {
-            ext = name_sections[-2]
-            if ( ext == 'gbz' ) {
-                error "ERROR: gbz files should not be gzipped. This is only accepted for linear references."
-            }
+        if ( ext == 'gz' ) {
+            error "ERROR: input reference files should not be gzipped."
         }
         // Define valid extensions per reference type
         def valid_extensions = [
@@ -220,8 +217,7 @@ def validateInputParameters() {
         def correct_extension = valid_extensions[params.reference_type]
         // Check that the extension of user input is correct
         if ( correct_extension && !(ext in correct_extension) ) {
-            def gz_note = params.reference_type == 'linear' ? ' (can optionally be gzipped)' : ''
-            error "ERROR: Invalid reference extension for the stated reference type ('${params.reference_type}'). Accepts: ${correct_extension.join(', ')}${gz_note}\n - Provided file: ${reference_name}\n - Extension found: ${ext}"
+            error "ERROR: Invalid reference extension for the stated reference type ('${params.reference_type}'). Accepts: ${correct_extension.join(', ')}\n - Provided file: ${reference_name}\n - Extension found: ${ext}"
         }
     }
 }

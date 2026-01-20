@@ -21,11 +21,12 @@ apptainer         = "==1.4.5"
 apptainer         = ["apptainer"]
 
 [tasks]
-test-docker       = "nextflow main.nf -profile docker,test"
-test-apptainer    = "nextflow main.nf -profile apptainer,test"
-test-singularity  = "nextflow main.nf -profile singularity,test"
-test-conda        = "nextflow main.nf -profile conda,test"
-test-linear       = "nextflow main.nf -profile docker,test_linear"
+test-docker           = "nextflow main.nf -profile docker,test"
+test-apptainer        = "nextflow main.nf -profile apptainer,test"
+test-singularity      = "nextflow main.nf -profile singularity,test"
+test-conda            = "nextflow main.nf -profile conda,test"
+test-docker-linear    = "nextflow main.nf -profile docker,test_linear"
+test-apptainer-linear = "nextflow main.nf -profile apptainer,test_linear"
 
 [activation.env]
 NXF_SYNTAX_PARSER = "v1"

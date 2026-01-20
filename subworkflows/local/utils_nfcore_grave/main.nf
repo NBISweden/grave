@@ -4,8 +4,6 @@ include { UTILS_NFSCHEMA_PLUGIN     } from '../../nf-core/utils_nfschema_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-schema'
 include { samplesheetToList         } from 'plugin/nf-schema'
 include { paramsHelp                } from 'plugin/nf-schema'
-//include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
-//include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 
 workflow PIPELINE_INITIALISATION {
 
@@ -127,35 +125,7 @@ workflow PIPELINE_INITIALISATION {
 
 }
 
-// workflow PIPELINE_COMPLETION {
-
-//     take:
-//     outdir          //    path: Path to output directory where results will be published
-//     monochrome_logs // boolean: Disable ANSI colour codes in log output
-
-//     main:
-//     summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
-
-//     //
-//     // Completion email and summary
-//     //
-//     workflow.onComplete {
-
-//         completionSummary(monochrome_logs)
-//     }
-
-//     workflow.onError {
-//         log.error "Pipeline failed. Please refer to troubleshooting docs: https://nf-co.re/docs/usage/troubleshooting"
-//     }
-// }
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    FUNCTIONS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// Check and validate pipeline parameters
+// Define pipeline parameter validation function
 def validateInputParameters() {
     // Define valid workflow steps
     def permitted_steps = [
@@ -204,15 +174,15 @@ def validateInputParameters() {
     }
     // Enforce input for preprocess step if requested
     if ( 'preprocess' in requested_steps && !params.input ) {
-
+        error "ERROR: Read preprocessing was reqested but no input samplesheet was provided with '--input'"
     }
     // Enforce reference for index if requested
     if ( 'index' in requested_steps && !params.reference ) {
-        error "ERROR: Reference indexing was requested but no reference file was provided."
+        error "ERROR: Reference indexing was requested but no reference file was provided with '--reference'"
     }
     // Enforce reference for graph_genotype if requested
     if ( 'graph_genotype' in requested_steps && !params.reference ) {
-        error "ERROR: Graph genotyping was requested but no reference file was provided."
+        error "ERROR: Graph genotyping was requested but no reference file was provided with '--reference'"
     }
     // Error if incompatible step requested
     if ( requested_steps.any { step -> step in ['graph_genotype', 'reads_genotype'] } && params.reference_type == 'linear' ) {
@@ -255,10 +225,3 @@ def validateInputParameters() {
         }
     }
 }
-
-// Saved, currently unused features of nf-core template:
-
-    // Check config provided to the pipeline
-    // UTILS_NFCORE_PIPELINE (
-    //     nextflow_cli_args
-    // )

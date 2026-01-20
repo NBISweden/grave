@@ -8,7 +8,7 @@ workflow DEDUPLICATE_BAM {
 
     main:
     // Deduplicate BAMs
-    DEDUPLICATE(
+    DEDUPLICATE (
         paths,
         merged_bams
     )

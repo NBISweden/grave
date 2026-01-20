@@ -56,54 +56,60 @@ workflow PIPELINE_INITIALISATION {
     validateInputParameters()
 
     // Create channel from input samplesheet provided with params.input
-    def uniqueReadGroups = new HashSet<String>() // Initialise empty set for detecting duplicate read groups
-    ch_samplesheet = channel.fromPath(params.input, checkIfExists: true)
-        .splitCsv(header: true, skip: 0)
-        .map { row ->
-            // Populate metadata
-            def meta = [
-                id: row.sample_id,
-                library: row.library_id,
-                repeat: row.repeat_number,
-                type: row.sample_type.toLowerCase(),
-                merged: row.merged.toLowerCase()
-            ]
-            // Check no duplicate "read group" combinations
-            def key = "${meta.id}${meta.library}${meta.repeat}"
-            if (!uniqueReadGroups.add(key)) {
-                error ("Error: found a duplicate for sample '${meta.id}' in the samplesheet. Each row should have a unique combination of 'sample_id', 'library_id' and 'repeat_number'.")
-            }
-            // Create read group meta field
-            meta.read_group = "${meta.id}.${meta.library}.${meta.repeat}"
-            // Check that merge information is true or false, convert to boolean
-            if (!['true', 'false'].contains(meta.merged)) {
-                error ("ERROR: Sample '${meta.id}' has an invalid 'merged' value: '${meta.merged}'. Please only supply 'true' or 'false' (case insensitive).")
-            }
-            meta.merged = meta.merged.toBoolean()
-            // Check sample types are correctly stated
-            if (!['ancient', 'modern'].contains(meta.type)) {
-                error ("Error: for '${meta.read_group}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
-            }
-            // Initial checks passed, add FASTQ paths
-            if (meta.merged) {
-                if (row.fastq_1 && !row.fastq_2) {
-                    return [meta, [file(row.fastq_1)]]
-                } else if (!row.fastq_1) {
-                    error ("Error caused by sample: '${meta.read_group}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
-                } else {
-                    error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting one merged FASTQ, but a second file was also provided.")
+    ch_samplesheet = channel.empty()
+    if ( params.input ) {
+        def uniqueReadGroups = new HashSet<String>() // Initialise empty set for detecting duplicate read groups
+        ch_samplesheet = channel.fromPath(params.input, checkIfExists: true)
+            .splitCsv(header: true, skip: 0)
+            .map { row ->
+                // Populate metadata
+                def meta = [
+                    id: row.sample_id,
+                    library: row.library_id,
+                    repeat: row.repeat_number,
+                    type: row.sample_type.toLowerCase(),
+                    merged: row.merged.toLowerCase()
+                ]
+                // Check no duplicate "read group" combinations
+                def key = "${meta.id}${meta.library}${meta.repeat}"
+                if (!uniqueReadGroups.add(key)) {
+                    error ("Error: found a duplicate for sample '${meta.id}' in the samplesheet. Each row should have a unique combination of 'sample_id', 'library_id' and 'repeat_number'.")
                 }
-            } else if (!meta.merged) {
-                if (row.fastq_1 && row.fastq_2) {
-                    return [meta, [file(row.fastq_1), file(row.fastq_2)]]
-                } else {
-                    error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting two FASTQ files, received one or none.")
+                // Create read group meta field
+                meta.read_group = "${meta.id}.${meta.library}.${meta.repeat}"
+                // Check that merge information is true or false, convert to boolean
+                if (!['true', 'false'].contains(meta.merged)) {
+                    error ("ERROR: Sample '${meta.id}' has an invalid 'merged' value: '${meta.merged}'. Please only supply 'true' or 'false' (case insensitive).")
+                }
+                meta.merged = meta.merged.toBoolean()
+                // Check sample types are correctly stated
+                if (!['ancient', 'modern'].contains(meta.type)) {
+                    error ("Error: for '${meta.read_group}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
+                }
+                // Initial checks passed, add FASTQ paths
+                if (meta.merged) {
+                    if (row.fastq_1 && !row.fastq_2) {
+                        return [meta, [file(row.fastq_1)]]
+                    } else if (!row.fastq_1) {
+                        error ("Error caused by sample: '${meta.read_group}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
+                    } else {
+                        error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting one merged FASTQ, but a second file was also provided.")
+                    }
+                } else if (!meta.merged) {
+                    if (row.fastq_1 && row.fastq_2) {
+                        return [meta, [file(row.fastq_1), file(row.fastq_2)]]
+                    } else {
+                        error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting two FASTQ files, received one or none.")
+                    }
                 }
             }
-        }
+    }
 
     // Create reference channel
-    ch_reference = channel.fromPath(params.reference, checkIfExists: true)
+    ch_reference = channel.empty()
+    if ( params.reference ) {
+        ch_reference = channel.fromPath(params.reference, checkIfExists: true).collect()
+    }
 
     // Create types channel for correct index generation (modern, ancient, or both)
     ch_types = ch_samplesheet
@@ -151,7 +157,6 @@ workflow PIPELINE_INITIALISATION {
 
 // Check and validate pipeline parameters
 def validateInputParameters() {
-
     // Define valid workflow steps
     def permitted_steps = [
         'preprocess',     // read preprocessing
@@ -162,9 +167,8 @@ def validateInputParameters() {
         'graph_genotype', // genotyping on the graph alone
         'reads_genotype', // genotyping on mapped reads against the graph
         'variant_call',   // variant calling on surjected reads
-        'assess_pmd'      // post-mortem damage profiling (ancient samples only)
+        'profile_pmd'     // post-mortem damage profiling (ancient samples only)
     ]
-
     // Parse requested steps
     def requested_steps = params.steps.tokenize(",")
     // Check requested steps are valid
@@ -183,9 +187,8 @@ def validateInputParameters() {
         'graph_genotype': [],
         'reads_genotype': ['align'],
         'variant_call'  : ['deduplicate'],
-        'assess_pmd'    : ['deduplicate']
+        'profile_pmd'   : ['deduplicate']
     ]
-
     // Check step dependencies are met
     def missing_dependencies = []
     requested_steps.each { step ->
@@ -199,26 +202,58 @@ def validateInputParameters() {
     if ( missing_dependencies ) {
         error "ERROR: An invalid combination of steps was requested.\n - You requested steps: ${requested_steps.join(', ')}\n - ${missing_dependencies.join('\n  - ')}\n"
     }
+    // Enforce input for preprocess step if requested
+    if ( 'preprocess' in requested_steps && !params.input ) {
 
+    }
+    // Enforce reference for index if requested
+    if ( 'index' in requested_steps && !params.reference ) {
+        error "ERROR: Reference indexing was requested but no reference file was provided."
+    }
+    // Enforce reference for graph_genotype if requested
+    if ( 'graph_genotype' in requested_steps && !params.reference ) {
+        error "ERROR: Graph genotyping was requested but no reference file was provided."
+    }
+    // Error if incompatible step requested
+    if ( requested_steps.any { step -> step in ['graph_genotype', 'reads_genotype'] } && params.reference_type == 'linear' ) {
+        error "ERROR: Graph or reads genotyping was requested but grave is running in linear mode."
+    }
+    // If reference is provided, enforce reference type also
+    if ( params.reference && !params.reference_type ) {
+        error "ERROR: When providing a reference, 'reference_type' must also be stated. Valid options are: 'unfiltered_graph', 'filtered_graph', or 'linear'"
+    }
+    // If reference type is provided, enforce reference also
+    if ( !params.reference && params.reference_type ) {
+        error "ERROR: A reference type has been provided, but no reference file."
+    }
 
-
-
-    // TODO Check incompatible reference with params. Check for missing params given the requested steps (reference not forced, but required for index)
-
-    // // Check correct reference format provided for the selected reference type
-    // if ( params.reference_type == 'graph' ) {
-    //     params.reference
-
-    // }
-
-
-
-    // TODO fix below
-    // // When running against a graph, ensure graph mode is set
-    // if ( params.reference_type == 'graph' && ! params.graph_mode ) {
-    //     error "ERROR: When using a graph reference, please also provide the graph mode (see --help)"
-    // }
-
+    // Check reference type matches the provided mode
+    if ( params.reference && params.reference_type ) {
+        def reference_file = new File(params.reference as String)
+        def reference_name = reference_file.getName()
+        // Handle compressed input
+        def name_sections  = reference_name.tokenize('.')
+        def ext            = name_sections.last()
+        if ( ext == 'gz' && name_sections.size() > 2 ) {
+            ext = name_sections[-2]
+            if ( ext == 'gbz' ) {
+                error "ERROR: gbz files should not be gzipped. This is only accepted for linear references."
+            }
+        }
+        // Define valid extensions per reference type
+        def valid_extensions = [
+            'unfiltered_graph': ['gbz'],
+            'filtered_graph'  : ['gbz'],
+            'linear'          : ['fa', 'fas', 'fasta', 'fna']
+        ]
+        // Define correct extension given the user input
+        def correct_extension = valid_extensions[params.reference_type]
+        // Check that the extension of user input is correct
+        if ( correct_extension && !(ext in correct_extension) ) {
+            def gz_note = params.reference_type == 'linear' ? ' (can optionally be gzipped)' : ''
+            error "ERROR: Invalid reference extension for the stated reference type ('${params.reference_type}'). Accepts: ${correct_extension.join(', ')}${gz_note}\n - Provided file: ${reference_name}\n - Extension found: ${ext}"
+        }
+    }
 }
 
 // Saved, currently unused features of nf-core template:

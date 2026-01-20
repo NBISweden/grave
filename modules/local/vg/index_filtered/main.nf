@@ -2,6 +2,7 @@ process INDEX_FILTERED_GRAPH {
 
     tag "${graph.baseName}_graph"
     label 'process_medium'
+    // NOTE: update version string manually
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
         'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"
@@ -13,8 +14,8 @@ process INDEX_FILTERED_GRAPH {
 
     output:
     path ("${graph.baseName}.????*"), emit: ch_filter_indexes
-    // PLANNED: enable topic channel once Nextflow bug resolved
-    //tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+    // NOTE: update version string manually
+    tuple val(task.process), val('vg'), val('1.70.0'), topic: versions
 
     script:
     def args = task.ext.args ?: ''

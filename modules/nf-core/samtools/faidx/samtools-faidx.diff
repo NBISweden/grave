@@ -1,0 +1,68 @@
+Changes in component 'nf-core/samtools/faidx'
+Changes in 'samtools/faidx/main.nf':
+--- modules/nf-core/samtools/faidx/main.nf
++++ modules/nf-core/samtools/faidx/main.nf
+@@ -1,5 +1,6 @@
+ process SAMTOOLS_FAIDX {
+-    tag "$fasta"
++
++    tag "$reference"
+     label 'process_single'
+ 
+     conda "${moduleDir}/environment.yml"
+@@ -8,43 +9,23 @@
+         'biocontainers/samtools:1.22.1--h96c455f_0' }"
+ 
+     input:
+-    tuple val(meta), path(fasta)
+-    tuple val(meta2), path(fai)
++    path (reference)
+     val get_sizes
+ 
+     output:
+-    tuple val(meta), path ("*.{fa,fasta}") , emit: fa, optional: true
+-    tuple val(meta), path ("*.sizes")      , emit: sizes, optional: true
+-    tuple val(meta), path ("*.fai")        , emit: fai, optional: true
+-    tuple val(meta), path ("*.gzi")        , emit: gzi, optional: true
+-    tuple val("${task.process}"), val('samtools'), eval("samtools version | sed '1!d;s/.* //'"), topic: versions, emit: versions_samtools
+-
+-    when:
+-    task.ext.when == null || task.ext.when
++    path ("*.fai")         , emit: ch_fai
++    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
+ 
+     script:
+     def args = task.ext.args ?: ''
+-    def get_sizes_command = get_sizes ? "cut -f 1,2 ${fasta}.fai > ${fasta}.sizes" : ''
++    def get_sizes_command = get_sizes ? "cut -f 1,2 ${reference}.fai > ${reference}.sizes" : ''
+     """
+     samtools \\
+         faidx \\
+-        $fasta \\
++        $reference \\
+         $args
+ 
+     ${get_sizes_command}
+     """
+ 
+-    stub:
+-    def match = (task.ext.args =~ /-o(?:utput)?\s(.*)\s?/).findAll()
+-    def fastacmd = match[0] ? "touch ${match[0][1]}" : ''
+-    def get_sizes_command = get_sizes ? "touch ${fasta}.sizes" : ''
+-    """
+-    ${fastacmd}
+-    touch ${fasta}.fai
+-    if [[ "${fasta.extension}" == "gz" ]]; then
+-        touch ${fasta}.gzi
+-    fi
+-
+-    ${get_sizes_command}
+-    """
+ }
+
+'modules/nf-core/samtools/faidx/environment.yml' is unchanged
+'modules/nf-core/samtools/faidx/meta.yml' is unchanged
+'modules/nf-core/samtools/faidx/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/samtools/faidx/tests/main.nf.test' is unchanged
+'modules/nf-core/samtools/faidx/tests/nextflow.config' is unchanged
+************************************************************

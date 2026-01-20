@@ -5,6 +5,14 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bwa/aln": {
+                        "branch": "master",
+                        "git_sha": "1c46359c837ef768b004519f535c30378e8289fc",
+                        "installed_by": [
+                            "modules"
+                        ],
+                        "patch": "modules/nf-core/bwa/aln/bwa-aln.diff"
+                    },
                     "bwa/index": {
                         "branch": "master",
                         "git_sha": "1c46359c837ef768b004519f535c30378e8289fc",
@@ -12,6 +20,14 @@
                             "modules"
                         ],
                         "patch": "modules/nf-core/bwa/index/bwa-index.diff"
+                    },
+                    "bwa/mem": {
+                        "branch": "master",
+                        "git_sha": "1c46359c837ef768b004519f535c30378e8289fc",
+                        "installed_by": [
+                            "modules"
+                        ],
+                        "patch": "modules/nf-core/bwa/mem/bwa-mem.diff"
                     },
                     "samtools/faidx": {
                         "branch": "master",

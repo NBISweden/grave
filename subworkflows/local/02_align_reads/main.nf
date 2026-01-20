@@ -1,5 +1,7 @@
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
 include { GAM_TO_TAGGED_SORTED_BAM } from '../../../modules/local/vg/surject/main'
+include { BWA_ALN_SAMSE            } from '../../../modules/nf-core/bwa/aln/main'
+include { BWA_MEM                  } from '../../../modules/nf-core/bwa/mem/main'
 
 workflow ALIGN_READS {
 
@@ -33,7 +35,26 @@ workflow ALIGN_READS {
         mapped_bam = GAM_TO_TAGGED_SORTED_BAM.out.ch_surjected_bams
     // Run in linear reference mode
     } else if ( reference_type == "linear" ) {
-        error "ERROR: WORK IN PROGRESS for reference of type: ${reference_type}"
+        // Split samples by type
+        fastp_reads
+            .branch { meta, reads ->
+                ancient: meta.type == "ancient"
+                modern:  meta.type == "modern"
+                return tuple( meta, reads )
+            }
+            .set { reads }
+        // Run BWA aln and samse for ancient samples (always pre-merged)
+        BWA_ALN_SAMSE (
+            reads.ancient,
+            indexed_reference
+        )
+        // Run BWA mem for modern samples
+        BWA_MEM (
+            reads.modern,
+            indexed_reference,
+        )
+        // Mix outputs
+        mapped_bam = BWA_ALN_SAMSE.out.ch_bam.mix(BWA_MEM.out.ch_bam)
     }
 
     emit:

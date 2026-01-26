@@ -5,17 +5,19 @@
 
 **Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
 
-## Description
+## Brief description
 
 `grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview). A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
 
-As input it takes a pangenome graph in `.gbz` format and either paired-end or merged FASTQ data (from samples listed in a `.csv` samplesheet).
+In normal usage, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
 
 Outputs are described [here](#workflow-outputs).
 
 More information on genotyping and variant calling is found [here](#genotyping-and-variant-calling).
 
-It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#input-fasta-naming).
+It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#file-setup).
+
+`NOTE:` For the purposes of comparing workflows, grave can also be run in linear mode against a single FASTA reference instead of a graph.
 
 ## Quick start
 
@@ -28,79 +30,77 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 1. [Install Pixi](https://pixi.sh/latest/installation/): `curl -fsSL https://pixi.sh/install.sh | sh`
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-3. Run `pixi install` (or `pixi install -e apptainer` for Apptainer support)
+3. Run `pixi install`
 
 >[!NOTE]
 >The pixi project contains two environments:<br><br>
->`default`: installed with `pixi install` - lacks apptainer (e.g. for systems with their own Apptainer installation)<br><br>
->`apptainer`: installed with `pixi install -e apptainer` - provides Apptainer support
+>`default`: installed with `pixi install`. This lacks apptainer (e.g. for systems with an existing Apptainer installation).<br><br>
+>`apptainer`: installed with `pixi install -e apptainer`. This provides an Apptainer installation.
 
 <details>
 
-<summary><h3>Introduction to pixi (drop down)</h3></summary>
+<summary><h3>Information on pixi usage (drop down)</h3></summary>
 
-- `grave` can run with only `Nextflow` and `Apptainer` installed in `$PATH`, but for reproducibility it is recommended to run it via `pixi`
-- `pixi` is a drop-in replacement for `conda`, and is used to easily and reproducibly share tested environments for running software
+- At minimum, `grave` can be run with `Nextflow` and either `Apptainer`, `Singularity`, or `Docker` installed in `$PATH`
+- However, for reproducibility it is recommended to run it via `pixi`.
+- `pixi` is a drop-in replacement for `conda`, and `grave` uses it to install its basic dependencies.
 - `pixi` environments have an editable manifest file of direct dependencies, the `pixi.toml`
-- Solved environments also have a `pixi.lock` file, which lists exact versions of all dependencies including transitive ones - the lockfile in this repository defines a tested environment for Linux systems
+- Solved environments also have a `pixi.lock` file, which lists exact versions of all dependencies including transitive ones - the lockfile in this repository represents an environment that has been tested for Linux systems
 - Installed `pixi` environments are found in the hidden folder `.pixi/envs`
-- `pixi` will automatically install an environment it lacks, if implied by another command (e.g., `pixi run -e apptainer ...` would install the `apptainer` environment even if the `default` environment is the only one currently installed)
-- You can run commands from outside the default `pixi` environment by prefixing them with `pixi run`, or in a specific environment with `pixi run -e <environment>`
-- You can also shell inside the default `pixi` environment with `pixi shell`, or into a specific environment with `pixi shell -e <environment>`, similar to `conda activate <environment>` (at this point you no longer need the `pixi run` prefix)
+- `pixi` will automatically install an environment it lacks, if implied by another command (e.g., `pixi run -e apptainer ...` would install the `apptainer` environment even if the `default` environment is the only one installed)
+- You can run commands in a `pixi` environment by prefixing them with `pixi run` (or in a specific environment with `pixi run -e <environment>`)
+- Alternatively you can shell inside an environment with `pixi shell` (or into a specific environment with `pixi shell -e <environment>`), similar to `conda activate <environment>` (at this point you no longer need the `pixi run` prefix)
 - To delete an environment: `rm -rf .pixi/envs/<environment_name>`
 
 </details>
 
-### Run grave with test data
+### Run grave with the bundled test data
 
-Run with the provided test data: `pixi run test`
+- To run with test data using Apptainer: `pixi run test-apptainer`
 
->[!TIP]
-> All `pixi run` commands assume the `default` environment. To use the `apptainer` environment, add `-e apptainer`, e.g.:<br><br>
->`pixi run -e apptainer test`
-
-### Run grave with your data
-
-1. [Input file setup](#file-setup)
-2. Run with defaults: `pixi run grave` (equivalent to `pixi run nextflow main.nf -profile apptainer`). Or run with custom parameters, e.g.: `pixi run nextflow main.nf --graphMode filter --account naiss2049-87-324 -profile apptainer,dardelSlurm`
+- To run with test data using Docker: `pixi run test-docker`
 
 >[!TIP]
->For help with command line options: `pixi run help`<br><br>
->An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `bin/example-cluster-job-script.sh`
+> All `pixi run` commands use the `default` environment. To specify the `apptainer` environment:<br><br>
+>`pixi run -e apptainer test-apptainer`
+
+### Run grave with your own data
+
+1. First, go through the steps detailed in [input file setup](#file-setup)
+2. Second, run `grave`:
+
+```
+# Local test run example (limited resources, use this for testing only)
+pixi run -e apptainer nextflow main.nf -profile apptainer,test -params-file params.yml
+
+# Run at scale (e.g., on SLURM cluster)
+TODO
+
+# An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `bin/slurm_example.sh`
+```
 
 ### File setup
 
-1. Generate or provide a [graph file](#graphs). By default `grave` looks for a `.gbz` file in `data`
-2. Fill out a `samplesheet.csv` including file system paths to the reads. By default `grave` looks for this in `data`. [See layout description below](#samplesheet-layout)
-3. Was your graph built with [more than one reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample)? **If no, you are done**. If yes, [read this section first](#multiple-reference-samples)
+#### 1. Generate or provide a reference
 
-#### Input fasta naming
+- References can be in one of three types: `unfiltered_graph`, `filtered_graph`, or `fasta` (for `linear` mode)
+
+- Graphs must be provided in `.gbz.` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users do not need to supply them.
 
 - When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)
 
 >[!WARNING]
 >Crucially: avoid hash characters in contig names
 
-#### Graphs
+- There are two main methods for building the graph with `Minigraph-Cactus`, see below:
 
-- `grave` takes `.gbz` pangenome graphs as input, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus)
-
->[!TIP]
->Note on idex files: Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users only need to provide the `.gbz` file
-
-- There are two main methods for building the graph with `Minigraph-Cactus`:
-	1) build an unfiltered graph, for downstream haplotype sampling prior to mapping [**best practice**]
-	2) build a graph with low coverage nodes filtered out
-
-- The choice of method impacts whether to run `grave` in `haplo` mode [default] or `filter` mode, described more below
-
-##### Haplotype sampling
+##### Unfiltered graphs for haplotype sampling
 
 - Current best practice for mapping samples to pangenome graphs utilises sample specific haplotype sampling from the graph, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
 
 - To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
 
-- The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `grave`
+- The clipped, unfiltered graph (e.g., `graph.gbz`) is used as input to `grave`, with the parameter `reference_type` set to `unfiltered_graph`
 
 ##### Filtered graphs
 
@@ -108,14 +108,14 @@ Run with the provided test data: `pixi run test`
 
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
 
-- To use a filtered graph with `grave`, the parameter `--graphMode filter` should be set on the command line
+- The filtered graph (e.g., `graph.d2.gbz`) is used as input to `grave`, with the parameter `reference_type` set to `filtered_graph`
 
-- The clipped, filtered graph (e.g., `graph.d2.gbz`) is used as input to `grave`
+#### 2. Fill out samplesheet
 
-#### Samplesheet layout
+Complete a `samplesheet.csv` file, detailing file system paths to your reads. The layout is shown below.
 
 >[!TIP]
-> The table below is for example purposes - the samplesheet must be in `.csv` format
+> The table below is an example. The file provided to grave must be in `.csv` format
 
 | sample_id     | library_id | repeat_number | sample_type | merged | fastq1                | fastq2               |
 |---------------|------------|---------------|-------------|--------|-----------------------|----------------------|
@@ -139,15 +139,23 @@ Run with the provided test data: `pixi run test`
 
 - `fastq2`: relative or absolute path to the second FASTQ
 
-#### Multiple reference samples
+#### 3. Customise your run parameters
 
-- `Minigraph-Cactus` requires at least one reference sample, usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
+Run parameters can be set for `grave` by editing the `params.yml` file, and providing it on the command line when you execute the workflow. These will override any default parameters.
 
-- Paths through the reference sample are _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others
+Use `pixi run help` to see the available parameters.
 
-- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiRef`, and to provide one or more `.paths` files. By default `grave` looks for these in the `data/paths` directory
+#### 4. Was your graph built with more than one reference sample?
 
-- Each `.paths` file contains a list of reference paths from one reference sample, with one path name per line
+- `Minigraph-Cactus` requires at least one [reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample), usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
+
+- If your graph has a single reference sample, you can skip this section.
+
+- Paths through the reference sample are called _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others
+
+- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiple_references`, and to provide one or more `.paths` files
+
+- Each `.paths` file contains a list of the reference paths in one reference sample, with one path name per line
 
 - __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
 
@@ -162,25 +170,23 @@ unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
 
-
 ## Workflow outputs
 
 >[!TIP]
-> Results are stored in the `results` directory. Exact outputs depend on the settings used (`pixi run help`), but the following can be configured:
+> Results are stored in the `results` directory. Exact outputs depend on the settings used.
 
-| Output directory  | Description                                                                                                           |
-|-------------------|-----------------------------------------------------------------------------------------------------------------------|
-| genotyping        | Genotyping outputs directly from the graph, & per sample                                                              |
-| linear_references | Graph reference assemblies in FASTA format with Pan-SN headers + index                                                |
-| mapped_files      | Library level GAM files & sample level deduplicated BAMs surjected to respective graph references                     |
-| package_versions  | Tool version report                                                                                                   |
-| pmd_profiles      | Post-mortem damage assessments (only for samples with the `ancient` metadata tag)                                     |
-| quality_reports   | FASTQC reports for both raw reads & QCed reads, fastp reports at the library level                                    |
-| statistics        | Graph statistics & metadata, alignment statistics per library, and deduplication stats per sample                     |
-| variant_calling   | Variant calling outputs per sample                                                                                    |
+| Output directory      | Description                                                                                               |
+|-----------------------|-----------------------------------------------------------------------------------------------------------|
+| 01_pipeline_info      | Package versions, run parameters, and Nextflow trace reports (if set)                                     |
+| 02_reference          | Reference statistics and reference FASTA files extracted from graphs with Pan-SN headers + index          |
+| 03_read_qc            | Read QC reports                                                                                           |
+| 04_mapped_reads       | Mapped reads (GAMs at library level, surjected BAMs sample merged and deduplicated), alignment statistics |
+| 05_post_mortem_damage | Post-mortem damage profiles (only for samples with the `ancient` metadata tag)                            |
+| 06_genotyping         | Genotyping outputs directly from the graph, & per sample                                                  |
+| 07_variant_calling    | Variant calling outputs per sample                                                                        |
 
 >[!TIP]
-> The workflow also computes graph snarls and indexes, stored in a folder alongside the input graph (detected on repeat runs)
+> The workflow also computes graph indexes and snarls, stored in a folder alongside the input graph (detected on repeat runs)
 
 ![Storedir example](assets/storedir.png)
 

@@ -1,0 +1,25 @@
+# ===================================================================
+# This file can be used to provide custom parameters to grave
+# ===================================================================
+# 1. Edit/add to the parameters below as needed
+# 2. Provide the file to nextflow using the '-params-file' option
+# e.g. nextflow main.nf -profile <PROFILES> -params-file params.yml
+
+# For a full list of available parameters and their defaults:
+# pixi run help
+# ===================================================================
+
+
+# -------------------------------------------------------------------
+# Mandatory parameters:
+# -------------------------------------------------------------------
+
+steps: 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call' 
+
+# -------------------------------------------------------------------
+# Core parameters (required by certain steps):
+# -------------------------------------------------------------------
+
+input: 'tests/data/samplesheet.csv'                  # Required by 'preprocess'
+reference: 'tests/data/graph/example-unfiltered.gbz' # Required by 'index' and 'graph_genotype'
+reference_type: 'unfiltered_graph'                   # Required by 'index' and 'graph_genotype'

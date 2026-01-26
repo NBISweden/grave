@@ -127,6 +127,7 @@ workflow PIPELINE_INITIALISATION {
 
 // Define pipeline parameter validation function
 def validateInputParameters() {
+
     // Define valid workflow steps
     def permitted_steps = [
         'preprocess',     // read preprocessing
@@ -220,4 +221,12 @@ def validateInputParameters() {
             error "ERROR: Invalid reference extension for the stated reference type ('${params.reference_type}'). Accepts: ${correct_extension.join(', ')}\n - Provided file: ${reference_name}\n - Extension found: ${ext}"
         }
     }
+    // Multi-reference mode requires paths directory and vice versa
+    if ( params.multiple_references && !params.paths_dir ) {
+        error "ERROR: When running with multiple references, a paths directory must be provided with '--paths_dir'"
+    }
+    if ( !params.multiple_references && params.paths_dir ) {
+        error "ERROR: A paths directory was provided with '--paths_dir' but multiple references mode is not enabled."
+    }
+
 }

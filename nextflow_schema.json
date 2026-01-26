@@ -179,61 +179,73 @@
     "outdir": {
       "type": "string",
       "default": "results"
-    },
-    "paths_dir": {
-      "type": "string"
     }
   },
   "$defs": {
-    "core_workflow_settings": {
-      "title": "Core workflow settings",
+    "mandatory_parameters": {
+      "title": "Mandatory parameters",
       "type": "object",
-      "description": "Settings that change the workflow mode",
+      "description": "",
       "default": "",
       "properties": {
         "steps": {
           "type": "string",
-          "description": "Desired workflow steps, csv string [preprocess,index,map]"
-        },
-        "reference_type": {
-          "type": "string",
-          "enum": ["unfiltered_graph", "filtered_graph", "linear"],
-          "description": "Align to a graph or to a linear reference genome"
-        },
-        "multiple_references": {
-          "type": "boolean",
-          "description": "Run graph analyses assuming multiple reference assemblies"
+          "description": "Desired workflow steps as a csv string",
+          "default": "preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call"
         }
       },
       "required": ["steps"]
     },
-    "inputs": {
-      "title": "Inputs",
+    "core_parameters": {
+      "title": "Core parameters",
       "type": "object",
-      "description": "Input files",
+      "description": "Required in most use cases",
       "default": "",
       "properties": {
         "input": {
           "type": "string",
           "format": "file-path",
           "mimetype": "csv",
-          "description": "Input samplesheet"
+          "description": "Input csv samplesheet"
         },
         "reference": {
           "type": "string",
           "format": "file-path",
           "pattern": "(?i)^.*\\.(gbz|fa|fas|fasta)(\\.gz)?$",
-          "description": "Reference graph (gbz) or FASTA for linear mode"
+          "description": "Reference graph (gbz) (or FASTA in linear mode)"
+        },
+        "reference_type": {
+          "type": "string",
+          "enum": ["unfiltered_graph", "filtered_graph", "linear"],
+          "description": "The type of reference file provided"
+        }
+      }
+    },
+    "multi_reference_graphs": {
+      "title": "Multi-reference graphs",
+      "type": "object",
+      "description": "Set when the graph contains multiple reference samples",
+      "default": "",
+      "properties": {
+        "multiple_references": {
+          "type": "boolean",
+          "description": "Run graph analyses assuming multiple reference assemblies"
+        },
+        "paths_dir": {
+          "type": "string"
         }
       }
     }
   },
   "allOf": [
     {
-      "$ref": "#/$defs/core_workflow_settings"
+      "$ref": "#/$defs/mandatory_parameters"
     },
     {
-      "$ref": "#/$defs/inputs"
+      "$ref": "#/$defs/core_parameters"
+    },
+    {
+      "$ref": "#/$defs/multi_reference_graphs"
     }
   ]
 }

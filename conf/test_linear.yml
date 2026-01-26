@@ -1,0 +1,13 @@
+# Linear reference test params yml
+
+steps: 'preprocess,index,align' # TODO temp development
+
+
+# steps: 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call' # TODO will be final
+reference_type: 'linear'
+input: 'tests/data/samplesheet.csv'
+reference: 'tests/data/linear/example.fas'
+deepvariant: true
+tracing: true
+
+# TODO convert to github links when pushed & merged to main

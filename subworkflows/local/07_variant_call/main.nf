@@ -60,8 +60,8 @@ workflow VARIANT_CALL {
     emit:
     freebayes_normalised_vcf
     freebayes_raw_vcf
-    deepvariant_raw_vcf
     deepvariant_normalised_vcf
+    deepvariant_raw_vcf
     deepvariant_html
 
 }

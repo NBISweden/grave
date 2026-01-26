@@ -16,6 +16,6 @@ workflow PROFILE_PMD {
     )
 
     emit:
-    pmd_profiles = DAMAGE_PROFILER.out.ch_pmd_profiles
+    damage_profiler = DAMAGE_PROFILER.out.ch_pmd_profiles
 
 }

@@ -17,9 +17,9 @@ workflow REFERENCE_UTILITIES {
 
     main:
     indexed_reference = channel.empty()
-    stats = channel.empty()
-    reference_fastas = channel.empty()
-    snarls = channel.empty()
+    stats             = channel.empty()
+    reference_fastas  = channel.empty()
+    snarls            = channel.empty()
 
     // If indexing is requested, index appropriately based on the reference type
     if ( 'index' in workflow_steps) {

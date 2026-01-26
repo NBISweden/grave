@@ -14,7 +14,7 @@ workflow MERGE_BAMS {
         .groupTuple() // Group by sample
         .map{ meta, readgroup, bams -> [meta, readgroup, bams.flatten()] } // Flatten nested lists (multi ref)
     // Merge bams
-    MERGE(
+    MERGE (
         paths,
         sample_grouped_bams
     )

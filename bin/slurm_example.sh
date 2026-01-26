@@ -1,13 +1,14 @@
 #!/bin/bash -l
 
-# EDIT THESE VALUES
+############### Edit these values ###############
 
+REPO_PATH=/path/to/repository/grave
 PIPELINE_NAME=grave
-REPO_PATH=~/grave
 TMUX_SESSION_NAME=grave
-PIXI_COMMAND="pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project <SLURM_ALLOCATION>"
+PIXI_COMMAND="pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project <ALLOCATION>"
 
-### DO NOT EDIT BELOW THIS LINE ###
+
+############### No edit required below ###############
 
 if [ -d "$REPO_PATH" ]; then
 
@@ -23,16 +24,36 @@ if [ -d "$REPO_PATH" ]; then
             if [ "$MAJORVERSION" -eq 1 ]; then
                 tmux new-session -s "$TMUX_SESSION_NAME" -d
                 tmux send-keys -t "$TMUX_SESSION_NAME" "$PIXI_COMMAND" C-m
-                echo "Found tmux version $MAJORVERSION"
-                echo "$PIPELINE_NAME pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
-                echo "$PIXI_COMMAND"
-                echo "Monitor workflow progress in '.nextflow.log' or with 'squeue -u $USER'"
+                cat << EOF
+Welcome to $PIPELINE_NAME
+
+Your job is running in the background via tmux version $MAJORVERSION (session name: $TMUX_SESSION_NAME).
+
+The command supplied was:
+$PIXI_COMMAND
+
+You can monitor workflow progress either via the '.nextflow.log' file, or with 'squeue -u $USER'
+
+View your active tmux sessions with: 'tmux list-sessions'
+
+Cancel this job with: 'tmux kill-session -t $TMUX_SESSION_NAME'
+EOF
             elif [ "$MAJORVERSION" -ge 2 ]; then
                 tmux new -s "$TMUX_SESSION_NAME" -d /bin/bash -c "$PIXI_COMMAND"
-                echo "Found tmux version $MAJORVERSION"
-                echo "$PIPELINE_NAME pipeline started in tmux session: '$TMUX_SESSION_NAME', with command:"
-                echo "$PIXI_COMMAND"
-                echo "Monitor workflow progress in '.nextflow.log' or with 'squeue -u $USER'"
+                cat << EOF
+Welcome to $PIPELINE_NAME
+
+Your job is running in the background via tmux version $MAJORVERSION (session name: $TMUX_SESSION_NAME).
+
+The command supplied was:
+$PIXI_COMMAND
+
+You can monitor workflow progress either via the '.nextflow.log' file, or with 'squeue -u $USER'
+
+View your active tmux sessions with: 'tmux list-sessions'
+
+Cancel this job with: 'tmux kill-session -t $TMUX_SESSION_NAME'
+EOF
             fi
         else
             echo "Error: Unable to parse tmux version"

@@ -1,5 +1,6 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 ![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
 # grave
 
@@ -9,22 +10,17 @@
 
 `grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview). A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
 
-In normal usage, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
+In normal use, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
 
 Outputs are described [here](#workflow-outputs).
 
 More information on genotyping and variant calling is found [here](#genotyping-and-variant-calling).
 
-It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#file-setup).
+It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#generate-or-provide-a-reference).
 
 `NOTE:` For the purposes of comparing workflows, grave can also be run in linear mode against a single FASTA reference instead of a graph.
 
 ## Quick start
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
-
->[!TIP]
->The base image includes pixi, Nextflow, Apptainer, wave, & nf-core tools. There is a 4-core minimum requirement to run the test
 
 ### Local or HPC installation
 

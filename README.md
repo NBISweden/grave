@@ -9,7 +9,7 @@
 
 ## Brief description
 
-`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. The steps are shown graphically [here](#pipeline-overview). A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
+`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
 
 In normal use, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
 
@@ -67,14 +67,11 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 #### Generate or provide a reference
 
-- References can be in one of three types: `unfiltered_graph`, `filtered_graph`, or `fasta` (for `linear` mode)
+- References can be in one of three types: `unfiltered_graph`, `filtered_graph`, or `linear` (i.e., FASTA alignment)
 
 - Graphs must be provided in `.gbz.` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users do not need to supply them.
 
-- When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)
-
->[!WARNING]
->Crucially: avoid hash characters in contig names
+- When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names). Avoid hash characters in contig names!
 
 - There are two main methods for building the graph with `Minigraph-Cactus`, see below:
 
@@ -215,7 +212,3 @@ unknownSimian.1.gorilla.bam
 #### DeepVariant
 
 - `DeepVariant` is integrated in `grave` (currently recommended for human input data only), read more [here](https://github.com/google/deepvariant)
-
-## Pipeline overview
-
-![Workflow](assets/workflow-dag.png)

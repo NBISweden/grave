@@ -5,9 +5,6 @@
   "description": "A workflow for mapping and variant calling aDNA against pangenome graphs",
   "type": "object",
   "properties": {
-    "account": {
-      "type": "string"
-    },
     "outputDir": {
       "type": "string",
       "default": "results"
@@ -179,6 +176,17 @@
     "outdir": {
       "type": "string",
       "default": "results"
+    },
+    "project": {
+      "type": "string"
+    },
+    "custom_config_version": {
+      "type": "string",
+      "default": "master"
+    },
+    "custom_config_base": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/nf-core/configs/master"
     }
   },
   "$defs": {

@@ -56,32 +56,19 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ### Run grave with the bundled test data
 
-- To run with test data using Apptainer: `pixi run test-apptainer`
+- To run with provided data using Apptainer: `pixi run test-apptainer`
 
-- To run with test data using Docker: `pixi run test-docker`
+- To run with provided data using Docker: `pixi run test-docker`
 
 >[!TIP]
 > All `pixi run` commands use the `default` environment. To specify the `apptainer` environment:<br><br>
 >`pixi run -e apptainer test-apptainer`
 
-### Run grave with your own data
+### Running grave with your own data
 
-1. First, go through the steps detailed in [input file setup](#file-setup)
-2. Second, run `grave`:
+### Step 1 of 2: Preparing the input files
 
-```
-# Local test run example (limited resources, use this for testing only)
-pixi run -e apptainer nextflow main.nf -profile apptainer,test -params-file params.yml
-
-# Run at scale (e.g., on SLURM cluster)
-TODO
-
-# An example shell script for running `grave` on a cluster with SLURM is provided in the repo: `bin/slurm_example.sh`
-```
-
-### File setup
-
-#### 1. Generate or provide a reference
+#### Generate or provide a reference
 
 - References can be in one of three types: `unfiltered_graph`, `filtered_graph`, or `fasta` (for `linear` mode)
 
@@ -110,7 +97,7 @@ TODO
 
 - The filtered graph (e.g., `graph.d2.gbz`) is used as input to `grave`, with the parameter `reference_type` set to `filtered_graph`
 
-#### 2. Fill out samplesheet
+#### Fill out the samplesheet
 
 Complete a `samplesheet.csv` file, detailing file system paths to your reads. The layout is shown below.
 
@@ -139,13 +126,13 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 - `fastq2`: relative or absolute path to the second FASTQ
 
-#### 3. Customise your run parameters
+#### Customise your run parameters
 
 Run parameters can be set for `grave` by editing the `params.yml` file, and providing it on the command line when you execute the workflow. These will override any default parameters.
 
 Use `pixi run help` to see the available parameters.
 
-#### 4. Was your graph built with more than one reference sample?
+#### Was your graph built with more than one reference sample?
 
 - `Minigraph-Cactus` requires at least one [reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample), usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
 
@@ -169,6 +156,22 @@ Use `pixi run help` to see the available parameters.
 unknownSimian.1.chimp.bam
 unknownSimian.1.gorilla.bam
 ```
+
+### Step 2 of 2: Running grave
+
+> Example of how to run a local test (not recommended for production runs)
+
+`pixi run -e apptainer nextflow main.nf -profile apptainer,test -params-file params.yml`
+
+> Running at scale (e.g., on SLURM cluster)
+
+- Institutional profiles are available via `nf-core` for many major HPC centres, see [here](https://nf-co.re/configs/). The example command below configures grave for the Dardel cluster in Stockholm, Sweden
+
+- When running on a cluster using the `slurm` job scheduler, ensure you provide a project allocation number using the `--project` parameter. This can be on the command line or via the `params.yml` file
+
+`pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project example-allocation-12345`
+
+- It is usually good practice to run `grave` via a `tmux` or `screen` session rather than directly on the login node. A template shell script that will do this for you is available in `bin/slurm_template.sh`
 
 ## Workflow outputs
 

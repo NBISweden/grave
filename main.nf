@@ -20,211 +20,281 @@ include { GENOTYPE                } from './subworkflows/local/06_genotype/main'
 include { VARIANT_CALL            } from './subworkflows/local/07_variant_call/main'
 
 // Entry workflow
+workflow {
 
-	workflow {
+    main:
+    // Validate input parameters and create input file channels
+    PIPELINE_INITIALISATION (
+        params.version,         // boolean: Display version and exit
+        params.validate_params, // boolean: Boolean whether to validate parameters against the schema at runtime
+        params.monochrome_logs, // boolean: Do not use coloured log outputs
+        args,                   //   array: List of positional nextflow CLI args
+        params.outdir,          //  string: The output directory where the results will be saved
+        params.input,           //  string: Path to input samplesheet
+        params.help,            // boolean: Display help message and exit
+        params.help_full,       // boolean: Show the full help message
+        params.show_hidden      // boolean: Show hidden parameters in the help message
+    )
+    reference    = PIPELINE_INITIALISATION.out.reference
+    samplesheet  = PIPELINE_INITIALISATION.out.samplesheet
+    sample_types = PIPELINE_INITIALISATION.out.types
+    paths        = params.multiple_references ? channel.fromPath("${params.paths_dir}/*.paths") : [] // Set up paths channel if multi-reference mode
 
-		main:
+    // Parse requested workflow steps
+    workflow_steps = params.steps.tokenize(",")
 
-			INITIALISE ()
-			GRAVE (
-				INITIALISE.out.ch_samplesheet,
-				INITIALISE.out.ch_types,
-				INITIALISE.out.ch_gbz_graph
-			)
+    // Run any required utility processes on the reference file
+    REFERENCE_UTILITIES (
+        workflow_steps,
+        params.reference_type,
+        reference,
+        sample_types,
+        paths
+    )
+    indexed_reference = REFERENCE_UTILITIES.out.indexed_reference   // Stored output
+    stats             = REFERENCE_UTILITIES.out.stats
+    reference_fastas  = REFERENCE_UTILITIES.out.reference_fastas
+    snarls            = REFERENCE_UTILITIES.out.snarls              // Stored output
 
-		publish:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~ Main grave workflow ~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-			graph_stats = GRAVE.out.ch_graph_stats
-			linear_references = GRAVE.out.ch_reference_fasta
-			fastp_libraries = GRAVE.out.ch_library_fastp_report
-			fastqc_raw = GRAVE.out.ch_fastqc_raw
-			fastqc_fastp = GRAVE.out.ch_fastqc_fastp
-			alignment_stats = GRAVE.out.ch_alignment_stats
-			mapped_gam = GRAVE.out.ch_mapped_gam
-			raw_gam = GRAVE.out.ch_raw_gam
-			deduplicated_bams = GRAVE.out.ch_sample_dedup_bams
-			dedup_metrics = GRAVE.out.ch_dedup_metrics
-			post_mortem_damage = GRAVE.out.ch_pmd_profiles
-			vg_graph_deconstruct_filtered_vcf = GRAVE.out.ch_vg_deconstruct_filtered_vcf
-			vg_graph_deconstruct_raw_vcf = GRAVE.out.ch_vg_deconstruct_raw_vcf
-			vg_genotype_filtered_vcf = GRAVE.out.ch_vg_genotype_filtered_vcf
-			vg_genotype_raw_vcf = GRAVE.out.ch_vg_genotype_raw_vcf
-			freebayes_normalised_vcf = GRAVE.out.ch_freebayes_norm_vcf
-			freebayes_raw_vcf = GRAVE.out.ch_freebayes_raw_vcf
-			deepvariant_report = GRAVE.out.ch_deepvariant_html
-			deepvariant_normalised_vcf = GRAVE.out.ch_deepvariant_norm_vcf
-			deepvariant_raw_vcf = GRAVE.out.ch_deepvariant_raw_vcf
-			package_versions = GRAVE.out.ch_versions
+    // Prepare reads (quality filtering + QC reports)
+    fastp_reads         = channel.empty()
+    fastp_report        = channel.empty()
+    raw_fastqc_report   = channel.empty()
+    fastp_fastqc_report = channel.empty()
+    if ( 'preprocess' in workflow_steps) {
+        PREPROCESS_READS (
+            samplesheet
+        )
+        fastp_reads         = PREPROCESS_READS.out.fastp_reads
+        fastp_report        = PREPROCESS_READS.out.fastp_report
+        raw_fastqc_report   = PREPROCESS_READS.out.raw_fastqc_report
+        fastp_fastqc_report = PREPROCESS_READS.out.fastp_fastqc_report
+    }
 
-	}
+    // Align reads (GAM + BAM produced in graph mode, & BAM in linear). Also adds read groups and sorts BAMs
+    mapped_gam      = channel.empty()
+    raw_gam         = channel.empty()
+    alignment_stats = channel.empty()
+    mapped_bam      = channel.empty()
+    if ( 'align' in workflow_steps ) {
+        ALIGN_READS (
+            params.reference_type,
+            paths,
+            fastp_reads,
+            reference,
+            indexed_reference
+        )
+        mapped_gam      = ALIGN_READS.out.mapped_gam
+        raw_gam         = ALIGN_READS.out.raw_gam
+        alignment_stats = ALIGN_READS.out.alignment_stats
+        mapped_bam      = ALIGN_READS.out.mapped_bam
+    }
+
+    // Merge library-level BAMs to sample-level for downstream analysis
+    merged_bams = channel.empty()
+    if ( 'merge' in workflow_steps ) {
+        MERGE_BAMS (
+            paths,
+            mapped_bam
+        )
+        merged_bams = MERGE_BAMS.out.merged_bams
+    }
+
+    // Deduplicate sample-level BAMs
+    deduplicated_bams     = channel.empty()
+    deduplication_metrics = channel.empty()
+    if ( 'deduplicate' in workflow_steps ) {
+        DEDUPLICATE_BAM (
+            paths,
+            merged_bams
+        )
+        deduplicated_bams     = DEDUPLICATE_BAM.out.deduplicated_bams
+        deduplication_metrics = DEDUPLICATE_BAM.out.deduplication_metrics
+    }
+
+    // Damage profile ancient samples if they are present
+    damage_profiler = channel.empty()
+    if ( 'profile_pmd' in workflow_steps ) {
+        if ( sample_types != "modern" ) {
+            PROFILE_PMD (
+                paths,
+                reference_fastas,
+                deduplicated_bams
+            )
+            damage_profiler = PROFILE_PMD.out.damage_profiler
+        }
+    }
+
+    // Genotyping
+    graph_filtered_vcf = channel.empty()
+    graph_raw_vcf      = channel.empty()
+    reads_filtered_vcf = channel.empty()
+    reads_raw_vcf      = channel.empty()
+    if ( 'graph_genotype' in workflow_steps || 'reads_genotype' in workflow_steps ) {
+        GENOTYPE (
+            workflow_steps,
+            reference,
+            snarls,
+            paths,
+            reference_fastas,
+            mapped_gam
+        )
+        graph_filtered_vcf = GENOTYPE.out.graph_filtered_vcf
+        graph_raw_vcf      = GENOTYPE.out.graph_raw_vcf
+        reads_filtered_vcf = GENOTYPE.out.reads_filtered_vcf
+        reads_raw_vcf      = GENOTYPE.out.reads_raw_vcf
+    }
+
+    // Variant calling
+    freebayes_normalised_vcf   = channel.empty()
+    freebayes_raw_vcf          = channel.empty()
+    deepvariant_normalised_vcf = channel.empty()
+    deepvariant_raw_vcf        = channel.empty()
+    deepvariant_html           = channel.empty()
+    if ( 'variant_call' in workflow_steps ) {
+        VARIANT_CALL (
+            params.freebayes,
+            params.deepvariant,
+            params.reference_type,
+            reference,
+            paths,
+            reference_fastas,
+            deduplicated_bams
+        )
+        freebayes_normalised_vcf   = VARIANT_CALL.out.freebayes_normalised_vcf
+        freebayes_raw_vcf          = VARIANT_CALL.out.freebayes_raw_vcf
+        deepvariant_normalised_vcf = VARIANT_CALL.out.deepvariant_normalised_vcf
+        deepvariant_raw_vcf        = VARIANT_CALL.out.deepvariant_raw_vcf
+        deepvariant_html           = VARIANT_CALL.out.deepvariant_html
+    }
+
+    // Report package versions
+    channel.topic('versions')
+        .map { process, tool, version ->
+            return [process: process, tool: tool, version: version]
+        }
+        .unique()
+        .collect()
+        .map { it -> it.join('\n') }
+        .collectFile(name: 'package_versions.txt', newLine: true)
+        .set { versions }
+
+    // Define publish targets
+    publish:
+    // REFERENCE_UTILITIES
+    stats                      = stats
+    linear_references          = reference_fastas
+    // PREPROCESS_READS
+    fastp_report               = fastp_report
+    raw_fastqc_report          = raw_fastqc_report
+    fastp_fastqc_report        = fastp_fastqc_report
+    // ALIGN_READS
+    mapped_gam                 = mapped_gam
+    raw_gam                    = raw_gam
+    alignment_stats            = alignment_stats
+    // DEDUPLICATE_BAM
+    deduplicated_bams          = deduplicated_bams
+    deduplication_metrics      = deduplication_metrics
+    // PROFILE_PMD
+    damage_profiler            = damage_profiler
+    // GENOTYPE
+    graph_filtered_vcf         = graph_filtered_vcf
+    graph_raw_vcf              = graph_raw_vcf
+    reads_filtered_vcf         = reads_filtered_vcf
+    reads_raw_vcf              = reads_raw_vcf
+    // VARIANT_CALL
+    freebayes_normalised_vcf   = freebayes_normalised_vcf
+    freebayes_raw_vcf          = freebayes_raw_vcf
+    deepvariant_normalised_vcf = deepvariant_normalised_vcf
+    deepvariant_raw_vcf        = deepvariant_raw_vcf
+    deepvariant_html           = deepvariant_html
+    // Version reporting
+    versions                   = versions
+
+}
 
 // Publish outputs
+output {
 
-	output {
+    // Version reporting
+    versions {
+        path '01_pipeline_info/package_versions'
+    }
+    // REFERENCE_UTILITIES
+    stats {
+        path '02_reference/statistics'
+    }
+    linear_references {
+        path '02_reference/extracted_linear_reference'
+    }
+    // PREPROCESS_READS
+    fastp_report {
+        path '03_read_qc/fastp_reports'
+    }
+    raw_fastqc_report {
+        path '03_read_qc/raw_data_fastq_reports'
+    }
+    fastp_fastqc_report {
+        path '03_read_qc/qced_data_fastq_reports'
+    }
+    // ALIGN_READS
+    mapped_gam {
+        path '04_mapped_reads/gams'
+    }
+    raw_gam {
+        path '04_mapped_reads/gams'
+        enabled params.keepRawGam
+    }
+    alignment_stats {
+        path '04_mapped_reads/alignment_statistics'
+    }
+    // DEDUPLICATE_BAM
+    deduplicated_bams {
+        path '04_mapped_reads/bams_processed'
+    }
+    deduplication_metrics {
+        path '04_mapped_reads/deduplication_statistics'
+    }
+    // PROFILE_PMD
+    damage_profiler {
+        path '05_post_mortem_damage/damage_profiler'
+    }
+    // GENOTYPE
+    graph_filtered_vcf {
+        path '06_genotyping/graph'
+    }
+    graph_raw_vcf {
+        path '06_genotyping/graph'
+        enabled params.keepRawVcf
+    }
+    reads_filtered_vcf {
+        path '06_genotyping/reads'
+    }
+    reads_raw_vcf {
+        path '06_genotyping/reads'
+        enabled params.keepRawVcf
+    }
+    // VARIANT_CALL
+    freebayes_normalised_vcf {
+        path '07_variant_calling/freebayes'
+    }
+    freebayes_raw_vcf {
+        path '07_variant_calling/freebayes'
+        enabled params.keepRawVcf
+    }
+    deepvariant_normalised_vcf {
+        path '07_variant_calling/deepvariant'
+    }
+    deepvariant_raw_vcf {
+        path '07_variant_calling/deepvariant'
+        enabled params.keepRawVcf
+    }
+    deepvariant_html {
+        path '07_variant_calling/deepvariant'
+    }
 
-		graph_stats {
-			path 'statistics/graph'
-			mode 'copy'
-			overwrite false
-		}
-
-		linear_references {
-			path 'linear_references'
-			mode 'copy'
-			overwrite false
-		}
-
-		fastp_libraries {
-			path 'quality_reports/fastp_library_level'
-			mode 'copy'
-			overwrite false
-		}
-
-		fastqc_raw {
-			path 'quality_reports/fastqc/raw'
-			mode 'copy'
-			overwrite false
-		}
-
-		fastqc_fastp {
-			path 'quality_reports/fastqc/fastp'
-			mode 'copy'
-			overwrite false
-		}
-
-		alignment_stats {
-			path 'statistics/alignments'
-			mode 'copy'
-			overwrite false
-		}
-
-		mapped_gam {
-			path 'mapped_files/gams'
-			mode 'copy'
-			overwrite false
-		}
-
-		raw_gam {
-			path 'mapped_files/gams'
-			mode 'copy'
-			overwrite false
-			enabled params.keepRawGam
-
-		}
-
-		deduplicated_bams {
-			path 'mapped_files/bams'
-			mode 'copy'
-			overwrite false
-		}
-
-		dedup_metrics {
-			path 'statistics/deduplication'
-			mode 'copy'
-			overwrite false
-		}
-
-		post_mortem_damage {
-			path 'pmd_profiles'
-			mode 'copy'
-			overwrite false
-		}
-
-		vg_graph_deconstruct_filtered_vcf {
-			path 'genotyping/graph'
-			mode 'copy'
-			overwrite false
-		}
-
-		vg_graph_deconstruct_raw_vcf {
-			path 'genotyping/graph'
-			mode 'copy'
-			overwrite false
-			enabled params.keepRawVcf
-		}
-
-		vg_genotype_filtered_vcf {
-			path 'genotyping/vg_genotype'
-			mode 'copy'
-			overwrite false
-		}
-
-		vg_genotype_raw_vcf {
-			path 'genotyping/vg_genotype'
-			mode 'copy'
-			overwrite false
-			enabled params.keepRawVcf
-		}
-
-		freebayes_normalised_vcf {
-			path 'variant_calling/freebayes'
-			mode 'copy'
-			overwrite false
-		}
-
-		freebayes_raw_vcf {
-			path 'variant_calling/freebayes'
-			mode 'copy'
-			overwrite false
-			enabled params.keepRawVcf
-		}
-
-		deepvariant_report {
-			path 'variant_calling/deepvariant'
-			mode 'copy'
-			overwrite false
-		}
-
-		deepvariant_normalised_vcf {
-			path 'variant_calling/deepvariant'
-			mode 'copy'
-			overwrite false
-		}
-
-		deepvariant_raw_vcf {
-			path 'variant_calling/deepvariant'
-			mode 'copy'
-			overwrite false
-			enabled params.keepRawVcf
-		}
-
-		package_versions {
-			path 'package_versions'
-			mode 'copy'
-			overwrite false
-		}
-
-	}
-
-// Email report
-
-	if (params.email_report) {
-
-		workflow.onComplete {
-
-			// Prepare email content
-			def workflow_status = workflow.success ? 'COMPLETED' : 'FAILED'
-			def email_address = params.email
-			def subject = "grave workflow run ${workflow.runName}: ${workflow_status}"
-			def msg = """
-			Pipeline execution summary
-			---------------------------
-			Run Name     : ${workflow.runName}
-			Completed at : ${workflow.complete}
-			Duration     : ${workflow.duration}
-			Success      : ${workflow.success}
-			Exit status  : ${workflow.exitStatus}
-			Error report : ${workflow.errorReport ?: 'No errors'}
-			"""
-			.stripIndent()
-
-			// Send the email
-			sendMail(
-				to: email_address,
-				subject: subject,
-				body: msg
-			)
-
-		}
-
-	}
+}

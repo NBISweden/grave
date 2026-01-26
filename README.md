@@ -165,7 +165,7 @@ unknownSimian.1.gorilla.bam
 
 `pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project example-allocation-12345`
 
-- It is usually good practice to run `grave` via a `tmux` or `screen` session rather than directly on the login node. A template shell script that will do this for you is available in `bin/slurm_template.sh`
+- It is usually good practice to run `grave` via a `tmux` or `screen` session rather than directly on the login node. An editable shell script that will do this for you is available in `bin/slurm_submission.sh`
 
 ## Workflow outputs
 

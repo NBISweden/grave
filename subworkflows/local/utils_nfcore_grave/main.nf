@@ -192,7 +192,7 @@ def validateInputParameters() {
     }
     // Error if incompatible step requested
     if ( requested_steps.any { step -> step in ['graph_genotype', 'reads_genotype'] } && params.reference_type == 'linear' ) {
-        error "ERROR: Graph or reads genotyping was requested but grave is running in linear mode."
+        println "WARN: Graph-based genotyping was requested but grave is running in linear mode."
     }
     // If reference is provided, enforce reference type also
     if ( params.reference && !params.reference_type ) {

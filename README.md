@@ -19,7 +19,7 @@ More information on genotyping and variant calling is found [here](#genotyping-a
 
 It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#generate-or-provide-a-reference).
 
-`NOTE:` For the purposes of comparing workflows, grave can also be run in linear mode against a single FASTA reference instead of a graph.
+`NOTE:` For the purposes of comparing workflows, grave can also be run in [linear mode](#linear-reference-mode) against a single FASTA reference instead of a graph.
 
 ## Quick start
 
@@ -212,3 +212,11 @@ unknownSimian.1.gorilla.bam
 #### DeepVariant
 
 - `DeepVariant` is integrated in `grave` (currently recommended for human input data only), read more [here](https://github.com/google/deepvariant)
+
+## Linear reference mode
+
+- `grave` can be run in linear reference mode, mapping reads against a single FASTA reference instead of a graph
+
+- Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) and modern DNA with `BWA MEM` (default settings)
+
+- To configure linear mode, set the parameter `reference_type` to `linear`, and provide a FASTA reference with the `reference` parameter)

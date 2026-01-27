@@ -135,18 +135,20 @@ workflow {
     reads_filtered_vcf = channel.empty()
     reads_raw_vcf      = channel.empty()
     if ( 'graph_genotype' in workflow_steps || 'reads_genotype' in workflow_steps ) {
-        GENOTYPE (
-            workflow_steps,
-            reference,
-            snarls,
-            paths,
-            reference_fastas,
-            mapped_gam
-        )
-        graph_filtered_vcf = GENOTYPE.out.graph_filtered_vcf
-        graph_raw_vcf      = GENOTYPE.out.graph_raw_vcf
-        reads_filtered_vcf = GENOTYPE.out.reads_filtered_vcf
-        reads_raw_vcf      = GENOTYPE.out.reads_raw_vcf
+        if ( params.reference_type != 'linear' ) {
+            GENOTYPE (
+                workflow_steps,
+                reference,
+                snarls,
+                paths,
+                reference_fastas,
+                mapped_gam
+            )
+            graph_filtered_vcf = GENOTYPE.out.graph_filtered_vcf
+            graph_raw_vcf      = GENOTYPE.out.graph_raw_vcf
+            reads_filtered_vcf = GENOTYPE.out.reads_filtered_vcf
+            reads_raw_vcf      = GENOTYPE.out.reads_raw_vcf
+        }
     }
 
     // Variant calling

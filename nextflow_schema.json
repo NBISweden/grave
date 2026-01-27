@@ -231,7 +231,6 @@
         "reference": {
           "type": "string",
           "format": "file-path",
-          "pattern": "(?i)^.*\\.(gbz|fa|fas|fasta)(\\.gz)?$",
           "description": "Reference graph (gbz) (or FASTA in linear mode)"
         },
         "reference_type": {

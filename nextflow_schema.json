@@ -9,13 +9,6 @@
       "type": "string",
       "default": "results"
     },
-    "freebayes": {
-      "type": "boolean",
-      "default": true
-    },
-    "deepvariant": {
-      "type": "boolean"
-    },
     "noNestedDistance": {
       "type": "boolean"
     },
@@ -148,7 +141,15 @@
     },
     "deepVariantModelType": {
       "type": "string",
-      "default": "WGS"
+      "default": "WGS",
+      "enum": [
+        "WGS",
+        "WES",
+        "PACBIO",
+        "ONT_R104",
+        "HYBRID_PACBIO_ILLUMINA",
+        "MASSEQ"
+      ]
     },
     "trace_timestamp": {
       "type": "string",
@@ -157,48 +158,56 @@
     "tracing": {
       "type": "boolean"
     },
-    "help_full": {
-      "type": "boolean"
-    },
     "validate_params": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "hidden": true
     },
     "show_hidden": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "version": {
       "type": "boolean"
     },
     "monochrome_logs": {
-      "type": "boolean"
+      "type": "boolean",
+      "hidden": true
     },
     "outdir": {
       "type": "string",
-      "default": "results"
-    },
-    "project": {
-      "type": "string"
+      "default": "results",
+      "hidden": true
     },
     "custom_config_version": {
       "type": "string",
-      "default": "master"
+      "default": "master",
+      "hidden": true
     },
     "custom_config_base": {
       "type": "string",
-      "default": "https://raw.githubusercontent.com/nf-core/configs/master"
+      "default": "https://raw.githubusercontent.com/nf-core/configs/master",
+      "hidden": true
     },
     "config_profile_name": {
-      "type": "string"
+      "type": "string",
+      "hidden": true
     },
     "config_profile_description": {
-      "type": "string"
+      "type": "string",
+      "hidden": true
     },
     "config_profile_contact": {
-      "type": "string"
+      "type": "string",
+      "hidden": true
     },
     "config_profile_url": {
-      "type": "string"
+      "type": "string",
+      "hidden": true
+    },
+    "help_full": {
+      "type": "boolean",
+      "hidden": true
     }
   },
   "$defs": {
@@ -226,17 +235,17 @@
           "type": "string",
           "format": "file-path",
           "mimetype": "csv",
-          "description": "Input csv samplesheet"
+          "description": "Path to input csv samplesheet"
         },
         "reference": {
           "type": "string",
           "format": "file-path",
-          "description": "Reference graph (gbz) (or FASTA in linear mode)"
+          "description": "Path to reference .gbz graph (modes: unfiltered_graph, filtered_graph), or .fasta (mode: linear)"
         },
         "reference_type": {
           "type": "string",
           "enum": ["unfiltered_graph", "filtered_graph", "linear"],
-          "description": "The type of reference file provided"
+          "description": "The type of reference file provided, changes the run mode accordingly"
         }
       }
     },
@@ -251,7 +260,37 @@
           "description": "Run graph analyses assuming multiple reference assemblies"
         },
         "paths_dir": {
-          "type": "string"
+          "type": "string",
+          "description": "Path to directory containing '.paths' files"
+        }
+      }
+    },
+    "slurm_hpc_specific_parameters": {
+      "title": "SLURM/HPC specific parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Used with the SLURM executor: project allocation string for hours logging"
+        }
+      }
+    },
+    "optional_processes": {
+      "title": "Optional processes",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "freebayes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Turn on (true) or off (false) the Freebayes variant caller"
+        },
+        "deepvariant": {
+          "type": "boolean",
+          "description": "Turn on (true) or off (false) the DeepVariant variant caller"
         }
       }
     }
@@ -265,6 +304,12 @@
     },
     {
       "$ref": "#/$defs/multi_reference_graphs"
+    },
+    {
+      "$ref": "#/$defs/slurm_hpc_specific_parameters"
+    },
+    {
+      "$ref": "#/$defs/optional_processes"
     }
   ]
 }

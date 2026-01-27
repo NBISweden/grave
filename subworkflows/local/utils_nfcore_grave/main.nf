@@ -29,6 +29,7 @@ workflow PIPELINE_INITIALISATION {
     )
 
     // Validate parameters and generate help message to stdout
+
     // ~~~ DO NOT EDIT WHITESPACE BELOW ~~~
     before_text = """
     \033[0;92mnbisweden/grave ${workflow.manifest.version}\033[0m
@@ -39,6 +40,7 @@ workflow PIPELINE_INITIALISATION {
     """
     command = "pixi run nextflow main.nf -profile singularity,test"
     // ~~~ END OF FIXED WHITESPACE ~~~
+
     UTILS_NFSCHEMA_PLUGIN (
         workflow,
         validate_params,

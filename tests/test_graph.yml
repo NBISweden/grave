@@ -7,4 +7,6 @@ reference: 'tests/data/graph/example-unfiltered.gbz'
 deepvariant: true
 tracing: true
 
-# TODO convert to github links when pushed & merged to main
+# TODO once repo public:
+# input: 'https://raw.githubusercontent.com/NBISweden/grave/main/tests/data/samplesheet.csv'
+# reference: 'https://raw.githubusercontent.com/NBISweden/grave/main/tests/data/graph/example-unfiltered.gbz'

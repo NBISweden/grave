@@ -6,7 +6,9 @@
 # e.g. nextflow main.nf -profile <PROFILES> -params-file params.yml
 
 # For a full list of available parameters and their defaults:
+
 # pixi run help
+
 # ===================================================================
 
 
@@ -20,6 +22,6 @@ steps: 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,read
 # Core parameters (required by certain steps):
 # -------------------------------------------------------------------
 
-input: 'tests/data/samplesheet.csv'                  # Required by 'preprocess'
-reference: 'tests/data/graph/example-unfiltered.gbz' # Required by 'index' and 'graph_genotype'
-reference_type: 'unfiltered_graph'                   # Required by 'index' and 'graph_genotype'
+input: '/path/to/samplesheet.csv'     # Required by 'preprocess'
+reference: '/path/to/reference.gbz'   # Required by 'index' and 'graph_genotype'
+reference_type: 'unfiltered_graph'    # Required by 'index' and 'graph_genotype'

@@ -10,14 +10,14 @@ Changes in 'samtools/faidx/main.nf':
      label 'process_single'
  
      conda "${moduleDir}/environment.yml"
-@@ -8,43 +9,23 @@
+@@ -8,43 +9,21 @@
          'biocontainers/samtools:1.22.1--h96c455f_0' }"
  
      input:
 -    tuple val(meta), path(fasta)
 -    tuple val(meta2), path(fai)
+-    val get_sizes
 +    path (reference)
-     val get_sizes
  
      output:
 -    tuple val(meta), path ("*.{fa,fasta}") , emit: fa, optional: true
@@ -28,21 +28,22 @@ Changes in 'samtools/faidx/main.nf':
 -
 -    when:
 -    task.ext.when == null || task.ext.when
-+    path ("*.fai")         , emit: ch_fai
++    path ("*.fai")                        , emit: ch_fai
++    tuple path (reference), path ("*.fai"), emit: ch_indexed_reference
 +    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
  
      script:
      def args = task.ext.args ?: ''
 -    def get_sizes_command = get_sizes ? "cut -f 1,2 ${fasta}.fai > ${fasta}.sizes" : ''
-+    def get_sizes_command = get_sizes ? "cut -f 1,2 ${reference}.fai > ${reference}.sizes" : ''
++
      """
      samtools \\
          faidx \\
 -        $fasta \\
 +        $reference \\
          $args
- 
-     ${get_sizes_command}
+-
+-    ${get_sizes_command}
      """
  
 -    stub:

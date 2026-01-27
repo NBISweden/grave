@@ -79,20 +79,22 @@ workflow REFERENCE_UTILITIES {
     // When reference is linear, produce statistics
     if ( reference_type == "linear") {
         SAMTOOLS_FAIDX (
-            reference,
-            false
+            reference
         )
-        stats = SAMTOOLS_FAIDX.out.ch_fai
+        stats                    = SAMTOOLS_FAIDX.out.ch_fai
+        indexed_linear_reference = SAMTOOLS_FAIDX.out.ch_indexed_reference
     }
 
-    // When reference is a graph, extract linear references if required by downstream modules
-    if ( reference_type != "linear") {
-        if ( workflow_steps.any { it in ['graph_genotype', 'reads_genotype', 'variant_call', 'assess_pmd'] } ) {
+    // Get and assign reference fasta channel if it's required
+    if ( workflow_steps.any { it in ['graph_genotype', 'reads_genotype', 'variant_call', 'profile_pmd'] } ) {
+        if ( reference_type != "linear") {
             GRAPH_EXTRACT (
                 reference,
                 paths
             )
             reference_fastas = GRAPH_EXTRACT.out.ch_reference_fastas
+        } else if ( reference_type == "linear") {
+            reference_fastas = indexed_linear_reference
         }
     }
 

@@ -10,22 +10,20 @@ process SAMTOOLS_FAIDX {
 
     input:
     path (reference)
-    val get_sizes
 
     output:
-    path ("*.fai")         , emit: ch_fai
+    path ("*.fai")                        , emit: ch_fai
+    tuple path (reference), path ("*.fai"), emit: ch_indexed_reference
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
     def args = task.ext.args ?: ''
-    def get_sizes_command = get_sizes ? "cut -f 1,2 ${reference}.fai > ${reference}.sizes" : ''
+
     """
     samtools \\
         faidx \\
         $reference \\
         $args
-
-    ${get_sizes_command}
     """
 
 }

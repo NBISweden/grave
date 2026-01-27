@@ -21,12 +21,12 @@ apptainer             = "==1.4.5"
 apptainer             = ["apptainer"]
 
 [tasks]
-test-docker           = "nextflow main.nf -profile docker,test -params-file conf/test.yml"
-test-apptainer        = "nextflow main.nf -profile apptainer,test -params-file conf/test.yml"
-test-singularity      = "nextflow main.nf -profile singularity,test -params-file conf/test.yml"
-test-conda            = "nextflow main.nf -profile conda,test -params-file conf/test.yml"
-test-docker-linear    = "nextflow main.nf -profile docker,test -params-file conf/test_linear.yml"
-test-apptainer-linear = "nextflow main.nf -profile apptainer,test -params-file conf/test_linear.yml"
+test-docker           = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml"
+test-apptainer        = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml"
+test-singularity      = "nextflow main.nf -profile singularity,test -params-file tests/test_graph.yml"
+test-conda            = "nextflow main.nf -profile conda,test -params-file tests/test_graph.yml"
+test-docker-linear    = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml"
+test-apptainer-linear = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml"
 help                  = "nextflow main.nf --help"
 
 [activation.env]

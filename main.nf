@@ -180,7 +180,7 @@ workflow {
         .unique()
         .collect()
         .map { it -> it.join('\n') }
-        .collectFile(name: 'package_versions.txt', newLine: true)
+        .collectFile(name: "${params.trace_timestamp}_package_versions.txt", newLine: true)
         .set { versions }
 
     // Define publish targets

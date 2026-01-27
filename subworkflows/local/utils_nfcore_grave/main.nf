@@ -1,4 +1,5 @@
 // Initialise the nbisweden/grave pipeline
+include { STANDARDISE_FASTA         } from '../../../modules/local/standardise_fasta/main'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { UTILS_NFSCHEMA_PLUGIN     } from '../../nf-core/utils_nfschema_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-schema'
@@ -106,7 +107,11 @@ workflow PIPELINE_INITIALISATION {
     // Create reference channel
     ch_reference = channel.empty()
     if ( params.reference ) {
-        ch_reference = channel.fromPath(params.reference, checkIfExists: true).collect()
+        def ref_input = channel.fromPath(params.reference, checkIfExists: true)
+        // Some tools don't like non-standard fasta extensions, therefore standardise in linear mode
+        ch_reference = params.reference_type == 'linear' ?
+            STANDARDISE_FASTA ( ref_input ).collect() :
+            ref_input.collect()
     }
 
     // Create types channel for correct index generation (modern, ancient, or both)

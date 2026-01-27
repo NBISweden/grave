@@ -61,7 +61,7 @@ Changes in 'bwa/aln/main.nf':
 +        $read_group \\
 +        \$INDEX_PREFIX \\
 +        - \\
-+        $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
++        $reads | samtools sort --threads ${task.cpus - 1} -O bam - > ${prefix}.bam
  
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":

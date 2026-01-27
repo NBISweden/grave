@@ -36,7 +36,7 @@ process BWA_ALN_SAMSE {
         $read_group \\
         \$INDEX_PREFIX \\
         - \\
-        $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
+        $reads | samtools sort --threads ${task.cpus - 1} -O bam - > ${prefix}.bam
 
     samtools flagstat ${prefix}.bam > ${prefix}_flagstat.txt
     """

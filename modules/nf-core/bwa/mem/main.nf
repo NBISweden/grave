@@ -9,49 +9,31 @@ process BWA_MEM {
 
     input:
     tuple val(meta) , path(reads)
-    tuple val(meta2), path(index)
-    tuple val(meta3), path(fasta)
-    val   sort_bam
+    tuple val(reference), path(indexes)
 
     output:
-    tuple val(meta), path("*.bam") , emit: bam,    optional: true
-    tuple val(meta), path("*.cram"), emit: cram,   optional: true
-    tuple val(meta), path("*.csi") , emit: csi,    optional: true
-    tuple val(meta), path("*.crai"), emit: crai,   optional: true
-    // TODO path  "versions.yml"           , emit: versions
-        // bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
-        // samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-
-    when:
-    task.ext.when == null || task.ext.when
+    tuple val(meta), path("*.bam"), emit: ch_bam
+    tuple val(meta), path("*_flagstat.txt"), emit: ch_flagstat
+    tuple val(task.process), val('bwa'), eval('bwa 2>&1 | head -n 3 | tail -n 1 | sed "s/Version: //"'), topic: versions
+    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
     def args = task.ext.args ?: ''
-    def args2 = task.ext.args2 ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
-    def samtools_command = sort_bam ? 'sort' : 'view'
-    def extension = args2.contains("--output-fmt sam")   ? "sam" :
-                    args2.contains("--output-fmt cram")  ? "cram":
-                    sort_bam && args2.contains("-O cram")? "cram":
-                    !sort_bam && args2.contains("-C")    ? "cram":
-                    "bam"
-    def reference = fasta && extension=="cram"  ? "--reference ${fasta}" : ""
-    if (!fasta && extension=="cram") error "Fasta reference is required for CRAM output"
+    def prefix = task.ext.prefix ?: "${meta.read_group}"
+    def read_group = meta.read_group ? "-R '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}'" : ""
 
-// TODO Add control logic for premerged and paired end reads.
     """
-    INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
+    INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
 
     bwa mem \\
         $args \\
+        $read_group \\
         -t $task.cpus \\
-        \$INDEX \\
-        $reads \\
-        | samtools $samtools_command $args2 ${reference} --threads $task.cpus -o ${prefix}.${extension} -
+        \$INDEX_PREFIX \\
+        ${reads} \\
+        | samtools sort --threads ${task.cpus - 1} -O bam - > ${prefix}.bam
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-    END_VERSIONS
+    samtools flagstat ${prefix}.bam > ${prefix}_flagstat.txt
     """
 
 }

@@ -55,6 +55,7 @@ workflow ALIGN_READS {
         )
         // Mix outputs
         mapped_bam = BWA_ALN_SAMSE.out.ch_bam.mix(BWA_MEM.out.ch_bam)
+        alignment_stats = BWA_ALN_SAMSE.out.ch_flagstat.mix(BWA_MEM.out.ch_flagstat)
     }
 
     emit:

@@ -28,15 +28,13 @@ process BWA_ALN_SAMSE {
     bwa aln \\
         $args \\
         -t $task.cpus \\
-        -f ${prefix}.sai \\
-        \$INDEX_PREFIX \\
-        ${reads}
-
+         \$INDEX_PREFIX \\
+        ${reads} | \\
     bwa samse \\
         $args2 \\
         $read_group \\
         \$INDEX_PREFIX \\
-        ${prefix}.sai \\
+        - \\
         $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
     """
 

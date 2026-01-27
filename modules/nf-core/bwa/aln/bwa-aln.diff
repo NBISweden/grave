@@ -1,0 +1,125 @@
+Changes in component 'nf-core/bwa/aln'
+Changes in 'bwa/aln/main.nf':
+--- modules/nf-core/bwa/aln/main.nf
++++ modules/nf-core/bwa/aln/main.nf
+@@ -1,89 +1,41 @@
+-process BWA_ALN {
+-    tag "$meta.id"
++process BWA_ALN_SAMSE {
++
++    tag "${meta.read_group}"
+     label 'process_medium'
+-
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+         'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d7/d7e24dc1e4d93ca4d3a76a78d4c834a7be3985b0e1e56fddd61662e047863a8a/data' :
+         'community.wave.seqera.io/library/bwa_htslib_samtools:83b50ff84ead50d0' }"
+ 
+     input:
+-    tuple val(meta) , path(reads)
+-    tuple val(meta2), path(index)
++    tuple val(meta), path(reads)
++    tuple path(reference), path(indexes)
+ 
+     output:
+-    tuple val(meta), path("*.sai"), emit: sai
+-    path "versions.yml"           , emit: versions
+-
+-    when:
+-    task.ext.when == null || task.ext.when
++    tuple val(meta), path("*.bam"), emit: ch_bam
++    tuple val(task.process), val('bwa'), eval('bwa 2>&1 | head -n 3 | tail -n 1 | sed "s/Version: //"'), topic: versions
++    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
+ 
+     script:
+     def args   = task.ext.args   ?: ''
+-    def prefix = task.ext.prefix ?: "${meta.id}"
++    def args2   = task.ext.args2   ?: ''
++    def prefix = task.ext.prefix ?: "${meta.read_group}"
++    def read_group = meta.read_group ? "-r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}'" : ""
+ 
+-    if (meta.single_end) {
+-        """
+-        INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
++    """
++    INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
+ 
+-        bwa aln \\
+-            $args \\
+-            -t $task.cpus \\
+-            -f ${prefix}.sai \\
+-            \$INDEX \\
+-            ${reads}
++    bwa aln \\
++        $args \\
++        -t $task.cpus \\
++         \$INDEX_PREFIX \\
++        ${reads} | \\
++    bwa samse \\
++        $args2 \\
++        $read_group \\
++        \$INDEX_PREFIX \\
++        - \\
++        $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
++    """
+ 
+-        cat <<-END_VERSIONS > versions.yml
+-        "${task.process}":
+-            bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
+-        END_VERSIONS
+-        """
+-    } else {
+-        """
+-        INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
+-
+-        bwa aln \\
+-            $args \\
+-            -t $task.cpus \\
+-            -f ${prefix}.1.sai \\
+-            \$INDEX \\
+-            ${reads[0]}
+-
+-        bwa aln \\
+-            $args \\
+-            -t $task.cpus \\
+-            -f ${prefix}.2.sai \\
+-            \$INDEX \\
+-            ${reads[1]}
+-
+-        cat <<-END_VERSIONS > versions.yml
+-        "${task.process}":
+-            bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
+-        END_VERSIONS
+-        """
+-    }
+-
+-    stub:
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-
+-    if (meta.single_end) {
+-        """
+-        touch ${prefix}.sai
+-
+-        cat <<-END_VERSIONS > versions.yml
+-        "${task.process}":
+-            bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
+-        END_VERSIONS
+-        """
+-    } else {
+-        """
+-        touch ${prefix}.1.sai
+-        touch ${prefix}.2.sai
+-
+-        cat <<-END_VERSIONS > versions.yml
+-        "${task.process}":
+-            bwa: \$(echo \$(bwa 2>&1) | sed 's/^.*Version: //; s/Contact:.*\$//')
+-        END_VERSIONS
+-        """
+-    }
+ }
+
+'modules/nf-core/bwa/aln/environment.yml' is unchanged
+'modules/nf-core/bwa/aln/meta.yml' is unchanged
+'modules/nf-core/bwa/aln/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/bwa/aln/tests/main.nf.test' is unchanged
+************************************************************

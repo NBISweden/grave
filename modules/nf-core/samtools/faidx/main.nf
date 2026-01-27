@@ -13,7 +13,7 @@ process SAMTOOLS_FAIDX {
 
     output:
     path ("*.fai")                        , emit: ch_fai
-    tuple path (reference), path ("*.fai"), emit: ch_indexed_reference
+    tuple path (reference), path ("*.fai"), emit: ch_ref_fai
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:

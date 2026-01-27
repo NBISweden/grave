@@ -81,8 +81,8 @@ workflow REFERENCE_UTILITIES {
         SAMTOOLS_FAIDX (
             reference
         )
-        stats                    = SAMTOOLS_FAIDX.out.ch_fai
-        indexed_linear_reference = SAMTOOLS_FAIDX.out.ch_indexed_reference
+        stats   = SAMTOOLS_FAIDX.out.ch_fai
+        ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
     }
 
     // Get and assign reference fasta channel if it's required
@@ -94,7 +94,7 @@ workflow REFERENCE_UTILITIES {
             )
             reference_fastas = GRAPH_EXTRACT.out.ch_reference_fastas
         } else if ( reference_type == "linear") {
-            reference_fastas = indexed_linear_reference
+            reference_fastas = ref_fai
         }
     }
 

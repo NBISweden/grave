@@ -1,14 +1,11 @@
 # Linear reference test params yml
 
-steps: 'preprocess,index,align' # TODO temp development
-
-
-# steps: 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call'
+steps         : 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call'
 reference_type: 'linear'
-input: 'tests/data/samplesheet.csv'
-reference: 'tests/data/linear/example.fas'
-deepvariant: true
-tracing: true
+input         : 'tests/data/samplesheet.csv'
+reference     : 'tests/data/linear/example.fas'
+deepvariant   : true
+tracing       : true
 
 # TODO once repo public:
 # input: 'https://raw.githubusercontent.com/NBISweden/grave/main/tests/data/samplesheet.csv'

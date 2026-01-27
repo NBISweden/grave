@@ -1,5 +1,6 @@
 include { FREEBAYES           } from '../../../modules/local/freebayes/main'
 include { GRAPH_DEEPVARIANT   } from '../../../modules/local/deepvariant/main'
+include { LINEAR_DEEPVARIANT  } from '../../../modules/local/deepvariant/linear'
 include { PROCESS_DEEPVARIANT } from '../../../modules/local/deepvariant/process_vcf'
 
 workflow VARIANT_CALL {
@@ -21,11 +22,11 @@ workflow VARIANT_CALL {
 
     // User info in case no variant caller was selected
     if ( !freebayes && !deepvariant ) {
-        println "WARNING: the variant calling subworkflow was requested, but no variant caller was turned."
+        println "WARNING: the variant calling subworkflow was requested, but no variant caller combination was specified."
     }
 
     // FreeBayes variant calling
-    if ( freebayes && reference_type != "linear" ) {
+    if ( freebayes ) {
         FREEBAYES (
             paths,
             reference_fastas,
@@ -33,8 +34,6 @@ workflow VARIANT_CALL {
         )
         freebayes_normalised_vcf = FREEBAYES.out.ch_freebayes_norm_vcf
         freebayes_raw_vcf        = FREEBAYES.out.ch_freebayes_raw_vcf
-    } else if ( freebayes && reference_type == "linear" ) {
-        error "ERROR: WORK IN PROGRESS for FreeBayes with linear reference"
     }
 
     // DeepVariant variant calling
@@ -45,7 +44,7 @@ workflow VARIANT_CALL {
             reference_fastas,
             deduplicated_bams
         )
-        deepvariant_html    = GRAPH_DEEPVARIANT.out.ch_deepvariant_html
+        deepvariant_html = GRAPH_DEEPVARIANT.out.ch_deepvariant_html
         PROCESS_DEEPVARIANT (
             paths,
             reference_fastas,
@@ -54,7 +53,18 @@ workflow VARIANT_CALL {
         deepvariant_normalised_vcf = PROCESS_DEEPVARIANT.out.ch_deepvariant_norm_vcf
         deepvariant_raw_vcf        = PROCESS_DEEPVARIANT.out.ch_deepvariant_raw_vcf
     } else if ( deepvariant && reference_type == "linear" ) {
-        error "ERROR: WORK IN PROGRESS for DeepVariant with linear reference"
+        LINEAR_DEEPVARIANT (
+            reference_fastas,
+            deduplicated_bams
+        )
+        deepvariant_html = LINEAR_DEEPVARIANT.out.ch_deepvariant_html
+        PROCESS_DEEPVARIANT (
+            paths,
+            reference_fastas,
+            LINEAR_DEEPVARIANT.out.ch_raw_deepvariant_vcf
+        )
+        deepvariant_normalised_vcf = PROCESS_DEEPVARIANT.out.ch_deepvariant_norm_vcf
+        deepvariant_raw_vcf        = PROCESS_DEEPVARIANT.out.ch_deepvariant_raw_vcf
     }
 
     emit:

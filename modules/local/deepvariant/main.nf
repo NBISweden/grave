@@ -12,7 +12,7 @@ process GRAPH_DEEPVARIANT {
 
     output:
     tuple val(meta), path("*.vcf.gz"), emit: ch_raw_deepvariant_vcf
-    tuple val(meta), path("*.html"), emit: ch_deepvariant_html
+    tuple val(meta), path("*.html")  , emit: ch_deepvariant_html
     tuple val(task.process), val('pangenome_aware_deepvariant'), eval('/opt/deepvariant/bin/run_pangenome_aware_deepvariant --version --model_type=WGS --ref=dummy --reads=dummy --pangenome=dummy --output_vcf=dummy 2>/dev/null | sed "s/.*version //"'), topic: versions
 
     script:

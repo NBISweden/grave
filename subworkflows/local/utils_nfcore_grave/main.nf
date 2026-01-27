@@ -226,12 +226,15 @@ def validateInputParameters() {
             error "ERROR: Invalid reference extension for the stated reference type ('${params.reference_type}'). Accepts: ${correct_extension.join(', ')}\n - Provided file: ${reference_name}\n - Extension found: ${ext}"
         }
     }
-    // Multi-reference mode requires paths directory and vice versa
+    // Multi-reference mode limitations: disallow in linear reference mode, & should require paths directory (+ vice versa)
+    if ( params.multiple_references && params.reference_type == 'linear' ) {
+        error "ERROR: grave in 'linear' mode does not currently support multiple references. You provided: '--multiple_references ${params.multiple_references}'."
+    }
     if ( params.multiple_references && !params.paths_dir ) {
         error "ERROR: When running with multiple references, a paths directory must be provided with '--paths_dir'"
     }
     if ( !params.multiple_references && params.paths_dir ) {
-        error "ERROR: A paths directory was provided with '--paths_dir' but multiple references mode is not enabled."
+        error "ERROR: A paths directory was provided with '--paths_dir' but '--multiple_references' = ${params.multiple_references}'."
     }
 
 }

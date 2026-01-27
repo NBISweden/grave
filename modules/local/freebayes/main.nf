@@ -22,7 +22,7 @@ process FREEBAYES {
     script:
     def args = task.ext.args ?: ''
 
-    if (!params.multiple_references)	// Assume single reference sample
+    if (!params.multiple_references) // Assume single reference sample (this setting forced in 'linear' mode).
         """
         # Generate equal coverage regions for parallelization
         bamtools coverage -in ${bams} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions

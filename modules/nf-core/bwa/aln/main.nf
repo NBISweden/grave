@@ -13,6 +13,7 @@ process BWA_ALN_SAMSE {
 
     output:
     tuple val(meta), path("*.bam"), emit: ch_bam
+    tuple val(meta), path("*_flagstat.txt"), emit: ch_flagstat
     tuple val(task.process), val('bwa'), eval('bwa 2>&1 | head -n 3 | tail -n 1 | sed "s/Version: //"'), topic: versions
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
@@ -36,6 +37,8 @@ process BWA_ALN_SAMSE {
         \$INDEX_PREFIX \\
         - \\
         $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
+
+    samtools flagstat ${prefix}.bam > ${prefix}_flagstat.txt
     """
 
 }

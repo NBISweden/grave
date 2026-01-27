@@ -2,7 +2,7 @@ Changes in component 'nf-core/bwa/aln'
 Changes in 'bwa/aln/main.nf':
 --- modules/nf-core/bwa/aln/main.nf
 +++ modules/nf-core/bwa/aln/main.nf
-@@ -1,89 +1,41 @@
+@@ -1,89 +1,44 @@
 -process BWA_ALN {
 -    tag "$meta.id"
 +process BWA_ALN_SAMSE {
@@ -28,6 +28,7 @@ Changes in 'bwa/aln/main.nf':
 -    when:
 -    task.ext.when == null || task.ext.when
 +    tuple val(meta), path("*.bam"), emit: ch_bam
++    tuple val(meta), path("*_flagstat.txt"), emit: ch_flagstat
 +    tuple val(task.process), val('bwa'), eval('bwa 2>&1 | head -n 3 | tail -n 1 | sed "s/Version: //"'), topic: versions
 +    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
  
@@ -61,7 +62,6 @@ Changes in 'bwa/aln/main.nf':
 +        \$INDEX_PREFIX \\
 +        - \\
 +        $reads | samtools sort -@ ${task.cpus - 1} -O bam - > ${prefix}.bam
-+    """
  
 -        cat <<-END_VERSIONS > versions.yml
 -        "${task.process}":
@@ -71,7 +71,9 @@ Changes in 'bwa/aln/main.nf':
 -    } else {
 -        """
 -        INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
--
++    samtools flagstat ${prefix}.bam > ${prefix}_flagstat.txt
++    """
+ 
 -        bwa aln \\
 -            $args \\
 -            -t $task.cpus \\

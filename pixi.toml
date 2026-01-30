@@ -27,6 +27,9 @@ test-singularity      = "nextflow main.nf -profile singularity,test -params-file
 test-conda            = "nextflow main.nf -profile conda,test -params-file tests/test_graph.yml"
 test-docker-linear    = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml"
 test-apptainer-linear = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml"
+nftest-docker         = "nf-test test tests/main.nf.test --verbose"
+nftest-apptainer      = "nf-test test tests/main.nf.test --verbose --profile apptainer"
+nftest-singularity    = "nf-test test tests/main.nf.test --verbose --profile singularity"
 debug                 = "nextflow main.nf -profile apptainer,test,debug -params-file tests/test_graph.yml"
 help                  = "nextflow main.nf --help"
 

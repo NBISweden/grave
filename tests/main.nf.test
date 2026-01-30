@@ -1,0 +1,107 @@
+nextflow_pipeline {
+
+    name "grave nf-test"
+    script "main.nf"
+
+    test("Unfiltered graph, single reference sample, all steps") {
+        tag "01"
+        when {
+            params {
+                steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
+                reference_type = 'unfiltered_graph'
+                input          = 'tests/data/samplesheet.csv'
+                reference      = 'tests/data/graph/example-unfiltered.gbz'
+                deepvariant    = true
+                kffKmerMinimum = 2
+            }
+        }
+        then {
+            assert workflow.success
+            assert workflow.trace.tasks().size() > 0
+            assert snapshot(
+                workflow.trace.tasks().size(),
+                getAllFilesFromDir(params.outdir,
+                    relative: true,
+                    ignore: ['01_pipeline_info/*']
+                )
+            ).match()
+        }
+    }
+
+    test("Unfiltered graph, multiple reference samples, all steps") {
+        tag "02"
+        when {
+            params {
+                steps               = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
+                reference_type      = 'unfiltered_graph'
+                input               = 'tests/data/samplesheet.csv'
+                reference           = 'tests/data/graph/additional_graphs/example-multiple-reference-samples.gbz'
+                deepvariant         = true
+                kffKmerMinimum      = 2
+                paths_dir           = 'tests/data/paths'
+                multiple_references = true
+            }
+        }
+        then {
+            assert workflow.success
+            assert workflow.trace.tasks().size() > 0
+            assert snapshot(
+                workflow.trace.tasks().size(),
+                getAllFilesFromDir(params.outdir,
+                    relative: true,
+                    ignore: ['01_pipeline_info/*']
+                )
+            ).match()
+        }
+    }
+
+    test("Filtered graph, single reference sample, all steps") {
+        tag "03"
+        when {
+            params {
+                steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
+                reference_type = 'filtered_graph'
+                input          = 'tests/data/samplesheet.csv'
+                reference      = 'tests/data/graph/additional_graphs/example-filtered.d2.gbz'
+                deepvariant    = true
+                kffKmerMinimum = 2
+            }
+        }
+        then {
+            assert workflow.success
+            assert workflow.trace.tasks().size() > 0
+            assert snapshot(
+                workflow.trace.tasks().size(),
+                getAllFilesFromDir(params.outdir,
+                    relative: true,
+                    ignore: ['01_pipeline_info/*']
+                )
+            ).match()
+        }
+    }
+
+    test("Linear reference, single reference sample, all steps") {
+        tag "04"
+        when {
+            params {
+                steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call'
+                reference_type = 'linear'
+                input          = 'tests/data/samplesheet.csv'
+                reference      = 'tests/data/linear/example.fas'
+                deepvariant    = true
+            }
+        }
+        then {
+            assert workflow.success
+            assert workflow.trace.tasks().size() > 0
+            assert snapshot(
+                workflow.trace.tasks().size(),
+                getAllFilesFromDir(params.outdir,
+                    relative: true,
+                    ignore: ['01_pipeline_info/*']
+                )
+            ).match()
+        }
+    }
+
+}

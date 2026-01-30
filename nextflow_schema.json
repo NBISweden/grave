@@ -5,158 +5,9 @@
   "description": "A workflow for mapping and variant calling aDNA against pangenome graphs",
   "type": "object",
   "properties": {
-    "outputDir": {
-      "type": "string",
-      "default": "results"
-    },
-    "noNestedDistance": {
-      "type": "boolean"
-    },
-    "aDNAkmerHaplSubSam": {
-      "type": "integer",
-      "default": 21
-    },
-    "aDNAwindowHaplSubSam": {
-      "type": "integer",
-      "default": 11
-    },
-    "modernKmerHaplSubSam": {
-      "type": "integer",
-      "default": 29
-    },
-    "modernWindowHaplSubSam": {
-      "type": "integer",
-      "default": 11
-    },
-    "aDNAkmerMinimizer": {
-      "type": "integer",
-      "default": 21
-    },
-    "aDNAwindowMinimizer": {
-      "type": "integer",
-      "default": 11
-    },
-    "modernKmerMinimizer": {
-      "type": "integer",
-      "default": 29
-    },
-    "modernWindowMinimizer": {
-      "type": "integer",
-      "default": 11
-    },
-    "discardUnmerged": {
-      "type": "boolean"
-    },
-    "fastpDedup": {
-      "type": "boolean"
-    },
-    "dupCalcAccuracy": {
-      "type": "integer",
-      "default": 1
-    },
-    "readDiscardLength": {
-      "type": "integer",
-      "default": 30
-    },
-    "gamDefrayEnds": {
-      "type": "boolean"
-    },
-    "defrayEndsLength": {
-      "type": "integer",
-      "default": 999
-    },
-    "gamDiscardUnmapped": {
-      "type": "boolean"
-    },
-    "gamFilterMapQ": {
-      "type": "boolean",
-      "default": true
-    },
-    "minimumMapQFilter": {
-      "type": "integer",
-      "default": 30
-    },
-    "kffKmerMinimum": {
-      "type": "integer",
-      "default": 2
-    },
-    "minimumScorePrimaryAlign": {
-      "type": "number",
-      "default": 0.8
-    },
-    "keepRawGam": {
-      "type": "boolean"
-    },
-    "duplicateTaggingPolicy": {
-      "type": "string",
-      "default": "DontTag",
-      "enum": ["DontTag", "OpticalOnly", "All"]
-    },
-    "dedupConsiderBothEnds": {
-      "type": "boolean",
-      "default": true
-    },
-    "removeDuplicates": {
-      "type": "boolean",
-      "default": true
-    },
-    "maxNestLevel": {
-      "type": "integer",
-      "default": 0
-    },
-    "maxRefLength": {
-      "type": "integer",
-      "default": 100000
-    },
-    "samplePloidy": {
-      "type": "integer",
-      "default": 2
-    },
-    "minimumAlleleSupport": {
-      "type": "integer",
-      "default": 1
-    },
-    "keepRawVcf": {
-      "type": "boolean"
-    },
-    "minimumSiteSupport": {
-      "type": "integer",
-      "default": 4
-    },
-    "baselineErrorSmallVariants": {
-      "type": "number",
-      "default": 0.005
-    },
-    "baselineErrorLargeVariants": {
-      "type": "number",
-      "default": 0.01
-    },
-    "maxComplexGap": {
-      "type": "integer",
-      "default": 3
-    },
-    "minFraction": {
-      "type": "number",
-      "default": 0.05
-    },
-    "deepVariantModelType": {
-      "type": "string",
-      "default": "WGS",
-      "enum": [
-        "WGS",
-        "WES",
-        "PACBIO",
-        "ONT_R104",
-        "HYBRID_PACBIO_ILLUMINA",
-        "MASSEQ"
-      ]
-    },
     "trace_timestamp": {
       "type": "string",
       "hidden": true
-    },
-    "tracing": {
-      "type": "boolean"
     },
     "validate_params": {
       "type": "boolean",
@@ -166,9 +17,6 @@
     "show_hidden": {
       "type": "boolean",
       "hidden": true
-    },
-    "version": {
-      "type": "boolean"
     },
     "monochrome_logs": {
       "type": "boolean",
@@ -219,7 +67,7 @@
       "properties": {
         "steps": {
           "type": "string",
-          "description": "Desired workflow steps as a csv string",
+          "description": "The workflow steps to execute, provided as a csv string",
           "default": "preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call"
         }
       },
@@ -273,12 +121,12 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Used with the SLURM executor: project allocation string for hours logging"
+          "description": "Provide this when using a SLURM system (project allocation code for hours logging)"
         }
       }
     },
-    "optional_processes": {
-      "title": "Optional processes",
+    "optional_processes_outputs": {
+      "title": "Optional processes & outputs",
       "type": "object",
       "description": "",
       "default": "",
@@ -291,6 +139,251 @@
         "deepvariant": {
           "type": "boolean",
           "description": "Turn on (true) or off (false) the DeepVariant variant caller"
+        },
+        "keepRawGam": {
+          "type": "boolean",
+          "description": "Publish raw GAM files in addition to standard filtered outputs"
+        },
+        "keepRawVcf": {
+          "type": "boolean",
+          "description": "Publish raw VCF files in addition to standard filtered & normalised output"
+        }
+      }
+    },
+    "read_qc_parameters": {
+      "title": "Read QC parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "discardUnmerged": {
+          "type": "boolean",
+          "description": "When merging aDNA reads, discard unmerged. If false, unmerged reads are combined with merged in a single FASTQ"
+        },
+        "fastpDedup": {
+          "type": "boolean",
+          "description": "Remove duplicate reads detected by exact hash matching algorithm"
+        },
+        "dupCalcAccuracy": {
+          "type": "integer",
+          "default": 1,
+          "description": "Accuracy of the duplication rate calculation. Higher accuracy uses more memory to avoid hash collision (1: 1G, 2: 2G, 3: 4G, 4: 8G, 5: 16G, 6: 24G). If --fastpDedup = true, 3+ recommended. If false, 1 recommended",
+          "enum": [1, 2, 3, 4, 5, 6]
+        },
+        "readDiscardLength": {
+          "type": "integer",
+          "default": 30,
+          "description": "Discard reads shorter than this value"
+        }
+      }
+    },
+    "graph_indexing_parameters": {
+      "title": "Graph indexing parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "aDNAkmerHaplSubSam": {
+          "type": "integer",
+          "default": 21,
+          "description": "Unfiltered graphs: K value when K-mer profiling ancient DNA samples for haplotype subsampling"
+        },
+        "aDNAwindowHaplSubSam": {
+          "type": "integer",
+          "default": 11,
+          "description": "Unfiltered graphs: Window size when constructing '.hapl' index for ancient DNA samples"
+        },
+        "modernKmerHaplSubSam": {
+          "type": "integer",
+          "default": 29,
+          "description": "Unfiltered graphs: K value when K-mer profiling modern samples for haplotype subsampling"
+        },
+        "modernWindowHaplSubSam": {
+          "type": "integer",
+          "default": 11,
+          "description": "Unfiltered graphs: Window size when constructing '.hapl' index for modern samples"
+        },
+        "aDNAkmerMinimizer": {
+          "type": "integer",
+          "default": 21,
+          "description": "Filtered graphs: K value when constructing minimizer indexes for ancient DNA samples"
+        },
+        "aDNAwindowMinimizer": {
+          "type": "integer",
+          "default": 11,
+          "description": "Filtered graphs: Window size when constructing minimizer indexes for ancient DNA samples"
+        },
+        "modernKmerMinimizer": {
+          "type": "integer",
+          "default": 29,
+          "description": "Filtered graphs: K value when constructing minimizer indexes for modern samples"
+        },
+        "modernWindowMinimizer": {
+          "type": "integer",
+          "default": 11,
+          "description": "Filtered graphs: Window size when constructing minimizer indexes for modern samples"
+        },
+        "noNestedDistance": {
+          "type": "boolean",
+          "description": "For complex graphs 'dist' index may use excessive memory. Set 'true' to debug (produces a limited version of the index and reduces memory imprint)"
+        }
+      }
+    },
+    "alignment_parameters": {
+      "title": "Alignment parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "kffKmerMinimum": {
+          "type": "integer",
+          "default": 10,
+          "description": "FASTQ: Minimum required occurences of a read K-mer for it to be counted prior to haplotype subsampling"
+        },
+        "gamDefrayEnds": {
+          "type": "boolean",
+          "description": "GAM: Clip the ends of ambiguously aligned reads"
+        },
+        "defrayEndsLength": {
+          "type": "integer",
+          "default": 999,
+          "description": "GAM: When clipping, sets max number of bases to clip from read ends"
+        },
+        "gamDiscardUnmapped": {
+          "type": "boolean",
+          "description": "GAM: Discard unmapped reads when filtering"
+        },
+        "gamFilterMapQ": {
+          "type": "boolean",
+          "default": true,
+          "description": "GAM: Apply MAPQ filtering"
+        },
+        "minimumMapQFilter": {
+          "type": "integer",
+          "default": 30,
+          "description": "GAM: MAPQ threshold when filtering (< INT), requires --gamFilterMapQ"
+        },
+        "minimumScorePrimaryAlign": {
+          "type": "number",
+          "default": 0.8,
+          "description": "GAM: Fraction identity required to keep primary alignment during filtering",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "bam_deduplication_parameters": {
+      "title": "BAM deduplication parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "dedupConsiderBothEnds": {
+          "type": "boolean",
+          "default": true,
+          "description": "For aDNA, consider both the 5' and 3' ends of the read when identifying duplicates. When false, the 5' end is used"
+        },
+        "removeDuplicates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remove duplicate reads with Picard MarkDuplicates. If false, they are written with duplicate flags and the tagging policy is applied"
+        },
+        "duplicateTaggingPolicy": {
+          "type": "string",
+          "default": "DontTag",
+          "enum": ["DontTag", "OpticalOnly", "All"],
+          "description": "Policy for tagging duplicates in the DT optional SAM/BAM field"
+        }
+      }
+    },
+    "genotyping_and_variant_calling_parameters": {
+      "title": "Genotyping and variant calling parameters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "samplePloidy": {
+          "type": "integer",
+          "default": 2,
+          "description": "General: Ploidy of the study organism"
+        },
+        "minimumAlleleSupport": {
+          "type": "integer",
+          "default": 1,
+          "description": "General: Minimum allele support for a call"
+        },
+        "maxNestLevel": {
+          "type": "integer",
+          "default": 0,
+          "description": "Genotyping: Maximum variant nest level. Discards VCF variants over this 'nest' level from genotyping outputs, unless found in a popped feature, i.e., reference allele was over --maxRefLength. Does not affect raw VCF output"
+        },
+        "maxRefLength": {
+          "type": "integer",
+          "default": 100000,
+          "description": "Genotyping: Maximum reference allele size. Pops/discards VCF variants if the reference allele is over this value, retaining variants nested within the popped variant (even if they are nested above --maxNestLevel). Does not affect raw VCF output"
+        },
+        "minimumSiteSupport": {
+          "type": "integer",
+          "default": 4,
+          "description": "Genotyping: Minimum site support for a call"
+        },
+        "baselineErrorSmallVariants": {
+          "type": "number",
+          "default": 0.005,
+          "description": "Genotyping: Baseline error rates for Poisson model for small variants"
+        },
+        "baselineErrorLargeVariants": {
+          "type": "number",
+          "default": 0.01,
+          "description": "Genotyping: Baseline error rates for Poisson model for large variants"
+        },
+        "maxComplexGap": {
+          "type": "integer",
+          "default": 3,
+          "description": "FreeBayes: Maximum distance between polymorphisms on the same read"
+        },
+        "minFraction": {
+          "type": "number",
+          "default": 0.05,
+          "description": "FreeBayes: Require at least this fraction of observations supporting an alternate allele within a single individual in the in order to evaluate the position"
+        },
+        "deepVariantModelType": {
+          "type": "string",
+          "default": "WGS",
+          "enum": [
+            "WGS",
+            "WES",
+            "PACBIO",
+            "ONT_R104",
+            "HYBRID_PACBIO_ILLUMINA",
+            "MASSEQ"
+          ],
+          "description": "Deepvariant: The model to use, based on the read data type"
+        }
+      }
+    },
+    "workflow_utility_paramaters": {
+      "title": "Workflow utility paramaters",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "outputDir": {
+          "type": "string",
+          "default": "results",
+          "description": "The name/location of the results folder"
+        },
+        "version": {
+          "type": "boolean",
+          "description": "Print the workflow version and exit"
+        },
+        "tracing": {
+          "type": "boolean",
+          "description": "Output workflow execution reports (resource/timeline reports and DAG image)"
+        },
+        "help": {
+          "type": "boolean",
+          "description": "Print this message"
         }
       }
     }
@@ -309,7 +402,25 @@
       "$ref": "#/$defs/slurm_hpc_specific_parameters"
     },
     {
-      "$ref": "#/$defs/optional_processes"
+      "$ref": "#/$defs/optional_processes_outputs"
+    },
+    {
+      "$ref": "#/$defs/read_qc_parameters"
+    },
+    {
+      "$ref": "#/$defs/graph_indexing_parameters"
+    },
+    {
+      "$ref": "#/$defs/alignment_parameters"
+    },
+    {
+      "$ref": "#/$defs/bam_deduplication_parameters"
+    },
+    {
+      "$ref": "#/$defs/genotyping_and_variant_calling_parameters"
+    },
+    {
+      "$ref": "#/$defs/workflow_utility_paramaters"
     }
   ]
 }

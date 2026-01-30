@@ -7,7 +7,3 @@ reference     : 'tests/data/graph/example-unfiltered.gbz'
 deepvariant   : true
 tracing       : true
 kffKmerMinimum: 2
-
-# TODO once repo public:
-# input: 'https://raw.githubusercontent.com/NBISweden/grave/main/tests/data/samplesheet.csv'
-# reference: 'https://raw.githubusercontent.com/NBISweden/grave/main/tests/data/graph/example-unfiltered.gbz'

@@ -1,17 +1,52 @@
 # Changelog
 
+## [2.0.0] - 20260130
 
-## [2.0.0] - Unreleased
+### Key version updates
+
+- Nextflow to 25.10.0
+- vg to 1.70.0
+- apptainer to 1.4.5 (apptainer env only)
+
+### Added
+
+- Linear mode to run mapping with traditional methods against a linear FASTA
+- Workflow parameter validation & help message via nf-schema + custom function (removed existing custom validation & help)
+- Docker support + other containerisation engines
+- Future modules to be initiated with `nf-core modules install`, then patched
+- All modules can now report versions (storeDir modules previously excluded, now require manual version update)
+
+### Changed
+
+- Reorganised repository structure, especially data, modules, and subworkflows
+- Improved SLURM helper script, now in `bin`
+- General code cleanup
+- Some process names changed for clarity
 
 ### Refactored
 
+#### Pixi environment
 
+- Updated to version 2 environment
+- Tasks overhauled for testing
+
+#### Workflow
+
+- replaced `grave` workflow with subworkflows
+- `main.nf` now used to call distinct subworkflows, improving readability/maintainability/extensibility
+- Added a linear mapping workflow option
+
+#### Parameters
+
+- Workflow can now run user-defined steps within the workflow (though some have step dependencies)
 
 ### Containers
 
+- Various version updates to process containers
 
+### Profiles
 
-
+- Removed custom profiles, replaced with an nf-core style approach (base, resource, & institutional profiles) + test profile
 
 ## [1.4.1] - 20251007
 

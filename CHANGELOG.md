@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.1] - 2026
+
+### Added
+
+- nf-test functionality for main run modes
+
+### Fixed
+
+- multi-ref mode now functional again
+
+
 ## [2.0.0] - 20260130
 
 ### Key version updates

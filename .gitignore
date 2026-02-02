@@ -6,9 +6,11 @@ work/
 results/
 tests/data/graph/*_indexes
 tests/data/linear/*_indexes
+tests/data/graph/additional_graphs/*_indexes
 
 # nf-test
 .nf-test.log
+.nf-test/
 
 # Other
 .DS_Store

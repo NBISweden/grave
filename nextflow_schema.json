@@ -368,11 +368,6 @@
       "description": "",
       "default": "",
       "properties": {
-        "outputDir": {
-          "type": "string",
-          "default": "results",
-          "description": "The name/location of the results folder"
-        },
         "version": {
           "type": "boolean",
           "description": "Print the workflow version and exit"

@@ -9,10 +9,11 @@ nextflow_pipeline {
             params {
                 steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
                 reference_type = 'unfiltered_graph'
-                input          = 'tests/data/samplesheet.csv'
-                reference      = 'tests/data/graph/example-unfiltered.gbz'
+                input          = "$projectDir/tests/data/samplesheet.csv"
+                reference      = "$projectDir/tests/data/graph/example-unfiltered.gbz"
                 deepvariant    = true
                 kffKmerMinimum = 2
+                outdir         = "$launchDir/results"
             }
         }
         then {
@@ -20,9 +21,9 @@ nextflow_pipeline {
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
                 workflow.trace.tasks().size(),
-                getAllFilesFromDir(params.outdir,
+                getAllFilesFromDir("$launchDir/results",
                     relative: true,
-                    ignore: ['01_pipeline_info/*']
+                    ignore: ["01_pipeline_info/**/**"]
                 )
             ).match()
         }
@@ -34,12 +35,13 @@ nextflow_pipeline {
             params {
                 steps               = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
                 reference_type      = 'unfiltered_graph'
-                input               = 'tests/data/samplesheet.csv'
-                reference           = 'tests/data/graph/additional_graphs/example-multiple-reference-samples.gbz'
+                input               = "$projectDir/tests/data/samplesheet.csv"
+                reference           = "$projectDir/tests/data/graph/additional_graphs/example-multiple-reference-samples.gbz"
                 deepvariant         = true
                 kffKmerMinimum      = 2
-                paths_dir           = 'tests/data/paths'
+                paths_dir           = "$projectDir/tests/data/paths"
                 multiple_references = true
+                outdir              = "$launchDir/results"
             }
         }
         then {
@@ -47,9 +49,9 @@ nextflow_pipeline {
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
                 workflow.trace.tasks().size(),
-                getAllFilesFromDir(params.outdir,
+                getAllFilesFromDir("$launchDir/results",
                     relative: true,
-                    ignore: ['01_pipeline_info/*']
+                    ignore: ["01_pipeline_info/**/**"]
                 )
             ).match()
         }
@@ -61,10 +63,12 @@ nextflow_pipeline {
             params {
                 steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
                 reference_type = 'filtered_graph'
-                input          = 'tests/data/samplesheet.csv'
-                reference      = 'tests/data/graph/additional_graphs/example-filtered.d2.gbz'
+                input          = "$projectDir/tests/data/samplesheet.csv"
+                reference      = "$projectDir/tests/data/graph/additional_graphs/example-filtered.d2.gbz"
                 deepvariant    = true
                 kffKmerMinimum = 2
+                outdir         = "$launchDir/results"
+
             }
         }
         then {
@@ -72,9 +76,9 @@ nextflow_pipeline {
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
                 workflow.trace.tasks().size(),
-                getAllFilesFromDir(params.outdir,
+                getAllFilesFromDir("$launchDir/results",
                     relative: true,
-                    ignore: ['01_pipeline_info/*']
+                    ignore: ["01_pipeline_info/**/**"]
                 )
             ).match()
         }
@@ -86,9 +90,10 @@ nextflow_pipeline {
             params {
                 steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call'
                 reference_type = 'linear'
-                input          = 'tests/data/samplesheet.csv'
-                reference      = 'tests/data/linear/example.fas'
+                input          = "$projectDir/tests/data/samplesheet.csv"
+                reference      = "$projectDir/tests/data/linear/example.fas"
                 deepvariant    = true
+                outdir         = "$launchDir/results"
             }
         }
         then {
@@ -96,9 +101,9 @@ nextflow_pipeline {
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
                 workflow.trace.tasks().size(),
-                getAllFilesFromDir(params.outdir,
+                getAllFilesFromDir("$launchDir/results",
                     relative: true,
-                    ignore: ['01_pipeline_info/*']
+                    ignore: ["01_pipeline_info/**/**"]
                 )
             ).match()
         }

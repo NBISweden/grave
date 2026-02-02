@@ -38,7 +38,7 @@ workflow {
     reference    = PIPELINE_INITIALISATION.out.reference
     samplesheet  = PIPELINE_INITIALISATION.out.samplesheet
     sample_types = PIPELINE_INITIALISATION.out.types
-    paths        = params.multiple_references ? channel.fromPath("${params.paths_dir}/*.paths") : [] // Set up paths channel if multi-reference mode
+    paths        = params.multiple_references ? channel.fromPath("${params.paths_dir}/*.paths").collect() : [] // Set up paths channel if multi-reference mode
 
     // Parse requested workflow steps
     workflow_steps = params.steps.tokenize(",")

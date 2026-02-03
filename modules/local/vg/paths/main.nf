@@ -1,7 +1,7 @@
 process GRAPH_EXTRACT {
 
     tag "${graph.baseName}_graph"
-    label 'process_low'
+    label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/samtools_vg:ab1a9bfdf926c13f' :
         'community.wave.seqera.io/library/samtools_vg:0f04bc64e6413f22' }"

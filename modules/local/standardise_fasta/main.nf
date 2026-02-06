@@ -1,7 +1,6 @@
 process STANDARDISE_FASTA {
 
     tag "${fasta_file}"
-    label 'process_single'
 
     input:
     path fasta_file

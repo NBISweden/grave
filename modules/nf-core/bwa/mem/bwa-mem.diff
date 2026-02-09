@@ -12,7 +12,7 @@ Changes in 'bwa/mem/main.nf':
      conda "${moduleDir}/environment.yml"
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
          'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d7/d7e24dc1e4d93ca4d3a76a78d4c834a7be3985b0e1e56fddd61662e047863a8a/data' :
-@@ -9,66 +9,31 @@
+@@ -9,66 +9,39 @@
  
      input:
      tuple val(meta) , path(reads)
@@ -62,8 +62,16 @@ Changes in 'bwa/mem/main.nf':
 -        $reads \\
 -        | samtools $samtools_command $args2 ${reference} --threads $task.cpus -o ${prefix}.${extension} -
 +        \$INDEX_PREFIX \\
-+        ${reads} \\
-+        | samtools sort --threads ${task.cpus - 1} -O bam - > ${prefix}.bam
++        ${reads} | \\
++    samtools view \\
++        --exclude-flags 4 \\
++        --with-header \\
++        --uncompressed \\
++        - | \\
++    samtools sort \\
++        --threads ${task.cpus - 1} \\
++        -O bam \\
++        - > ${prefix}.bam
  
 -    cat <<-END_VERSIONS > versions.yml
 -    "${task.process}":

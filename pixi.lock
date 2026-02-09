@@ -4,8 +4,6 @@ environments:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
     - url: https://conda.anaconda.org/bioconda/
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
@@ -131,7 +129,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.3.5-py314h2b28147_0.conda
@@ -324,7 +322,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/ncurses-6.5-h0622a9a_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.3.5-py314hf08249b_0.conda
@@ -501,7 +499,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ncurses-6.5-h5e97a16_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.3.5-py314h5b5928d_0.conda
@@ -593,8 +591,6 @@ environments:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
     - url: https://conda.anaconda.org/bioconda/
-    options:
-      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
@@ -707,7 +703,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.3.5-py314h2b28147_0.conda
@@ -897,7 +893,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/ncurses-6.5-h0622a9a_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.3.5-py314hf08249b_0.conda
@@ -1074,7 +1070,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ncurses-6.5-h5e97a16_3.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/nodeenv-1.9.1-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.3.5-py314h5b5928d_0.conda
@@ -3557,9 +3553,9 @@ packages:
   license: Apache-2.0
   size: 34828352
   timestamp: 1764361506696
-- conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.1-pyhdfd78af_0.conda
-  sha256: e8d871de76739be15ad94fec5428f2a826e38e033853eda45ae276253d34b4de
-  md5: 9d0306d5044e430ef8a6d750317b073e
+- conda: https://conda.anaconda.org/bioconda/noarch/nf-core-3.5.2-pyhdfd78af_0.conda
+  sha256: cc91fe15f6375fb9145079883a660b4d84cff34a815609b1faebc72838c30983
+  md5: 2f5fbdfa0e04ae600f763e6dd62f81ea
   depends:
   - click
   - filetype
@@ -3593,8 +3589,8 @@ packages:
   - trogon
   license: MIT
   license_family: MIT
-  size: 503651
-  timestamp: 1763568956996
+  size: 437409
+  timestamp: 1769790633784
 - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
   sha256: 8248f23527f3829bd5f3bf7cbfed1c1938a0caa1b2a4d640ad04a18a3f8a485c
   md5: be0dd632423c5d548cc03897279198b9

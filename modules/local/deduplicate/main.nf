@@ -31,7 +31,7 @@ process DEDUPLICATE {
             --METRICS_FILE ${meta.id}.dedup_metrics.txt \
             --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
             --REMOVE_DUPLICATES ${params.removeDuplicates} \
-            --VALIDATION_STRINGENCY STRICT \
+            --VALIDATION_STRINGENCY LENIENT \
             --ASSUME_SORT_ORDER coordinate \
             ${args}
 
@@ -52,7 +52,7 @@ process DEDUPLICATE {
             --METRICS_FILE ${meta.id}.dedup_metrics.txt \
             --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
             --REMOVE_DUPLICATES ${params.removeDuplicates} \
-            --VALIDATION_STRINGENCY STRICT \
+            --VALIDATION_STRINGENCY LENIENT \
             --ASSUME_SORT_ORDER coordinate
 
         # Index BAM
@@ -75,7 +75,7 @@ process DEDUPLICATE {
                     --METRICS_FILE ${meta.id}.\$PREFIX.dedup_metrics.txt \
                     --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
                     --REMOVE_DUPLICATES ${params.removeDuplicates} \
-                    --VALIDATION_STRINGENCY STRICT \
+                    --VALIDATION_STRINGENCY LENIENT \
                     --ASSUME_SORT_ORDER coordinate \
                     ${args}
 
@@ -99,7 +99,7 @@ process DEDUPLICATE {
                     --METRICS_FILE ${meta.id}.\$PREFIX.dedup_metrics.txt \
                     --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
                     --REMOVE_DUPLICATES ${params.removeDuplicates} \
-                    --VALIDATION_STRINGENCY STRICT \
+                    --VALIDATION_STRINGENCY LENIENT \
                     --ASSUME_SORT_ORDER coordinate
 
                 samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam

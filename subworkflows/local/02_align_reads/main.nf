@@ -13,10 +13,11 @@ workflow ALIGN_READS {
     indexed_reference
 
     main:
-    mapped_gam = channel.empty()
-    raw_gam    = channel.empty()
+    mapped_gam      = channel.empty()
+    failed_samples  = channel.empty()
+    raw_gam         = channel.empty()
     alignment_stats = channel.empty()
-    mapped_bam = channel.empty()
+    mapped_bam      = channel.empty()
 
     // Run alignment to pangenome graph
     if ( reference_type == "unfiltered_graph" || reference_type == "filtered_graph" ) {
@@ -24,7 +25,17 @@ workflow ALIGN_READS {
             fastp_reads,
             indexed_reference
         )
-        mapped_gam      = GIRAFFE.out.ch_mapped_gam
+        // Branch passed/failed samples to separate channels
+        GIRAFFE.out.ch_gam_counts
+            .branch { meta, gam, alignment_count ->
+                passed: alignment_count.toInteger() > 0
+                    return [ meta, gam ]
+                failed: alignment_count.toInteger() == 0
+                    return [ meta, gam ]
+            }
+            .set { branched_gam }
+        mapped_gam      = branched_gam.passed
+        failed_samples  = branched_gam.failed
         raw_gam         = GIRAFFE.out.ch_raw_gam
         alignment_stats = GIRAFFE.out.ch_alignment_stats
         GAM_TO_TAGGED_SORTED_BAM (
@@ -60,6 +71,7 @@ workflow ALIGN_READS {
 
     emit:
     mapped_gam      = mapped_gam
+    failed_samples  = failed_samples
     raw_gam         = raw_gam
     alignment_stats = alignment_stats
     mapped_bam      = mapped_bam

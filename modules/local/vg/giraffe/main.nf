@@ -11,7 +11,7 @@ process GIRAFFE {
     tuple path(graph), path(indexes)
 
     output:
-    tuple val(meta), path("${meta.read_group}.filtered.gam"), emit: ch_mapped_gam
+    tuple val(meta), path("${meta.read_group}.filtered.gam"), env('ALIGNMENT_COUNT'), emit: ch_gam_counts
     path "${meta.read_group}.gam", optional: true, emit: ch_raw_gam
     path "${meta.read_group}_alignment-stats.txt", emit: ch_alignment_stats
     tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
@@ -49,6 +49,9 @@ process GIRAFFE {
         # Report mapping statistics
         vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
 
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
         """
@@ -69,6 +72,9 @@ process GIRAFFE {
 
         # Report mapping statistics
         vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == false) // Arrives paired, output interleaved
@@ -94,6 +100,9 @@ process GIRAFFE {
         # Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
         vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
 
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff readfiles
         """
@@ -114,6 +123,9 @@ process GIRAFFE {
 
         # Report mapping statistics
         vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged, output not interleaved
@@ -136,6 +148,9 @@ process GIRAFFE {
         # Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
         vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
 
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
         """
@@ -156,6 +171,9 @@ process GIRAFFE {
 
         # Report mapping statistics
         vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+
+        # Get alignment count (to branch passed/failed samples)
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
         """
 
 }

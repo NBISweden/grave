@@ -77,6 +77,7 @@ workflow {
 
     // Align reads (GAM + BAM produced in graph mode, & BAM in linear). Also adds read groups and sorts BAMs
     mapped_gam      = channel.empty()
+    failed_samples  = channel.empty()
     raw_gam         = channel.empty()
     alignment_stats = channel.empty()
     mapped_bam      = channel.empty()
@@ -89,6 +90,7 @@ workflow {
             indexed_reference
         )
         mapped_gam      = ALIGN_READS.out.mapped_gam
+        failed_samples  = ALIGN_READS.out.failed_samples
         raw_gam         = ALIGN_READS.out.raw_gam
         alignment_stats = ALIGN_READS.out.alignment_stats
         mapped_bam      = ALIGN_READS.out.mapped_bam
@@ -196,6 +198,7 @@ workflow {
     fastp_fastqc_report        = fastp_fastqc_report
     // ALIGN_READS
     mapped_gam                 = mapped_gam
+    failed_samples             = failed_samples
     raw_gam                    = raw_gam
     alignment_stats            = alignment_stats
     // DEDUPLICATE_BAM
@@ -246,6 +249,9 @@ output {
     // ALIGN_READS
     mapped_gam {
         path '04_mapped_reads/gams'
+    }
+    failed_samples {
+        path '04_mapped_reads/failed_samples'
     }
     raw_gam {
         path '04_mapped_reads/gams'

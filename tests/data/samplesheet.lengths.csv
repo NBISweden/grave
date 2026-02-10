@@ -1,0 +1,5 @@
+sample_id,library_id,repeat_number,sample_type,merged,fastq_1,fastq_2
+simChimp20,1,1,ancient,false,./tests/data/fastq/variable_lengths/simchimp_L20_R1.fq.gz,./tests/data/fastq/variable_lengths/simchimp_L20_R2.fq.gz
+simChimp30,1,1,ancient,false,./tests/data/fastq/variable_lengths/simchimp_L30_R1.fq.gz,./tests/data/fastq/variable_lengths/simchimp_L30_R2.fq.gz
+simChimp40,1,1,ancient,false,./tests/data/fastq/variable_lengths/simchimp_L40_R1.fq.gz,./tests/data/fastq/variable_lengths/simchimp_L40_R2.fq.gz
+simChimp50,1,1,ancient,false,./tests/data/fastq/variable_lengths/simchimp_L50_R1.fq.gz,./tests/data/fastq/variable_lengths/simchimp_L50_R2.fq.gz

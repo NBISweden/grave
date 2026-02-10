@@ -183,45 +183,25 @@
       "description": "",
       "default": "",
       "properties": {
-        "aDNAkmerHaplSubSam": {
+        "aDNAkmerLength": {
           "type": "integer",
           "default": 21,
-          "description": "Unfiltered graphs: K value when K-mer profiling ancient DNA samples for haplotype subsampling"
+          "description": "K value when K-mer profiling ancient DNA samples and constructing graph indexes"
         },
-        "aDNAwindowHaplSubSam": {
+        "aDNAwindowLength": {
           "type": "integer",
           "default": 11,
-          "description": "Unfiltered graphs: Window size when constructing '.hapl' index for ancient DNA samples"
+          "description": "Window size when constructing graph indexes for ancient DNA samples"
         },
-        "modernKmerHaplSubSam": {
+        "modernKmerLength": {
           "type": "integer",
           "default": 29,
-          "description": "Unfiltered graphs: K value when K-mer profiling modern samples for haplotype subsampling"
+          "description": "K value when K-mer profiling modern samples and constructing graph indexes"
         },
-        "modernWindowHaplSubSam": {
+        "modernWindowLength": {
           "type": "integer",
           "default": 11,
-          "description": "Unfiltered graphs: Window size when constructing '.hapl' index for modern samples"
-        },
-        "aDNAkmerMinimizer": {
-          "type": "integer",
-          "default": 21,
-          "description": "Filtered graphs: K value when constructing minimizer indexes for ancient DNA samples"
-        },
-        "aDNAwindowMinimizer": {
-          "type": "integer",
-          "default": 11,
-          "description": "Filtered graphs: Window size when constructing minimizer indexes for ancient DNA samples"
-        },
-        "modernKmerMinimizer": {
-          "type": "integer",
-          "default": 29,
-          "description": "Filtered graphs: K value when constructing minimizer indexes for modern samples"
-        },
-        "modernWindowMinimizer": {
-          "type": "integer",
-          "default": 11,
-          "description": "Filtered graphs: Window size when constructing minimizer indexes for modern samples"
+          "description": "Window size when constructing graph indexes for modern samples"
         },
         "noNestedDistance": {
           "type": "boolean",

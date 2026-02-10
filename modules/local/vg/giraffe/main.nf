@@ -28,12 +28,12 @@ process GIRAFFE {
     if (meta.type == "ancient" && params.reference_type == "unfiltered_graph") // Ancient samples arrive merged, thus output not interleaved
         """
         # Generate kff index of the reads
-        kmc -k${params.aDNAkmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
+        kmc -k${params.aDNAkmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
 
         # Generate the subsampled graph and index it
         vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.adna.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerMinimizer} --window-length ${params.aDNAwindowMinimizer} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min ${basename}.${meta.read_group}.gbz
 
         # Map reads to graph (settings based on BWA aln)
         vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
@@ -84,7 +84,9 @@ process GIRAFFE {
         echo -e "./${reads[0]}\n./${reads[1]}" > readfiles
 
         # Generate kff index of the reads
-        kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.read_group} .
+        kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.read_group} .
+
+# TODO: if user changes the kmer/window settings, there will be an issue here - we assume the default is kept.
 
         # Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
@@ -132,7 +134,9 @@ process GIRAFFE {
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged, output not interleaved
         """
         # Generate kff index of the reads
-        kmc -k${params.modernKmerHaplSubSam} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
+        kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
+
+# TODO: if user changes the kmer/window settings, there will be an issue here - we assume the default is kept.
 
         # Map merged reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam

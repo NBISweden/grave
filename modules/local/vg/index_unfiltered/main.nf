@@ -33,14 +33,14 @@ process INDEX_UNFILTERED_GRAPH {
     # Type specific ".hapl" production
     if [ "${types}" == "ancient" ]
         then
-            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --haplotype-output ${ahaplname} ${graph}
     elif [ "${types}" == "modern" ]
         then
-            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --haplotype-output ${mhaplname} ${graph}
     elif [ "${types}" == "both" ]
         then
-            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerHaplSubSam} --window-length ${params.aDNAwindowHaplSubSam} --haplotype-output ${ahaplname} ${graph}
-            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerHaplSubSam} --window-length ${params.modernWindowHaplSubSam} --haplotype-output ${mhaplname} ${graph}
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --haplotype-output ${ahaplname} ${graph}
+            vg haplotypes --threads ${task.cpus} --verbosity 2 --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --haplotype-output ${mhaplname} ${graph}
     fi
 
     # Clean up

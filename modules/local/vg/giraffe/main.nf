@@ -21,6 +21,7 @@ process GIRAFFE {
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
     def args3 = task.ext.args3 ?: ''
+    def args4 = task.ext.args4 ?: ''
     def memory = task.memory.toGiga()
     def basename = graph.baseName - '.gbz'
 
@@ -38,7 +39,7 @@ process GIRAFFE {
         vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]
@@ -62,7 +63,7 @@ process GIRAFFE {
         vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]
@@ -89,7 +90,7 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]
@@ -113,7 +114,7 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} --interleaved-all -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]
@@ -137,7 +138,7 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]
@@ -161,7 +162,7 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
-        vg filter ${args} ${args2} ${args3} -t ${task.cpus} -x ${graph} -r ${params.minimumScorePrimaryAlign} -fu -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
         # Remove raw GAM unless overridden
         if [ "${params.keepRawGam}" != "true" ]

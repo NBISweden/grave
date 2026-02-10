@@ -240,15 +240,6 @@
           "default": 5,
           "description": "FASTQ: Minimum required occurences of a read K-mer for it to be counted prior to haplotype subsampling"
         },
-        "gamDefrayEnds": {
-          "type": "boolean",
-          "description": "GAM: Clip the ends of ambiguously aligned reads"
-        },
-        "defrayEndsLength": {
-          "type": "integer",
-          "default": 999,
-          "description": "GAM: When clipping, sets max number of bases to clip from read ends"
-        },
         "gamDiscardUnmapped": {
           "type": "boolean",
           "description": "GAM: Discard unmapped reads when filtering",
@@ -262,14 +253,28 @@
         "minimumMapQFilter": {
           "type": "integer",
           "default": 30,
-          "description": "GAM: MAPQ threshold when filtering (< INT), requires --gamFilterMapQ"
+          "description": "GAM: MAPQ threshold applied when filtering (< INT), requires --gamFilterMapQ"
+        },
+        "alignIdentityFilter": {
+          "type": "boolean",
+          "default": true,
+          "description": "GAM: Apply alignment fraction identity filtering"
         },
         "minimumScorePrimaryAlign": {
           "type": "number",
           "default": 0.8,
-          "description": "GAM: Fraction identity required to keep primary alignment during filtering",
+          "description": "GAM: Fraction identity required to keep primary alignment during filtering, requires --alignIdentityFilter",
           "minimum": 0,
           "maximum": 1
+        },
+        "gamDefrayEnds": {
+          "type": "boolean",
+          "description": "GAM: Clip the ends of ambiguously aligned reads"
+        },
+        "defrayEndsLength": {
+          "type": "integer",
+          "default": 999,
+          "description": "GAM: When clipping, sets max number of bases to clip from read ends, requires --gamDefrayEnds"
         }
       }
     },

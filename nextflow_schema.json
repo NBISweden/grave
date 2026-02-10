@@ -237,7 +237,7 @@
       "properties": {
         "kffKmerMinimum": {
           "type": "integer",
-          "default": 10,
+          "default": 5,
           "description": "FASTQ: Minimum required occurences of a read K-mer for it to be counted prior to haplotype subsampling"
         },
         "gamDefrayEnds": {

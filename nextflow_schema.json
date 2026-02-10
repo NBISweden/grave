@@ -251,7 +251,8 @@
         },
         "gamDiscardUnmapped": {
           "type": "boolean",
-          "description": "GAM: Discard unmapped reads when filtering"
+          "description": "GAM: Discard unmapped reads when filtering",
+          "default": true
         },
         "gamFilterMapQ": {
           "type": "boolean",

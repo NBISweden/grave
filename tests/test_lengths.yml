@@ -1,10 +1,9 @@
 # Graph test params yml
 
-steps         : 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
-reference_type: 'unfiltered_graph'
-input         : 'tests/data/samplesheet.lengths.csv'
-reference     : 'tests/data/graph/example-unfiltered.gbz'
-deepvariant   : true
-tracing       : true
-kffKmerMinimum: 2
-keepRawGam    : true
+steps              : 'preprocess,index,align'
+reference_type     : 'filtered_graph'
+#reference_type     : 'unfiltered_graph'
+input              : 'tests/data/samplesheet.lengths.csv'
+reference          : 'tests/data/graph/example-unfiltered.gbz'
+tracing            : true
+kffKmerMinimum     : 2

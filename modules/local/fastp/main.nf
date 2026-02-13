@@ -31,6 +31,7 @@ process FASTP {
             --dup_calc_accuracy ${params.dupCalcAccuracy} \
             --overrepresentation_analysis \
             --length_required ${params.readDiscardLength} \
+            --overlap_len_require ${params.minFastpOverlapLength} \
             --thread ${task.cpus} \
             ${args} \
             ${args2} \
@@ -53,6 +54,7 @@ process FASTP {
             --dup_calc_accuracy ${params.dupCalcAccuracy} \
             --overrepresentation_analysis \
             --length_required ${params.readDiscardLength} \
+            --overlap_len_require ${params.minFastpOverlapLength} \
             --thread ${task.cpus} \
             ${args2} \
             --detect_adapter_for_pe \

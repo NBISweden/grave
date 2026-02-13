@@ -32,9 +32,7 @@ workflow REFERENCE_UTILITIES {
                 .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
                 .collect()
                 .map { element ->
-                    def ref = element[0]
-                    def indexes = element.size() == 3 ? [element[1], element[2]] : element[1] // Array == 3 if ref + two indexes, else == 2 for ref + index
-                    return [ref: ref, indexes: indexes]
+                    [ref: element[0], indexes: element[1..-1]]
                 }
                 .set { indexed_reference }
         } else if ( reference_type == "filtered_graph" ) {
@@ -46,9 +44,7 @@ workflow REFERENCE_UTILITIES {
                 .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
                 .collect()
                 .map { element ->
-                    def ref = element[0]
-                    def indexes = element.size() == 4 ? [element[1], element[2], element[3]] : [element[1], element[2]] // Array == 4 if ref + three indexes, else == 3 for ref + two indexes
-                    return [ref: ref, indexes: indexes]
+                    [ref: element[0], indexes: element[1..-1]]
                 }
                 .set { indexed_reference }
         } else if ( reference_type == "linear" ) {
@@ -60,9 +56,7 @@ workflow REFERENCE_UTILITIES {
                 .combine(BWA_INDEX.out.ch_bwa_index)
                 .collect()
                 .map { element ->
-                    def ref = element[0]
-                    def indexes = element[1..-1]
-                    return [ref: ref, indexes: indexes]
+                    [ref: element[0], indexes: element[1..-1]]
                 }
                 .set { indexed_reference }
         }

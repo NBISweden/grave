@@ -28,14 +28,14 @@ process INDEX_FILTERED_GRAPH {
     # Type specific ".min" production
     if [ "${types}" == "ancient" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min --zipcode-name ${basename}.adna.min.zipcodes ${graph}
     elif [ "${types}" == "modern" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min --zipcode-name ${basename}.modern.min.zipcodes ${graph}
     elif [ "${types}" == "both" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min ${graph}
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min --zipcode-name ${basename}.adna.min.zipcodes ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min --zipcode-name ${basename}.modern.min.zipcodes ${graph}
     fi
     """
 

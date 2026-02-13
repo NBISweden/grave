@@ -86,10 +86,13 @@ process GIRAFFE {
         # Generate kff index of the reads
         kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.read_group} .
 
-# TODO: if user changes the kmer/window settings, there will be an issue here - we assume the default is kept.
+        # Generate the subsampled graph and index it
+        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
+        vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
 
         # Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -107,13 +110,13 @@ process GIRAFFE {
         ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
 
         # Remove sample specific indexes
-#TODOrm *.${meta.read_group}.* *.kff readfiles
+        rm *.${meta.read_group}.* *.kff readfiles
         """
 
     else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == false) // Arrives paired, output interleaved
         """
         # Map paired-end reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -136,10 +139,13 @@ process GIRAFFE {
         # Generate kff index of the reads
         kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
 
-# TODO: if user changes the kmer/window settings, there will be an issue here - we assume the default is kept.
+        # Generate the subsampled graph and index it
+        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
+        vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
 
         # Map merged reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads} --kff-name ${meta.read_group}.kff --gbz-name ${graph} --haplotype-name *.modern.hapl --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -157,13 +163,13 @@ process GIRAFFE {
         ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
 
         # Remove sample specific indexes
-#TODO        rm *.${meta.read_group}.* *.kff
+        rm *.${meta.read_group}.* *.kff
         """
 
     else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == true) // Arrives merged, output not interleaved
         """
         # Map merged reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam

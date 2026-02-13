@@ -172,15 +172,15 @@ unknownSimian.1.gorilla.bam
 >[!TIP]
 > Results are stored in the `results` directory. Exact outputs depend on the settings used.
 
-| Output directory      | Description                                                                                               |
-|-----------------------|-----------------------------------------------------------------------------------------------------------|
-| 01_pipeline_info      | Package versions, run parameters, and Nextflow trace reports (if set)                                     |
-| 02_reference          | Reference statistics and reference FASTA files extracted from graphs with Pan-SN headers + index          |
-| 03_read_qc            | Read QC reports                                                                                           |
-| 04_mapped_reads       | Mapped reads (GAMs at library level, surjected BAMs sample merged and deduplicated), alignment statistics |
-| 05_post_mortem_damage | Post-mortem damage profiles (only for samples with the `ancient` metadata tag)                            |
-| 06_genotyping         | Genotyping outputs directly from the graph, & per sample                                                  |
-| 07_variant_calling    | Variant calling outputs per sample                                                                        |
+| Output directory      | Description                                                                                                               |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------|
+| 01_pipeline_info      | Package versions, run parameters, and Nextflow trace reports (if set)                                                     |
+| 02_reference          | Reference statistics and reference FASTA files extracted from graphs with Pan-SN headers + index                          |
+| 03_read_qc            | Read QC reports                                                                                                           |
+| 04_mapped_reads       | Mapped reads (GAMs at library level, surjected BAMs sample merged and deduplicated), alignment statistics, failed samples |
+| 05_post_mortem_damage | Post-mortem damage profiles (only for samples with the `ancient` metadata tag)                                            |
+| 06_genotyping         | Genotyping outputs directly from the graph, & per sample                                                                  |
+| 07_variant_calling    | Variant calling outputs per sample                                                                                        |
 
 >[!TIP]
 > The workflow also computes graph indexes and snarls, stored in a folder alongside the input graph (detected on repeat runs)

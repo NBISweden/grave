@@ -1,8 +1,7 @@
 # Graph test params yml
 
 steps              : 'preprocess,index,align'
-reference_type     : 'filtered_graph'
-#reference_type     : 'unfiltered_graph'
+reference_type     : 'unfiltered_graph'
 input              : 'tests/data/samplesheet.lengths.csv'
 reference          : 'tests/data/graph/example-unfiltered.gbz'
 tracing            : true

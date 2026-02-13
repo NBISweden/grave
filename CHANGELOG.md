@@ -1,5 +1,52 @@
 # Changelog
 
+## [2.1.0] - 202602
+
+### Updated
+
+#### HPC resource requests
+- Significant improvements to the default resource requests when running on HPC. More scale tests will be needed to finalise these
+
+#### GAM filtering
+- Removed all hard coded GAM filtering choices to args (added switch params for each of these, with a setting param for fine-tuning)
+- Unmapped GAM records are now discarded by default (mirrors linear workflow)
+
+#### Versions
+- pixi env nf-core version to 3.5.2
+
+#### Reference + index map simplified
+- Removed complex logic for assigning index elements to the map. Now use a slice operation which allows for variable file counts
+
+### Added
+
+1. Parameter for FASTP minimum overlap for merge. Previously used program default of 30, which may have penalised our target fragment group. Set default to 20.
+
+2. New test profile & dataset for reads 20-40 bp
+
+3. New logic to handle failed samples. Failed samples are those that have zero aligned reads after GAM filtering. Giraffe now exports the alignment count as an env variable, and the resulting channel is branched (0 = fail, >0 = pass). Previously these would pass to the next process and `grave` would crash. 
+
+The failed samples can now be seen in the results folder: `04_mapped_reads/failed_samples`
+
+### Fixed
+
+#### Linear indexing
+- Fixed issue whereby accession versions were stripped from the linear reference index `storeDir` directory. This would have caused issues if users ran grave on two versions of the same reference
+
+#### Indexing + haplotype subsampling params simplified
+- We had 8 confusingly named parameters where 4 would suffice. This is implemented, and names are more clear. 
+- This additionally fixed a potential mapping issue if users changed the `aDNAkmerHaplSubSam` kmer value without mirroring the change in `aDNAKmerMimizer`. This scenario can now be safely handled by a single parameter change.
+
+#### Confirmed zipcodes issue for aDNA samples
+- Recent versions of vg create zipcodes files. If not found during giraffe runs, it auto creates new files with default params, which caused mapping failure for aDNA. This is fixed, with zipcode creation and provision now explicit
+
+#### Potential mapping parameter issue for modern samples
+- For modern DNA we previously allowed Giraffe to run auto-index construction (i.e. default kmer/window params), and controlled it for aDNA. This would cause problems if users adjusted these settings during `.hapl` construction
+- Grave now controls index construction for both sample types for increased reliability
+
+#### Linear workflow bug
+- the BWA aln algorithm can output unmapped records with MAPQ > 0, which is incompatible with strict SAM specs enforced by picard. We now pipe from `samse/mem` into `samtools view`, and remove unmapped records prior to `samtools sort`
+
+
 ## [2.0.1] - 20260202
 
 ### Added

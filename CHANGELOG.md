@@ -19,7 +19,7 @@
 
 ### Added
 
-1. Parameter for FASTP minimum overlap for merge. Previously used program default of 30, which may have penalised our target fragment group. Set default to 20.
+1. Parameter for FASTP minimum overlap for merge. Previously used program default of 30, which may have penalised our target fragment group. Set default to 11 to match AdapterRemoval (used by EAGER), + flash, used elsewhere.
 
 2. New test profile & dataset for reads 20-40 bp
 

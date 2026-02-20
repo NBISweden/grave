@@ -177,7 +177,7 @@
         },
         "minFastpOverlapLength": {
           "type": "integer",
-          "default": 20,
+          "default": 11,
           "description": "Minimum overlap required for FASTP to merge paired-end data"
         }
       }

@@ -328,6 +328,12 @@
           "default": 0.01,
           "description": "Genotyping: Baseline error rates for Poisson model for large variants"
         },
+        "freebayes_mode": {
+          "type": "string",
+          "default": "single_thread",
+          "description": "FreeBayes: run in normal mode (single-threaded), or parallel mode (experimental)",
+          "enum": ["single_thread", "parallel"]
+        },
         "maxComplexGap": {
           "type": "integer",
           "default": 3,

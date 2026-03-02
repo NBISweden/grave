@@ -162,6 +162,7 @@ workflow {
     if ( 'variant_call' in workflow_steps ) {
         VARIANT_CALL (
             params.freebayes,
+            params.freebayes_mode,
             params.deepvariant,
             params.reference_type,
             reference,

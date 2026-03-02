@@ -1,4 +1,4 @@
-process FREEBAYES {
+process FREEBAYES_PARALLEL {
 
     tag "${meta.id}"
     label 'process_high'

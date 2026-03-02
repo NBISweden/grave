@@ -1,0 +1,121 @@
+Changes in component 'nf-core/freebayes'
+'modules/nf-core/freebayes/environment.yml' is unchanged
+'modules/nf-core/freebayes/meta.yml' is unchanged
+Changes in 'freebayes/main.nf':
+--- modules/nf-core/freebayes/main.nf
++++ modules/nf-core/freebayes/main.nf
+@@ -1,52 +1,69 @@
+ process FREEBAYES {
++
+     tag "${meta.id}"
+-    label 'process_single'
+-
+-    conda "${moduleDir}/environment.yml"
+-    container "${workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container
+-        ? 'https://depot.galaxyproject.org/singularity/freebayes:1.3.10--hbefcdb2_0'
+-        : 'biocontainers/freebayes:1.3.10--hbefcdb2_0'}"
++    label 'process_medium'
++    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
++        'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:0a559cef58513a6f' :
++        'community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:4a6a1795bbef9fd5' }"
+ 
+     input:
+-    tuple val(meta), path(input_1), path(input_1_index), path(input_2), path(input_2_index), path(target_bed)
+-    tuple val(meta2), path(fasta)
+-    tuple val(meta3), path(fasta_fai)
+-    tuple val(meta4), path(samples)
+-    tuple val(meta5), path(populations)
+-    tuple val(meta6), path(cnv)
++    path ref_path_files
++    tuple path(reference_fasta), path(fasta_index)
++    tuple val(meta), path(bams), path(indexes)
+ 
+     output:
+-    tuple val(meta), path("*.vcf.gz"), emit: vcf
+-    tuple val("${task.process}"), val('freebayes'), eval('freebayes --version 2>&1 | sed "s/version:\s*v//g"'), emit: versions_freebayes, topic: versions
+-
+-
+-    when:
+-    task.ext.when == null || task.ext.when
++    path("*.norm.vcf.gz"), emit: ch_freebayes_norm_vcf
++    path("*.raw.vcf.gz"), optional: true, emit: ch_freebayes_raw_vcf
++    tuple val(task.process), val('freebayes'), eval('freebayes --version | sed "s/version.*v//"'), topic: versions
++    tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
++    tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
+ 
+     script:
+-    def args    = task.ext.args   ?: ''
+-    def prefix  = task.ext.prefix ?: "${meta.id}"
+-    def input            = input_2     ? "${input_1} ${input_2}"        : "${input_1}"
+-    def targets_file     = target_bed  ? "--target ${target_bed}"       : ""
+-    def samples_file     = samples     ? "--samples ${samples}"         : ""
+-    def populations_file = populations ? "--populations ${populations}" : ""
+-    def cnv_file         = cnv         ? "--cnv-map ${cnv}"             : ""
+-    """
+-    freebayes \\
+-        -f ${fasta} \\
+-        ${targets_file} \\
+-        ${samples_file} \\
+-        ${populations_file} \\
+-        ${cnv_file} \\
+-        ${args} \\
+-        ${input} > ${prefix}.vcf
++    def args = task.ext.args ?: ''
+ 
+-    bgzip ${prefix}.vcf
+-    """
++    if (!params.multiple_references) // Assume single reference sample (this setting forced in 'linear' mode).
++        """
++        freebayes -f ${reference_fasta} \\
++            --genotype-qualities \\
++            --min-alternate-count ${params.minimumAlleleSupport} \\
++            --min-alternate-fraction ${params.minFraction} \\
++            --ploidy ${params.samplePloidy} \\
++            --max-complex-gap ${params.maxComplexGap} \\
++            ${bams} | \\
++            bgzip --threads ${task.cpus} > \\
++            ${meta.id}.raw.vcf.gz
+ 
+-    stub:
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-    """
+-    echo | gzip > ${prefix}.vcf.gz
+-    """
++        bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
++
++        # Clean up
++        if [ "${params.keepRawVcf}" != "true" ]
++            then
++                rm ${meta.id}.raw.vcf.gz
++        fi
++        """
++
++    else if (params.multiple_references)
++        """
++        for i in *.paths
++            do
++                PREFIX=`echo \$i | sed 's/\\.paths//'`
++                freebayes -f \$PREFIX.fasta \\
++                    --genotype-qualities \\
++                    --min-alternate-count ${params.minimumAlleleSupport} \\
++                    --min-alternate-fraction ${params.minFraction} \\
++                    --ploidy ${params.samplePloidy} \\
++                    --max-complex-gap ${params.maxComplexGap} \\
++                    ${meta.id}.\$PREFIX.dedup.bam | \\
++                    bgzip --threads ${task.cpus} > \\
++                    ${meta.id}.\$PREFIX.raw.vcf.gz
++
++                bcftools norm -f \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.norm.vcf.gz
++
++                if [ "${params.keepRawVcf}" != "true" ]
++                    then
++                        rm ${meta.id}.\$PREFIX.raw.vcf.gz
++                fi
++            done
++        """
++
+ }
+
+'modules/nf-core/freebayes/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/freebayes/tests/main.nf.test' is unchanged
+************************************************************

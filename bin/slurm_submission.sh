@@ -5,10 +5,11 @@ set -euo pipefail
 ############### Edit these values ###############
 #################################################
 
-REPO_PATH=/path/to/repository/grave
 PIPELINE_NAME=grave
 TMUX_SESSION_NAME=grave
+REPO_PATH=/path/to/repository/grave
 PIXI_COMMAND="pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project <ALLOCATION>"
+SINGULARITY_CACHE_DIRECTORY="/path/to/shared/singularity/cache"
 
 
 
@@ -75,8 +76,17 @@ function launch_workflow {
         return 1
     fi
 
+    # Set up environment variables
+    if [ ! -d "$SINGULARITY_CACHE_DIRECTORY" ]; then
+        echo "Error: '$SINGULARITY_CACHE_DIRECTORY' does not exist."
+        return 1
+    else
+        export NXF_SINGULARITY_CACHEDIR="$SINGULARITY_CACHE_DIRECTORY"
+    fi
+
     MAJORVERSION=$(echo "$TMUX_VERSION_OUTPUT" | awk '{split($2,v,"."); print v[1]}')
 
+    # Launch run
     if [ "$MAJORVERSION" -eq 1 ]; then
         tmux new-session -s "$TMUX_SESSION_NAME" -d
         tmux send-keys -t "$TMUX_SESSION_NAME" "$PIXI_COMMAND" C-m

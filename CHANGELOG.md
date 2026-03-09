@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.1.0] - 202602
+## [2.1.0] - 20260309
 
 ### Updated
 
@@ -28,6 +28,10 @@
 The failed samples can now be seen in the results folder: `04_mapped_reads/failed_samples`
 
 ### Fixed
+
+#### Freebayes memory issues
+
+- The current regions calculation for Freebayes parallel uses extortionate memory and needs to be refactored. In the meantime, added a freebayes mode option, such that by default Freebayes will run in single-threaded mode. This has been tested and finishes using appropriate resource allocation. An issue has been raised to eventually address the parallel mode.
 
 #### Linear indexing
 - Fixed issue whereby accession versions were stripped from the linear reference index `storeDir` directory. This would have caused issues if users ran grave on two versions of the same reference

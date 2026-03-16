@@ -182,7 +182,7 @@ def validateInputParameters() {
     }
     // Enforce input for preprocess step if requested
     if ( 'preprocess' in requested_steps && !params.input ) {
-        error "ERROR: Read preprocessing was reqested but no input samplesheet was provided with '--input'"
+        error "ERROR: Read preprocessing was requested but no input samplesheet was provided with '--input'"
     }
     // Enforce reference for index if requested
     if ( 'index' in requested_steps && !params.reference ) {

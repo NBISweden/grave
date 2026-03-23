@@ -9,17 +9,17 @@
 
 ## Brief description
 
-`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. A Wiki with more detail is found [here](https://github.com/NBISweden/grave/wiki).
+`grave` is a Nextflow workflow for mapping, genotyping, and variant calling ancient or modern samples against a pangenome graph. A Wiki with a detailed summary of workflow steps is found [here](https://github.com/NBISweden/grave/wiki).
 
 In normal use, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
+
+`NOTE:` To compare outcomes of graph-based versus traditional (linear assembly) workflow methodologies, grave can also be run in [linear mode](#linear-reference-mode) against a single FASTA reference instead of a graph.
 
 Outputs are described [here](#workflow-outputs).
 
 More information on genotyping and variant calling is found [here](#genotyping-and-variant-calling).
 
 It is recommended to construct the graph with [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md). Before doing so, read this [section](#generate-or-provide-a-reference).
-
-`NOTE:` For the purposes of comparing workflows, grave can also be run in [linear mode](#linear-reference-mode) against a single FASTA reference instead of a graph.
 
 ## Quick start
 

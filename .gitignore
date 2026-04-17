@@ -15,3 +15,4 @@ tests/data/graph/additional_graphs/*_indexes
 # Other
 .DS_Store
 .vscode/
+local_files/

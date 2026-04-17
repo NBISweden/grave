@@ -1,5 +1,12 @@
 # Changelog
 
+## [ Unreleased ]
+
+### Read QC file naming
+
+- Now renames input files prior to entering raw FASTQC -> else the pre/post FASTP reports need to be cross-referenced. Now they share the same sample/read group prefix
+
+
 ## [2.1.0] - 20260309
 
 ### Updated

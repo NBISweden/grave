@@ -6,6 +6,9 @@
 
 - Now renames input files prior to entering raw FASTQC -> else the pre/post FASTP reports need to be cross-referenced. Now they share the same sample/read group prefix
 
+### Added a giraffe alignment stats report
+
+- added new stats report prior to alignment filtering, to diagnose where issues might be occuring if low counts are observed, i.e., a) at alignment, or b) at filtering
 
 ## [2.1.0] - 20260309
 

@@ -13,7 +13,8 @@ process GIRAFFE {
     output:
     tuple val(meta), path("${meta.read_group}.filtered.gam"), env('ALIGNMENT_COUNT'), emit: ch_gam_counts
     path "${meta.read_group}.gam", optional: true, emit: ch_raw_gam
-    path "${meta.read_group}_alignment-stats.txt", emit: ch_alignment_stats
+    path "${meta.read_group}_raw-alignment-stats.txt", emit: ch_raw_alignment_stats
+    path "${meta.read_group}_filtered-alignment-stats.txt", emit: ch_filtered_alignment_stats
     tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
     tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
@@ -38,6 +39,9 @@ process GIRAFFE {
         # Map reads to graph (settings based on BWA aln)
         vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
@@ -47,11 +51,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
@@ -62,6 +66,9 @@ process GIRAFFE {
         # Map merged reads (settings based on BWA aln)
         vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --zipcode-name *.adna.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
@@ -71,11 +78,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == false) // Arrives paired, output interleaved
@@ -91,8 +98,11 @@ process GIRAFFE {
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
         vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
 
-        # Map paired-end reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
+        # Map paired-end reads
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -103,11 +113,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff readfiles
@@ -118,6 +128,9 @@ process GIRAFFE {
         # Map paired-end reads (default settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
@@ -127,11 +140,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged, output not interleaved
@@ -144,8 +157,11 @@ process GIRAFFE {
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
         vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
 
-        # Map merged reads (for modern reads the default Giraffe pipeline is appropriate. The mapping settings are equivalent to BWA mem)
+        # Map merged reads
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -156,11 +172,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics (the mapped graph in Giraffe workflow above is the subsampled one)
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
@@ -171,6 +187,9 @@ process GIRAFFE {
         # Map merged reads (default settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
+        # Report raw mapping statistics
+        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
@@ -180,11 +199,11 @@ process GIRAFFE {
                 rm ${meta.read_group}.gam
         fi
 
-        # Report mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_alignment-stats.txt
+        # Report filtered mapping statistics
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
         """
 
 }

@@ -37,7 +37,8 @@ workflow ALIGN_READS {
         mapped_gam      = branched_gam.passed
         failed_samples  = branched_gam.failed
         raw_gam         = GIRAFFE.out.ch_raw_gam
-        alignment_stats = GIRAFFE.out.ch_alignment_stats
+        alignment_stats = GIRAFFE.out.ch_raw_alignment_stats.mix(GIRAFFE.out.ch_filtered_alignment_stats)
+
         GAM_TO_TAGGED_SORTED_BAM (
             reference,
             paths,

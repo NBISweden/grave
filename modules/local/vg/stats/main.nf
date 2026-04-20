@@ -1,7 +1,7 @@
 process GRAPH_STATISTICS {
 
     tag "${graph.baseName}_graph"
-    label 'process_low'
+    label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
         'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"

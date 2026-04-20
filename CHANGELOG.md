@@ -17,6 +17,10 @@
 
 - added `reference_stats` param to make ref stats reporting processes optional. Prior to the change, running the `index` step alone still forced stats to be reported (which can take a long time & is not what the user requested)
 
+### vg stats resources
+
+- increased resources (low to medium) to avoid OOM errors for larger graphs
+
 ### Read QC file naming
 
 - Now renames input files prior to entering raw FASTQC -> else the pre/post FASTP reports need to be cross-referenced. Now they share the same sample/read group prefix

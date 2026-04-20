@@ -1,0 +1,8 @@
+# Ovis linear (baseline reference)
+
+steps         : 'preprocess,index,align,merge,deduplicate,profile_pmd,variant_call'
+reference_type: 'linear'
+input         : 'tests/data/ovis-samplesheet.csv'
+reference     : 'local_files/GCF_016772045.2_ARS-UI_Ramb_v3.0_genomic.fna'
+deepvariant   : false
+tracing       : true

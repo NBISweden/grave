@@ -1,0 +1,9 @@
+# Ovis filtered graph
+
+steps         : 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
+reference_type: 'filtered_graph'
+input         : 'tests/data/ovis-samplesheet.csv'
+reference     : 'local_files/sheep_pangenome_v20260417.d3.gbz'
+deepvariant   : false
+tracing       : true
+keepRawGam    : true

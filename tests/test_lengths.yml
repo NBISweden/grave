@@ -1,8 +1,7 @@
 # Graph test params yml
 
 steps              : 'preprocess,index,align'
-reference_type     : 'unfiltered_graph'
+reference_type     : 'filtered_graph'
 input              : 'tests/data/samplesheet.lengths.csv'
-reference          : 'tests/data/graph/example-unfiltered.gbz'
+reference          : 'tests/data/graph/example-filtered.d2.gbz'
 tracing            : true
-kffKmerMinimum     : 2

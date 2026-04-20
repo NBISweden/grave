@@ -10,6 +10,10 @@
 
 - added new stats report prior to alignment filtering, to diagnose where issues might be occuring if low counts are observed, i.e., a) at alignment, or b) at filtering
 
+### Added ovis test resources for internal usage
+
+- requires local graphs/linear reference, not uploaded to the repo due to size
+
 ## [2.1.0] - 20260309
 
 ### Updated

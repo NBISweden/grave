@@ -140,6 +140,11 @@
           "type": "boolean",
           "description": "Turn on (true) or off (false) the DeepVariant variant caller"
         },
+        "reference_stats": {
+        "type": "boolean",
+        "default": true,
+        "description": "Report reference statistics (FAI index for linear, text summaries for graphs)"
+        },
         "keepRawGam": {
           "type": "boolean",
           "description": "Publish raw GAM files in addition to standard filtered outputs"
@@ -172,7 +177,7 @@
         },
         "readDiscardLength": {
           "type": "integer",
-          "default": 30,
+          "default": 20,
           "description": "Discard reads shorter than this value"
         },
         "minFastpOverlapLength": {

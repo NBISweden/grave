@@ -47,6 +47,7 @@ workflow {
     REFERENCE_UTILITIES (
         workflow_steps,
         params.reference_type,
+        params.reference_stats,
         reference,
         sample_types,
         paths

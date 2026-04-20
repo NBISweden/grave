@@ -11,6 +11,7 @@ workflow REFERENCE_UTILITIES {
     take:
     workflow_steps
     reference_type
+    reference_stats
     reference
     sample_types
     paths
@@ -63,19 +64,24 @@ workflow REFERENCE_UTILITIES {
     }
 
     // When reference is a graph, produce statistics
-    if ( reference_type != "linear") {
+    if ( reference_type != "linear" && reference_stats == true ) {
         GRAPH_STATISTICS (
             reference
         )
         stats = GRAPH_STATISTICS.out.ch_graph_stats
     }
 
-    // When reference is linear, produce statistics
-    if ( reference_type == "linear") {
+    // When reference is linear, produce fai index & statistics
+    if ( reference_type == "linear" && reference_stats == true ) {
         SAMTOOLS_FAIDX (
             reference
         )
         stats   = SAMTOOLS_FAIDX.out.ch_fai
+        ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
+    } else if ( reference_type == "linear" && reference_stats == false ) {
+        SAMTOOLS_FAIDX (
+            reference
+        )
         ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
     }
 

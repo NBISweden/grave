@@ -80,9 +80,9 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - This method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes, typically this should be set to around 10% of the number of haplotypes (i.e., `40 haplotypes` in the graph, `set depth to 4`)
 
 > [!IMPORTANT]
-> Although this method is not considered current best practices (`see unfiltered graphs section below`), this assumes modern, pure readsets: <br><br>
-> `For running aDNA with grave, filtered graphs should be used!`<br><br>
-> The reason is that in unfiltered graph mode, k-mers from the reads are used to subsample the graph for representative haplotypes to run against. If a sample is mostly contamination/non-target reads, and actual target reads are short and damaged (i.e., aDNA samples), k-mer subsampling of the graph is likely to underperform. Thus, it is preferable to sacrifice some rare variants and use a pre-filtered graph. On the other hand, if running only on modern, pure readsets, or using test data that is pure, unfiltered graphs are preferable.
+> Although this method is not generally considered current best practices (`see unfiltered graphs section below`), this assumes modern, pure readsets: <br><br>
+> `For running aDNA samples through grave, filtered graphs should be used!`<br><br>
+> The reason is that in unfiltered graph mode, k-mers from the reads are used to subsample the graph for representative haplotypes to align against. If a sample is mostly made up of contamination/non-target reads, and the actual target reads are short and damaged (i.e., aDNA samples), k-mer subsampling of the graph is likely to underperform. Thus, it is preferable to sacrifice some rare variants and use a depth filtered graph. On the other hand, if running only on modern, pure readsets (or using test data that is pure), unfiltered graphs are preferable.
 
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
 
@@ -93,7 +93,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - Running in unfiltered graph mode utilises k-mer profiling of the reads to sample representative haplotypes from the graph for mapping, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
 
 > [!IMPORTANT]
-> See above section, unfiltered graphs should only be used if your reads are mostly made up of the target organism, i.e., modern reads
+> See the above section, unfiltered graphs should only be used if your reads are mostly made up of the target organism, e.g., modern reads
 
 - To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
 

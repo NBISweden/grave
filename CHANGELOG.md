@@ -3,7 +3,7 @@
 ## [ Unreleased ]
 
 
-### Priotise filtered graphs
+### Prioritise filtered graphs
 
 - Although unfiltered graphs + haplo mode are "best practices" in typical use cases, for `grave` the intended use case is aDNA. Samples will be highly contaminated & the target reads are both short & degraded. Thus we expect k-mer subsampling of the graph to perform worse than a depth filtered graph reference, therefore:
 

@@ -2,6 +2,18 @@
 
 ## [ Unreleased ]
 
+
+### Priotise filtered graphs
+
+- Although unfiltered graphs + haplo mode are "best practices" in typical use cases, for `grave` the intended use case is aDNA. Samples will be highly contaminated & the target reads are both short & degraded. Thus we expect k-mer subsampling of the graph to perform worse than a depth filtered graph reference, therefore:
+
+- Updated basic tests to priotise filtered graphs
+
+- TODO: Updated docs to reflect new advice
+
+- TODO: update wiki to reflect advice
+
+
 ### Read QC file naming
 
 - Now renames input files prior to entering raw FASTQC -> else the pre/post FASTP reports need to be cross-referenced. Now they share the same sample/read group prefix

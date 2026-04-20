@@ -15,7 +15,7 @@
 
 ### Reference stats reporting processes optional
 
-- added `reference_stats` param to make these processes optional, as currently running `index` alone forces the stats to be reported (which can take a long time & is not what the user requested)
+- added `reference_stats` param to make ref stats reporting processes optional. Prior to the change, running the `index` step alone still forced stats to be reported (which can take a long time & is not what the user requested)
 
 ### Read QC file naming
 

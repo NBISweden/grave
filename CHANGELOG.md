@@ -1,7 +1,21 @@
 # Changelog
 
+TODO: update vg to 1.73 & check for any associated command line changes
+
+
 ## [ Unreleased ]
 
+### Pixi environment
+
+- vg bumped to 1.73.0 & lock file updated
+
+### Indexing
+
+- aDNA Kmer and window settings lowered to cover 30 bp reads. May need to be tuned lower for real degraded reads? I.e. to get the kmer seeds...
+
+- Note added to nextflow.config regarding successful mapping of ultra-short reads
+
+- Changed the minimiser and zipcode extensions throughout the codebase to conform with those used by vg developers. (i.e. minimiser = `.withzip.min`, and zipcodes = `.zipcodes`)
 
 ### Prioritise filtered graphs
 
@@ -9,9 +23,9 @@
 
 - Updated basic tests to priotise filtered graphs
 
-- TODO: Updated docs to reflect new advice
+- Updated docs to reflect new advice
 
-- TODO: update wiki to reflect advice
+- updated wiki to reflect advice
 
 ### Reference stats reporting processes optional
 

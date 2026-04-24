@@ -2,7 +2,7 @@ process INDEX_FILTERED_GRAPH {
 
     tag "${graph.baseName}_graph"
     label 'process_high_memory'
-    // NOTE: update version string manually
+    // NOTE: update version string manually (due to use of storedir)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
         'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"
@@ -14,7 +14,7 @@ process INDEX_FILTERED_GRAPH {
 
     output:
     path ("${graph.baseName}.????*"), emit: ch_filter_indexes
-    // NOTE: update version string manually
+    // NOTE: update version string manually (due to use of storedir)
     tuple val(task.process), val('vg'), val('1.70.0'), topic: versions
 
     script:
@@ -28,14 +28,14 @@ process INDEX_FILTERED_GRAPH {
     # Type specific ".min" production
     if [ "${types}" == "ancient" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min --zipcode-name ${basename}.adna.min.zipcodes ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.withzip.min --zipcode-name ${basename}.adna.zipcodes ${graph}
     elif [ "${types}" == "modern" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min --zipcode-name ${basename}.modern.min.zipcodes ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.withzip.min --zipcode-name ${basename}.modern.zipcodes ${graph}
     elif [ "${types}" == "both" ]
         then
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.min --zipcode-name ${basename}.adna.min.zipcodes ${graph}
-            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.min --zipcode-name ${basename}.modern.min.zipcodes ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.dist --output-name ${basename}.adna.withzip.min --zipcode-name ${basename}.adna.zipcodes ${graph}
+            vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.dist --output-name ${basename}.modern.withzip.min --zipcode-name ${basename}.modern.zipcodes ${graph}
     fi
     """
 

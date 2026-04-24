@@ -34,10 +34,10 @@ process GIRAFFE {
         # Generate the subsampled graph and index it
         vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.adna.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
 
         # Map reads to graph (settings based on BWA aln)
-        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
@@ -64,7 +64,7 @@ process GIRAFFE {
     else if (meta.type == "ancient" && params.reference_type == "filtered_graph") // Ancient samples arrive merged, thus output not interleaved
         """
         # Map merged reads (settings based on BWA aln)
-        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.min --zipcode-name *.adna.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.withzip.min --zipcode-name *.adna.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
@@ -96,10 +96,10 @@ process GIRAFFE {
         # Generate the subsampled graph and index it
         vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
 
         # Map paired-end reads
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
@@ -126,7 +126,7 @@ process GIRAFFE {
     else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == false) // Arrives paired, output interleaved
         """
         # Map paired-end reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
@@ -155,10 +155,10 @@ process GIRAFFE {
         # Generate the subsampled graph and index it
         vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes ${basename}.${meta.read_group}.gbz
+        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
 
         # Map merged reads
-        vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.min --zipcode-name ${basename}.${meta.read_group}.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
@@ -185,7 +185,7 @@ process GIRAFFE {
     else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == true) // Arrives merged, output not interleaved
         """
         # Map merged reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.min --zipcode-name *.modern.min.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt

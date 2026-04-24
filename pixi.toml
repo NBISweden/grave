@@ -12,7 +12,7 @@ nf-core                = ">=3.5.2,<4"
 nf-test                = ">=0.9.3"
 
 [target.linux-64.dependencies]
-vg                     = "==1.70.0"
+vg                     = "==1.73.0"
 
 [feature.apptainer.target.linux-64.dependencies]
 apptainer              = "==1.4.5"

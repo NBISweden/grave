@@ -2,7 +2,7 @@ process INDEX_UNFILTERED_GRAPH {
 
     tag "${graph.baseName}_graph"
     label 'process_high_memory'
-    // NOTE: update version string manually
+    // NOTE: update version string manually (due to use of storedir)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
         'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"
@@ -14,7 +14,7 @@ process INDEX_UNFILTERED_GRAPH {
 
     output:
     path ("*.hapl"), emit: ch_hapl_indexes
-    // NOTE: update version string manually
+    // NOTE: update version string manually (due to use of storedir)
     tuple val(task.process), val('vg'), val('1.70.0'), topic: versions
 
     script:

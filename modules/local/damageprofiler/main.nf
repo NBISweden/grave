@@ -3,8 +3,8 @@ process DAMAGE_PROFILER {
     tag "${meta.id}"
     label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/damageprofiler_vg:ac59528479402a25' :
-        'community.wave.seqera.io/library/damageprofiler_vg:9c347a920a2599da' }"
+        'oras://community.wave.seqera.io/library/damageprofiler_vg:6312ca2a32abebd3' :
+        'community.wave.seqera.io/library/damageprofiler_vg:8984ed1be158c61c' }"
 
     input:
     path ref_path_files

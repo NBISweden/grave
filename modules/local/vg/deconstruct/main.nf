@@ -3,8 +3,8 @@ process GENOTYPE_GRAPH {
     tag "${graph.baseName}_graph"
     label 'process_high_memory'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-            'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:6507ed0bc1467ab0' :
-            'community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:ef1929a49292252b' }"
+            'oras://community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:f474eaae146f7cf0' :
+            'community.wave.seqera.io/library/bcftools_htslib_samtools_vcfbub_vg:7f95ea15fb262fe1' }"
 
     input:
     path graph

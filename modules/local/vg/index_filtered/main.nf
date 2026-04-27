@@ -4,8 +4,8 @@ process INDEX_FILTERED_GRAPH {
     label 'process_high_memory'
     // NOTE: update version string manually (due to use of storedir)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/vg:1.70.0--6aa72998bf6738ae' :
-        'community.wave.seqera.io/library/vg:1.70.0--601cb9ffed863393' }"
+        'oras://community.wave.seqera.io/library/vg:1.73.0--645b5a4f32c11ace' :
+        'community.wave.seqera.io/library/vg:1.73.0--e9dad0f50dfcdf46' }"
     storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes/min_dist") }
 
     input:
@@ -15,7 +15,7 @@ process INDEX_FILTERED_GRAPH {
     output:
     path ("${graph.baseName}.????*"), emit: ch_filter_indexes
     // NOTE: update version string manually (due to use of storedir)
-    tuple val(task.process), val('vg'), val('1.70.0'), topic: versions
+    tuple val(task.process), val('vg'), val('1.73.0'), topic: versions
 
     script:
     def args = task.ext.args ?: ''

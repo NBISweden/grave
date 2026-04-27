@@ -3,8 +3,8 @@ process GIRAFFE {
     tag "${meta.read_group}"
     label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/kmc_vg:469fa513f88bd14f' :
-        'community.wave.seqera.io/library/kmc_vg:51df7ac5d5cbd79d' }"
+        'oras://community.wave.seqera.io/library/kmc_vg:d27de6645074ab5c' :
+        'community.wave.seqera.io/library/kmc_vg:57c489c0e1d4e955' }"
 
     input:
     tuple val(meta), path(reads)

@@ -1,9 +1,14 @@
 # Changelog
 
-TODO: update vg to 1.73 & check for any associated command line changes
+## [ 2.2.0 - Unreleased ]
 
+### Docs
 
-## [ Unreleased ]
+- added explainer on k and w choice in the context of aDNA alignment
+
+### Containers
+
+- updated vg containers to 1.73
 
 ### Pixi environment
 
@@ -11,41 +16,45 @@ TODO: update vg to 1.73 & check for any associated command line changes
 
 ### Giraffe aDNA scoring parameters
 
-- Now implemented as parameters rather than hard-coded
+- Now implemented as parameters rather than hard-coded, though the settings are currently not changed
 
-### Indexing
+### Graph indexing
 
-- aDNA Kmer and window settings lowered to cover 30 bp reads. May need to be tuned lower for real degraded reads? I.e. to get the kmer seeds...
+- K-mer and window size default parameters should now work better for typical degraded aDNA reads
 
-- Note added to nextflow.config regarding successful mapping of ultra-short reads
+- Note added to nextflow.config (and docs) regarding successful mapping of ultra-short reads
 
-- Changed the minimiser and zipcode extensions throughout the codebase to conform with those used by vg developers. (i.e. minimiser = `.withzip.min`, and zipcodes = `.zipcodes`)
+- Changed the minimiser and zipcode extensions throughout the codebase to conform with those currently used by vg developers. (i.e. minimiser = `.withzip.min`, and zipcodes = `.zipcodes`)
+
+### GAM filtering
+
+- TODO: #################
 
 ### Prioritise filtered graphs
 
-- Although unfiltered graphs + haplo mode are "best practices" in typical use cases, for `grave` the intended use case is aDNA. Samples will be highly contaminated & the target reads are both short & degraded. Thus we expect k-mer subsampling of the graph to perform worse than a depth filtered graph reference, therefore:
+- Although unfiltered graphs + haplo mode are "best practices" in typical use cases, for `grave` the intended use case is aDNA. Samples will be highly contaminated & the target reads are both short & degraded. Thus we expect k-mer subsampling of the graph to perform worse than a depth filtered graph reference. Thus:
 
-- Updated basic tests to priotise filtered graphs
+    - Updated basic tests to prioritise filtered graphs
 
-- Updated docs to reflect new advice
+    - Updated docs to reflect latest advice
 
-- updated wiki to reflect advice
+    - Updated wiki to reflect latest advice
 
-### Reference stats reporting processes optional
+### Reference stats reporting processes are now optional
 
-- added `reference_stats` param to make ref stats reporting processes optional. Prior to the change, running the `index` step alone still forced stats to be reported (which can take a long time & is not what the user requested)
+- added the `reference_stats` parameter to make reference stats reporting processes optional. Prior to the change, running the `index` step in isolation still forced stats reporting, which can a) take a long time & b) is not what the user requested
 
 ### vg stats resources
 
-- increased resources (low to medium) to avoid OOM errors for larger graphs
+- changed resources label (low to medium) to avoid OOM errors for larger graphs
 
 ### Read QC file naming
 
-- Now renames input files prior to entering raw FASTQC -> else the pre/post FASTP reports need to be cross-referenced. Now they share the same sample/read group prefix
+- Now renames input files to raw FASTQC processing. Before, the pre/post FASTP reports needed to be cross-referenced if input FASTQ files were not named by sample. Now, they will share exactly the same sample/read group prefix for quick navigation.
 
 ### Added a giraffe alignment stats report
 
-- added new stats report prior to alignment filtering, to diagnose where issues might be occuring if low counts are observed, i.e., a) at alignment, or b) at filtering
+- added new stats report prior to alignment filtering, to quickly diagnose where issues might be occuring if low counts are observed, i.e., a) at entry into alignment, or b) at filtering after alignment
 
 ### Added ovis test resources for internal usage
 

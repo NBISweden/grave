@@ -36,8 +36,8 @@ process GIRAFFE {
         vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
         vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
 
-        # Map reads to graph (settings based on BWA aln)
-        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        # Map reads to graph
+        vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
@@ -63,8 +63,8 @@ process GIRAFFE {
 
     else if (meta.type == "ancient" && params.reference_type == "filtered_graph") // Ancient samples arrive merged, thus output not interleaved
         """
-        # Map merged reads (settings based on BWA aln)
-        vg giraffe --progress --mismatch 3 --gap-open 11 --gap-extend 4 --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.withzip.min --zipcode-name *.adna.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+        # Map merged reads
+        vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.withzip.min --zipcode-name *.adna.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
         vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt

@@ -9,6 +9,10 @@ TODO: update vg to 1.73 & check for any associated command line changes
 
 - vg bumped to 1.73.0 & lock file updated
 
+### Giraffe aDNA scoring parameters
+
+- Now implemented as parameters rather than hard-coded
+
 ### Indexing
 
 - aDNA Kmer and window settings lowered to cover 30 bp reads. May need to be tuned lower for real degraded reads? I.e. to get the kmer seeds...

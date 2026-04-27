@@ -141,9 +141,9 @@
           "description": "Turn on (true) or off (false) the DeepVariant variant caller"
         },
         "reference_stats": {
-        "type": "boolean",
-        "default": true,
-        "description": "Report reference statistics (FAI index for linear, text summaries for graphs)"
+          "type": "boolean",
+          "default": true,
+          "description": "Report reference statistics (FAI index for linear, text summaries for graphs)"
         },
         "keepRawGam": {
           "type": "boolean",
@@ -225,6 +225,21 @@
       "description": "",
       "default": "",
       "properties": {
+        "aDNA_mismatch_penalty": {
+          "type": "integer",
+          "default": 3,
+          "description": "Giraffe alignment (aDNA reads only): mismatch penalty"
+        },
+        "aDNA_gap_open_penalty": {
+          "type": "integer",
+          "default": 11,
+          "description": "Giraffe alignment (aDNA reads only): gap open penalty"
+        },
+        "aDNA_gap_extend_penalty": {
+          "type": "integer",
+          "default": 4,
+          "description": "Giraffe alignment (aDNA reads only): gap extend penalty"
+        },
         "kffKmerMinimum": {
           "type": "integer",
           "default": 5,

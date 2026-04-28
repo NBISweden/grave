@@ -1,6 +1,7 @@
 process GRAPH_DEEPVARIANT {
 
     tag "${meta.id}"
+    // NOTE: memory handled in conf/tool_resources.config
     label 'process_high'
     container 'docker.io/google/deepvariant:pangenome_aware_deepvariant-1.9.0'
 

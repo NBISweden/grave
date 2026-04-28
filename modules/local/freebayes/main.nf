@@ -1,6 +1,7 @@
 process FREEBAYES_PARALLEL {
 
     tag "${meta.id}"
+    // NOTE: cpus & memory handled in conf/tool_resources.config
     label 'process_high'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:0a559cef58513a6f' :

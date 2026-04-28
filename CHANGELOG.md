@@ -2,6 +2,12 @@
 
 ## [ 2.2.0 - Unreleased ]
 
+
+### Developer guidance
+
+- added guidance to any module with resources specifically set outside of `conf/base.config`
+- increased resources to giraffe to account for aDNA parameter tuning
+
 ### Docs
 
 - added explainer on k and w choice in the context of aDNA alignment

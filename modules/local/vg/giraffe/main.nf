@@ -1,7 +1,7 @@
 process GIRAFFE {
 
     tag "${meta.read_group}"
-    label 'process_medium'
+    // NOTE: all resources handled in conf/tool_resources.config
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/kmc_vg:d27de6645074ab5c' :
         'community.wave.seqera.io/library/kmc_vg:57c489c0e1d4e955' }"

@@ -1,6 +1,7 @@
 process COMPUTE_SNARLS {
 
     tag "${graph.baseName}_graph"
+    // NOTE: memory handled in conf/tool_resources.config
     label 'process_medium'
     // NOTE: update version string manually
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

@@ -1,6 +1,7 @@
 process DAMAGE_PROFILER {
 
     tag "${meta.id}"
+    // NOTE: time & memory handled in conf/tool_resources.config
     label 'process_medium'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/damageprofiler_vg:6312ca2a32abebd3' :

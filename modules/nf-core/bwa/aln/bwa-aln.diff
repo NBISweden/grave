@@ -2,12 +2,13 @@ Changes in component 'nf-core/bwa/aln'
 Changes in 'bwa/aln/main.nf':
 --- modules/nf-core/bwa/aln/main.nf
 +++ modules/nf-core/bwa/aln/main.nf
-@@ -1,89 +1,53 @@
+@@ -1,89 +1,54 @@
 -process BWA_ALN {
 -    tag "$meta.id"
 +process BWA_ALN_SAMSE {
 +
 +    tag "${meta.read_group}"
++    // NOTE: time handled in conf/tool_resources.config
      label 'process_medium'
 -
      conda "${moduleDir}/environment.yml"

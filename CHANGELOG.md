@@ -2,15 +2,10 @@
 
 ## [ 2.2.0 - Unreleased ]
 
-
 ### Developer guidance
 
 - added guidance to any module with resources specifically set outside of `conf/base.config`
 - increased resources to giraffe to account for aDNA parameter tuning
-
-### Docs
-
-- added explainer on k and w choice in the context of aDNA alignment
 
 ### Containers
 
@@ -28,9 +23,13 @@
 
 - K-mer and window size default parameters should now work better for typical degraded aDNA reads
 
-- Note added to nextflow.config (and docs) regarding successful mapping of ultra-short reads
+- Notes added to nextflow.config regarding successful mapping of ultra-short reads
+
+- added README explainer on k and w choice in the context of aDNA alignment
 
 - Changed the minimiser and zipcode extensions throughout the codebase to conform with those currently used by vg developers. (i.e. minimiser = `.withzip.min`, and zipcodes = `.zipcodes`)
+
+- TODO: update schema with final selected defaults
 
 ### GAM filtering
 

@@ -130,9 +130,41 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 #### Customise your run parameters
 
-Run parameters can be set for `grave` by editing the `params.yml` file, and providing it on the command line when you execute the workflow. These will override any default parameters.
+Run parameters can be set for `grave` by editing the `params.yml` file, and providing it on the command line when you execute the workflow. These will override the default parameters.
 
-Use `pixi run help` to see the available parameters.
+The only mandatory parameter is `--steps`, a string specifying which pipeline subworkflows to run, e.g., (`--steps 'index,preprocess'`). Each requested step has further dependencies which the user will be prompted to provide.
+
+Use `pixi run help` to see the available parameters and their descriptions.
+
+> [!IMPORTANT]
+> The graph aligner `vg giraffe` uses a seed and extend strategy, with two crucial parameters: *K*-mer length (`k`) and window length (`w`).
+> During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value.
+> The seeding stage of alignment involves computing exact matches between these minimisers and reads, via a hash table lookup.
+> Users must keep in mind that reads shorter than `k+w-1` will not be aligned, as they cannot be seeded. <br><br>
+> To address this, grave uses different `k` and `w` defaults for modern and ancient reads.
+> Modern samples are run with the program defaults, emphasising higher specificity (`k` = 29, `w` = 11).
+> For aDNA reads, which are usually short and highly degraded, achieving exact matches to minimisers necessitates reducing specificity by reducing `k`.
+> Meanwhile, minimiser density in the index can be boosted via lowering `w`.
+> Reducing either of these values will generally increase alignment runtime. <br><br>
+TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balance specificity/sensitivity, minimiser density, and computational runtime.
+> Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
+> Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).
+> As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context.
+
+**Table: Comparison of alignment parameters**<br>Unmapped reads removed, no other `GAM/BAM` filtering, `grave` defaults for remaining settings.
+
+| Alignment tool                   | \|---    | Percent aligned | ---\| | \|---   | Runtime | ---\|   |
+| :------:                         |  :-:     | :-----:         | :-:   | :--:    | :---:   | :--:    |
+| *Read length*\*                  | *30*     | *50*            | *70*  | *30*    | *50*    | *70*    |
+| `grave`: `k-21, w-11`            | 0.0**    | 92.1            | 96.5  | 3m 53s  | 4m 3s   | 4m 5s   |
+| `grave`: `k-17, w-9`             | 71.7     | 94.1            | 96.4  | 24m 34s | 34m 25s | 3m 47s  |
+| `grave`: `k-15, w-7`             | 84.1     | 94.5            | 96.6  | 4h 34m  | 3h 26m  | 10h 22m |
+| `grave`: `k-15, w-5 `            | **89.7** | **95.5**        | TODO  | 7h 14m  | 13h 36m | TODO    |
+| `bwa aln: -l 16500 -n 0.01 -o 2` | 88.3     | 89.0            | 90.0  | 10.6s   | 28.5s   | 1m 5s   |
+
+\* ~10k merged reads were generated (per length) with `NGSNGS` from related assemblies not present in the graph (sheep). The `bwa` linear reference was the same assembly used as the graph backbone.
+
+\*\* `k+w-1` (31) is greater than the read length (30), therefore no alignments are generated.
 
 #### Was your graph built with more than one reference sample?
 
@@ -146,7 +178,7 @@ Use `pixi run help` to see the available parameters.
 
 - Each `.paths` file contains a list of the reference paths in one reference sample, with one path name per line
 
-- __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, & `gorilla.paths`
+- __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, and `gorilla.paths`
 
 >[!TIP]
 > `vg` is packaged in the pixi environment, to see the reference samples in your graph run: `pixi run vg paths --reference-paths --metadata -x myGraph.gbz | cut -f3 | tail -n+2 | sort | uniq`<br><br>
@@ -187,7 +219,7 @@ unknownSimian.1.gorilla.bam
 | 03_read_qc            | Read QC reports                                                                                                           |
 | 04_mapped_reads       | Mapped reads (GAMs at library level, surjected BAMs sample merged and deduplicated), alignment statistics, failed samples |
 | 05_post_mortem_damage | Post-mortem damage profiles (only for samples with the `ancient` metadata tag)                                            |
-| 06_genotyping         | Genotyping outputs directly from the graph, & per sample                                                                  |
+| 06_genotyping         | Genotyping outputs directly from the graph, and per sample                                                                |
 | 07_variant_calling    | Variant calling outputs per sample                                                                                        |
 
 >[!TIP]

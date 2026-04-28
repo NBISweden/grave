@@ -162,9 +162,9 @@ TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balan
 | `grave`: `k-15, w-5 `            | **89.7**   | **95.5**        | TODO  | 7h 14m  | 13h 36m | TODO    |
 | `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3    | 89.0            | 90.0  | 10.6s   | 28.5s   | 1m 5s   |
 
-\* ~10k merged reads were generated (per length) with `NGSNGS` from related assemblies not present in the graph (sheep). The `bwa` linear reference was the same assembly used as the graph backbone.
+\*~10k merged reads were generated (per length) with `NGSNGS` from related assemblies not present in the graph (sheep).
 
-\*\* `k+w-1` (31) is greater than the read length (30), therefore no alignments are generated.
+\*\*`k+w-1` (31) is greater than the read length (30), therefore no alignments are generated.
 
 \*\*\*The bwa linear reference was the same assembly used as the graph backbone.
 

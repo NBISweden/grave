@@ -69,7 +69,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - References can be in one of three types: `filtered_graph`, `unfiltered_graph`, or `linear` (i.e., FASTA alignment).
 
-- Graphs must be provided in `.gbz.` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users do not need to supply them.
+- Graphs must be provided in `.gbz` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), part of the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Because `grave` is designed to handle very short reads (i.e., aDNA at <50 bp) in addition to typical (100-150 bp) short reads, it recreates all graph indexes, and users do not need to supply them.
 
 - When using `Minigraph-Cactus` for graph construction, please take note to keep contig names for the input FASTAs as simple as possible, [see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names). Avoid hash characters in contig names!
 
@@ -77,7 +77,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ##### Filtered graphs
 
-- This method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes, typically this should be set to around 10% of the number of haplotypes (i.e., `40 haplotypes` in the graph - set depth to `4`).
+- This method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes, typically this should be set to around 10% of the number of haplotypes (i.e., `40 haplotypes` in the graph: set depth to `4`).
 
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
 
@@ -139,32 +139,33 @@ The only mandatory parameter is `--steps`, a string specifying which pipeline su
 Use `pixi run help` to see the available parameters and their descriptions.
 
 > [!IMPORTANT]
-> The graph aligner `vg giraffe` uses a seed and extend strategy, with two crucial parameters: *K*-mer length (`k`) and window length (`w`).
+> The graph aligner `vg giraffe` uses a seed and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`).
 > During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value.
-> The seeding stage of alignment involves computing exact matches between these minimisers and reads, via a hash table lookup.
+> The seeding stage of alignment involves computing exact matches between these minimisers and reads.
 > Users must keep in mind that reads shorter than `k+w-1` will not be aligned, as they cannot be seeded. <br><br>
 > To address this, grave uses different `k` and `w` defaults for modern and ancient reads.
 > Modern samples are run with the program defaults, emphasising higher specificity (`k` = 29, `w` = 11).
-> For aDNA reads, which are usually short and highly degraded, achieving exact matches to minimisers necessitates reducing specificity by reducing `k`.
+> For aDNA reads, which are usually short and highly degraded, achieving more exact matches to minimisers involves reducing specificity via a lower `k`.
 > Meanwhile, minimiser density in the index can be boosted via lowering `w`.
 > Reducing either of these values will generally increase alignment runtime. <br><br>
-TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balance specificity/sensitivity, minimiser density, and computational runtime.
+TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balance sensitivity with computational runtime.
 > Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).
-> As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context.
+> As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and the reads.
 
-**Table: Comparison of alignment parameters**<br>Unmapped reads removed, no other `GAM/BAM` filtering, `grave` defaults for remaining settings.
+**Table: Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.
 
 | Alignment tool                   | \|---      | Percent aligned | ---\| | \|---   | Runtime | ---\|   |
 | :------:                         |  :-:       | :-----:         | :-:   | :--:    | :---:   | :--:    |
 | *Read length*\*                  | *30*       | *50*            | *70*  | *30*    | *50*    | *70*    |
 | `grave`: `k-21, w-11`            | 0.0**      | 92.1            | 96.5  | 3m 53s  | 4m 3s   | 4m 5s   |
+| `grave`: `k-19, w-5`             |            |                 |       |         |         |         |
 | `grave`: `k-17, w-9`             | 71.7       | 94.1            | 96.4  | 24m 34s | 34m 25s | 3m 47s  |
 | `grave`: `k-15, w-7`             | 84.1       | 94.5            | 96.6  | 4h 34m  | 3h 26m  | 10h 22m |
-| `grave`: `k-15, w-5 `            | **89.7**   | **95.5**        | TODO  | 7h 14m  | 13h 36m | TODO    |
+| `grave`: `k-15, w-5`             | **89.7**   | **95.5**        | TODO  | 7h 14m  | 13h 36m | TODO    |
 | `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3    | 89.0            | 90.0  | 10.6s   | 28.5s   | 1m 5s   |
 
-\*~10k merged reads were generated (per length) with `NGSNGS` from related assemblies not present in the graph (sheep).
+\*~10k merged reads were generated (per length) with `NGSNGS` from a related assembly not present in the graph (sheep).
 
 \*\*`k+w-1` (31) is greater than the read length (30), therefore no alignments are generated.
 

@@ -150,10 +150,10 @@ Use `pixi run help` to see the available parameters and their descriptions.
 > Reducing either of these values will generally increase alignment runtime. <br><br>
 TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balance sensitivity with computational runtime.
 > Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
-> Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).
+> Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).<br>
 > As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and the reads.
 
-**Table: Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.
+**Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.
 
 | Alignment tool                   | \|---      | Percent aligned | ---\| | \|---   | Runtime | ---\|   |
 | :------:                         |  :-:       | :-----:         | :-:   | :--:    | :---:   | :--:    |

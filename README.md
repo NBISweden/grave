@@ -77,23 +77,25 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 ##### Filtered graphs
 
-- This method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes, typically this should be set to around 10% of the number of haplotypes (i.e., `40 haplotypes` in the graph, `set depth to 4`)
-
-> [!IMPORTANT]
-> Although this method is not generally considered current best practices (`see unfiltered graphs section below`), this assumes modern, pure readsets: <br><br>
-> `For running aDNA samples through grave, filtered graphs should be used!`<br><br>
-> The reason is that in unfiltered graph mode, k-mers from the reads are used to subsample the graph for representative haplotypes to align against. If a sample is mostly made up of contamination/non-target reads, and the actual target reads are short and damaged (i.e., aDNA samples), k-mer subsampling of the graph is likely to underperform. Thus, it is preferable to sacrifice some rare variants and use a depth filtered graph. On the other hand, if running only on modern, pure readsets (or using test data that is pure), unfiltered graphs are preferable.
+- This method of building pangenome graphs for read mapping uses coverage filtering to remove nodes not found in a set number of haplotypes, typically this should be set to around 10% of the number of haplotypes (i.e., `40 haplotypes` in the graph - set depth to `4`).
 
 - By default the `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Coverage support level can be adjusted with the `--filter` option, e.g.: `--giraffe --filter 10`
 
-- The filtered graph (e.g., `graph.d2.gbz`) is used as input to `grave`, with the parameter `reference_type` set to `filtered_graph`
+- The filtered graph (e.g., `graph.d10.gbz`) is used as input to `grave`, with the parameter `reference_type` set to `filtered_graph`
 
-##### Unfiltered graphs for haplotype sampling
-
-- Running in unfiltered graph mode utilises k-mer profiling of the reads to sample representative haplotypes from the graph for mapping, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling)
+- The cost of this approach is that variants under the depth filter will be removed from the graph. This should be considered when users are building a graph from relatively divergent assemblies, or for example when a target organism with a single assembly is to be compared with related species. If users cannot afford to lose under-represented variant information they may prefer to use an unfiltered graph (see below).
 
 > [!IMPORTANT]
-> See the above section, unfiltered graphs should only be used if your reads are mostly made up of the target organism, e.g., modern reads
+> - Depth filtered graphs are not considered current best practice when users can provide relatively high coverage and high quality readsets typical of modern samples (e.g. 20x read coverage with 150 bp reads). In this case, an approach that uses *K*-mers from the reads to sample representative haplotypes from the unfiltered graph is preferable, `see unfiltered graphs section below`.
+> - However, when running `short, highly degraded, and contaminated aDNA readsets` through grave, `filtered graphs may perform better`.
+> - This is because the haplotype subsampling of the graph is likely to underperform. Issues include the low coverage of target reads, deamination of target reads, short target reads (that require higher read coverage to perform comparibly with longer reads), and high representation of non-target *K*-mers. In this case, it may be preferable to sacrifice some rare variants and use a depth filtered graph.
+
+##### Unfiltered graphs
+
+- Running in unfiltered graph mode utilises *K*-mer profiling of the reads to sample representative haplotypes from the graph for mapping, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling).
+
+> [!IMPORTANT]
+> See the above section, users should consider (or test) whether an unfiltered graph is appropriate for their samples.
 
 - To build the graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
 

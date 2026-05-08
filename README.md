@@ -4,7 +4,7 @@
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
 <p align="center">
-  <img src="assets/grave.svg" alt="grave" width="300">
+  <img src="assets/grave.svg" alt="grave" width="500">
 </p>
 
 **Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**

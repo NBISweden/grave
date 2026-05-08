@@ -1,29 +1,13 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 ![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
-
-<table width="100%"><tr>
-<td align="left" valign="middle">
-
-[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
-![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
-
-</td>
-<td align="right" valign="middle">
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
-
-</td>
-</tr></table>
-
-<p align="centre">
+<p align="center">
   <img src="assets/grave.svg" alt="grave" width="500">
 </p>
 
-<div align="center">
-**Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
-</div>
+<div align="center"><strong>Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA</strong></div>
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
 ## Brief description
 

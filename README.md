@@ -158,10 +158,10 @@ Use `pixi run help` to see the available parameters and their descriptions.
 | Alignment tool                 | \|---      | Percent aligned | ---\|    | \|---   | Runtime | ---\|   |
 | :------:                       |  :-:       | :-----:         | :-:      | :--:    | :---:   | :--:    |
 | *Read length*\*                | *30*       | *50*            | *70*     | *30*    | *50*    | *70*    |
-| `grave`: `k-21, w-11`          | 0.0**      | 92.1            | 96.5     | 3m 53s  | 4m 3s   | 4m 5s   | update time (24 cpus) - running
+| `grave`: `k-21, w-11`          | 0.0**      | 92.1            | 96.5     | 3m 44s  | 3m 54s  | 3m 33s  |
 | `grave`: `k-19, w-5`           | 77.83      | **95.9**        | **97.6** | 3m 43s  | 4m 4s   | 4m      |
-| `grave`: `k-17, w-9`           | 71.7       | 94.1            | 96.4     | 24m 34s | 34m 25s | 3m 47s  | update time (24 cpus) - running
-| `grave`: `k-15, w-7`           | 84.1       | 94.5            | 96.6     | 4h 34m  | 3h 26m  | 10h 22m | update time (24 cpus) - running
+| `grave`: `k-17, w-9`           | 71.7       | 94.1            | 96.4     | 3m 30s  | 3m 34s  | 3m 44s  |
+| `grave`: `k-15, w-7`           | 84.1       | 94.5            | 96.6     |         |         |         | update time all 3
 | `grave`: `k-15, w-5`           | **89.7**   | 95.5            | 97.0     | 6m 43s  | 3m 43s  | 3m 52s  |
 | `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3  | 89.0            | 90.0     | 10.6s   | 28.5s   | 1m 5s   |
 

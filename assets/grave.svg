@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 38 285 100" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <style>
+      .ink   { fill: #2c3e50; }
+      .stone { fill: #2c3e50; }
+      .earth { stroke: #6c7a89; stroke-width: 1.6; fill: none; stroke-linecap: round; }
+      .word  { font-size: 96px; font-weight: 400; letter-spacing: 2px; }
+    </style>
+  </defs>
+
+  <!-- "gr_ve" -->
+  <text x="40" y="115" class="ink word">gr</text>
+  <text x="210" y="115" class="ink word">ve</text>
+
+  <!-- Tombstone -->
+  <g transform="translate(135,40)">
+    <path class="stone"
+          d="M5,75 L5,30 A30,30 0 0 1 65,30 L65,75 Z"/>
+  </g>
+
+  <!-- Mound under the stone -->
+  <path class="earth" d="M142,122 Q170,114 198,122"/>
+</svg>

@@ -5,7 +5,6 @@
 ### Developer guidance
 
 - added guidance to any module with resources specifically set outside of `conf/base.config`
-- increased resources to giraffe to account for aDNA parameter tuning
 
 ### Containers
 
@@ -19,17 +18,21 @@
 
 - Now implemented as parameters rather than hard-coded, though the settings are currently not changed
 
+### Giraffe resources
+
+- testing shows Giraffe runtime scales well with cpu count. Increased default to 64 cores.
+
 ### Graph indexing
 
-- K-mer and window size default parameters should now work better for typical degraded aDNA reads
+- K-mer and window size default parameters should now work better for typical degraded aDNA reads (k 19, w 5 selected as a balanced default with excellent performance particularly at 50 & 70 bp, plus acceptable performance at 30)
 
 - Notes added to nextflow.config regarding successful mapping of ultra-short reads
 
-- added README explainer on k and w choice in the context of aDNA alignment
+- added README explainer on k and w choice in the context of aDNA alignment, with examples of performance for target read lengths (e.g. k 15, w 5, if 30 bp performance needs to be improved)
 
 - Changed the minimiser and zipcode extensions throughout the codebase to conform with those currently used by vg developers. (i.e. minimiser = `.withzip.min`, and zipcodes = `.zipcodes`)
 
-- TODO: update schema with final selected defaults
+- updated schema with selected defaults
 
 ### GAM filtering
 

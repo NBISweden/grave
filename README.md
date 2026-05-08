@@ -148,22 +148,22 @@ Use `pixi run help` to see the available parameters and their descriptions.
 > For aDNA reads, which are usually short and highly degraded, achieving more exact matches to minimisers involves reducing specificity via a lower `k`.
 > Meanwhile, minimiser density in the index can be boosted via lowering `w`.
 > Reducing either of these values will generally increase alignment runtime. <br><br>
-TODO: > The grave aDNA default settings (`k` = x, `w` = y) are selected to balance sensitivity with computational runtime.
+> The grave aDNA default settings (`k` = 19, `w` = 5) are selected to balance sensitivity/specificity with computational runtime.
 > Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).<br>
-> As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and the reads.
+> As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
-**Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.
+**Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.<br>Note that `bwa` defaults to use 6 cpus, while `grave` uses 64.
 
-| Alignment tool                   | \|---      | Percent aligned | ---\| | \|---   | Runtime | ---\|   |
-| :------:                         |  :-:       | :-----:         | :-:   | :--:    | :---:   | :--:    |
-| *Read length*\*                  | *30*       | *50*            | *70*  | *30*    | *50*    | *70*    |
-| `grave`: `k-21, w-11`            | 0.0**      | 92.1            | 96.5  | 3m 53s  | 4m 3s   | 4m 5s   |
-| `grave`: `k-19, w-5`             |            |                 |       |         |         |         |
-| `grave`: `k-17, w-9`             | 71.7       | 94.1            | 96.4  | 24m 34s | 34m 25s | 3m 47s  |
-| `grave`: `k-15, w-7`             | 84.1       | 94.5            | 96.6  | 4h 34m  | 3h 26m  | 10h 22m |
-| `grave`: `k-15, w-5`             | **89.7**   | **95.5**        | TODO  | 7h 14m  | 13h 36m | TODO    |
-| `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3    | 89.0            | 90.0  | 10.6s   | 28.5s   | 1m 5s   |
+| Alignment tool                 | \|---      | Percent aligned | ---\|    | \|---   | Runtime | ---\|   |
+| :------:                       |  :-:       | :-----:         | :-:      | :--:    | :---:   | :--:    |
+| *Read length*\*                | *30*       | *50*            | *70*     | *30*    | *50*    | *70*    |
+| `grave`: `k-21, w-11`          | 0.0**      | 92.1            | 96.5     | 3m 53s  | 4m 3s   | 4m 5s   | update time (24 cpus) - running
+| `grave`: `k-19, w-5`           | 77.83      | **95.9**        | **97.6** | 3m 43s  | 4m 4s   | 4m      |
+| `grave`: `k-17, w-9`           | 71.7       | 94.1            | 96.4     | 24m 34s | 34m 25s | 3m 47s  | update time (24 cpus) - running
+| `grave`: `k-15, w-7`           | 84.1       | 94.5            | 96.6     | 4h 34m  | 3h 26m  | 10h 22m | update time (24 cpus) - running
+| `grave`: `k-15, w-5`           | **89.7**   | 95.5            | 97.0     | 6m 43s  | 3m 43s  | 3m 52s  |
+| `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3  | 89.0            | 90.0     | 10.6s   | 28.5s   | 1m 5s   |
 
 \*~10k merged reads were generated (per length) with `NGSNGS` from a related assembly not present in the graph (sheep).
 
@@ -215,7 +215,7 @@ unknownSimian.1.gorilla.bam
 ## Workflow outputs
 
 >[!TIP]
-> Results are stored in the `results` directory. Exact outputs depend on the settings used.
+> By default results are stored in the `results` directory. Exact outputs depend on the settings used.
 
 | Output directory      | Description                                                                                                               |
 |-----------------------|---------------------------------------------------------------------------------------------------------------------------|

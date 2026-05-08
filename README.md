@@ -3,7 +3,7 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
-<p align="center">
+<p align="left">
   <img src="assets/grave.svg" alt="grave" width="500">
 </p>
 

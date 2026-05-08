@@ -2,8 +2,7 @@
   <defs>
     <style>
       .ink   { fill: #2c3e50; }
-      .stone { fill: #2c3e50; }
-      .earth { stroke: #6c7a89; stroke-width: 1.6; fill: none; stroke-linecap: round; }
+      .stone { fill: #1f2d3a; }
       .word  { font-size: 96px; font-weight: 400; letter-spacing: 2px; }
     </style>
   </defs>
@@ -17,7 +16,4 @@
     <path class="stone"
           d="M5,75 L5,30 A30,30 0 0 1 65,30 L65,75 Z"/>
   </g>
-
-  <!-- Mound under the stone -->
-  <path class="earth" d="M142,122 Q170,114 198,122"/>
 </svg>

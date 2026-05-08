@@ -3,7 +3,9 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 
-![grave logo](assets/grave.svg)
+<p align="center">
+  <img src="assets/grave.svg" alt="grave" width="300">
+</p>
 
 **Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
 

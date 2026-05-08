@@ -2,7 +2,7 @@
 ![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
 
 <p align="center">
-  <img src="assets/grave.svg" alt="grave" width="500">
+  <img src="assets/grave3.svg" alt="grave" width="500">
 </p>
 
 <div align="center"><strong>Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA</strong></div><br>

@@ -5,7 +5,7 @@
   <img src="assets/grave.svg" alt="grave" width="500">
 </p>
 
-<div align="center"><strong>Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA</strong></div>
+<div align="center"><strong>Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA</strong></div><br>
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
 

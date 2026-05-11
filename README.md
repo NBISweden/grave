@@ -173,7 +173,7 @@ Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for 
 
 \*\*`k+w-1` (31) is greater than the read length (30), therefore no alignments are generated.
 
-\*\*\*The bwa linear reference was the same assembly used as the graph backbone.
+\*\*\*The bwa linear reference was the same assembly that was used as the graph backbone.
 
 #### Was your graph built with more than one reference sample?
 

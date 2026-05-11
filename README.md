@@ -15,7 +15,7 @@
 
 In normal use, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet (listing either paired-end or pre-merged FASTQ data).
 
-`NOTE:` To compare outcomes of graph-based versus traditional (linear assembly) workflow methodologies, grave can also be run in [linear mode](#linear-reference-mode) against a single FASTA reference instead of a graph.
+`NOTE:` To compare outcomes of graph-based versus traditional (linear assembly) workflow methodologies, `grave` can also be run in [linear mode](#linear-reference-mode) against a single FASTA reference instead of a graph.
 
 Outputs are described [here](#workflow-outputs).
 
@@ -89,8 +89,8 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 > [!IMPORTANT]
 > - Depth filtered graphs are not considered current best practice when users can provide relatively high coverage and high quality readsets typical of modern samples (e.g. 20x read coverage with 150 bp reads). In this case, an approach that uses *K*-mers from the reads to sample representative haplotypes from the unfiltered graph is preferable, `see unfiltered graphs section below`.
-> - However, when running `short, highly degraded, and contaminated aDNA readsets` through grave, `filtered graphs may perform better`.
-> - This is because the haplotype subsampling of the graph is likely to underperform. Issues include the low coverage of target reads, deamination of target reads, short target reads (that require higher read coverage to perform comparibly with longer reads), and high representation of non-target *K*-mers. In this case, it may be preferable to sacrifice some rare variants and use a depth filtered graph.
+> - However, when running `short, highly degraded, and contaminated aDNA readsets` through `grave`, `filtered graphs may perform better`.
+> - This is because haplotype subsampling of the graph using read *K*-mers is likely to underperform. Issues include the low coverage of target reads, deamination of target reads, short target reads (that require higher read coverage to perform comparibly with longer reads), and high representation of non-target *K*-mers. Depending on the use case, it may be preferable to sacrifice some rare variants and use a depth filtered graph, or at least test both graph types.
 
 ##### Unfiltered graphs
 
@@ -108,7 +108,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 Complete a `samplesheet.csv` file, detailing file system paths to your reads. The layout is shown below.
 
 >[!TIP]
-> The table below is an example. The file provided to grave must be in `.csv` format
+> The table below is an example. The file provided to `grave` must be in `.csv` format
 
 | sample_id     | library_id | repeat_number | sample_type | merged | fastq1                | fastq2               |
 |---------------|------------|---------------|-------------|--------|-----------------------|----------------------|
@@ -145,17 +145,17 @@ Use `pixi run help` to see the available parameters and their descriptions.
 > During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value.
 > The seeding stage of alignment involves computing exact matches between these minimisers and reads.
 > Users must keep in mind that reads shorter than `k+w-1` will not be aligned, as they cannot be seeded. <br><br>
-> To address this, grave uses different `k` and `w` defaults for modern and ancient reads.
+> To address this, `grave` uses different `k` and `w` defaults for modern and ancient reads.
 > Modern samples are run with the program defaults, emphasising higher specificity (`k` = 29, `w` = 11).
 > For aDNA reads, which are usually short and highly degraded, achieving more exact matches to minimisers involves reducing specificity via a lower `k`.
 > Meanwhile, minimiser density in the index can be boosted via lowering `w`.
 > Reducing either of these values can increase alignment runtime. <br><br>
-> The grave aDNA default settings (`k` = 19, `w` = 5) are selected to balance sensitivity/specificity with computational runtime.
+> The `grave` aDNA default settings (`k` = 19, `w` = 5) are selected to balance sensitivity/specificity with computational runtime.
 > Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).<br>
 > As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
-**Comparison of alignment parameters**<br>Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.<br>Note that `bwa` defaults to use 6 cpus, while `grave` uses 64.
+**Comparison of alignment parameters**<br>
 
 | Alignment tool                 | \|---      | Percent aligned | ---\|    | \|---   | Runtime | ---\|   |
 | :------:                       |  :-:       | :-----:         | :-:      | :--:    | :---:   | :--:    |
@@ -166,6 +166,8 @@ Use `pixi run help` to see the available parameters and their descriptions.
 | `grave`: `k-15, w-7`           | 84.1       | 94.5            | 96.6     | 3m 44s  | 3m 33   | 3m 56s  |
 | `grave`: `k-15, w-5`           | **89.7**   | 95.5            | 97.0     | 6m 43s  | 3m 43s  | 3m 52s  |
 | `bwa aln: -l 16500 -n 0.01 -o 2`*** | 88.3  | 89.0            | 90.0     | 10.6s   | 28.5s   | 1m 5s   |
+
+Unmapped reads removed, no additional `GAM/BAM` filtering, `grave` defaults for the remaining settings.<br>Note that `bwa` defaults to use 6 cpus, while `grave` uses 64.
 
 \*~10k merged reads were generated (per length) with `NGSNGS` from a related assembly not present in the graph (sheep).
 
@@ -206,7 +208,7 @@ unknownSimian.1.gorilla.bam
 
 > Running at scale (e.g., on SLURM cluster)
 
-- Institutional profiles are available via `nf-core` for many major HPC centres, see [here](https://nf-co.re/configs/). The example command below configures grave for the Dardel cluster in Stockholm, Sweden
+- Institutional profiles are available via `nf-core` for many major HPC centres, see [here](https://nf-co.re/configs/). The example command below configures `grave` for the Dardel cluster in Stockholm, Sweden
 
 - When running on a cluster using the `slurm` job scheduler, ensure you provide a project allocation number using the `--project` parameter. This can be on the command line or via the `params.yml` file
 

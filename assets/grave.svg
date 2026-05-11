@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 38 345 100" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <style>
+      .ink   { fill: #4a6a85; }
+      .stone { fill: #3a5470; }
+      .earth { fill: #6d8298; }
+      .graph { fill: none; stroke: #a4b5c4; stroke-width: 2; stroke-linecap: round; }
+      .node  { fill: #a4b5c4; }
+      .word  { font-size: 96px; font-weight: 400; letter-spacing: 2px; }
+    </style>
+    <mask id="textCutout" maskUnits="userSpaceOnUse">
+      <rect x="0" y="38" width="345" height="100" fill="white"/>
+      <g fill="black" stroke="black" stroke-width="2" stroke-linejoin="round">
+        <text x="40"  y="115" class="word">gr</text>
+        <text x="210" y="115" class="word">ve</text>
+        <path d="M140,115 L140,70 A30,30 0 0 1 200,70 L200,115 Z"/>
+      </g>
+    </mask>
+  </defs>
+
+  <!-- Background: left bubble + masked path behind text -->
+  <g mask="url(#textCutout)">
+    <g class="graph">
+      <line x1="5"   y1="95" x2="10"  y2="95"/>
+      <line x1="35"  y1="95" x2="308" y2="95"/>
+      <path d="M10,95 Q22.5,78 35,95"/>
+      <path d="M10,95 Q22.5,112 35,95"/>
+    </g>
+  </g>
+
+  <!-- Wordmark + tombstone + mound -->
+  <text x="40" y="115" class="ink word">gr</text>
+  <text x="210" y="115" class="ink word">ve</text>
+  <g transform="translate(135,40)">
+    <path class="stone" d="M5,75 L5,30 A30,30 0 0 1 65,30 L65,75 Z"/>
+  </g>
+  <path class="earth" d="M132,115 L208,115 Q170,149 132,115 Z"/>
+
+  <!-- Foreground: right bubble + remainder of path -->
+<g class="graph">
+  <line x1="308" y1="95" x2="310" y2="95"/>
+  <line x1="340" y1="95" x2="344" y2="95"/>
+  <path d="M310,95 Q325,78 340,95"/>
+  <path d="M310,95 Q315,103 320,105"/>
+  <path d="M330,105 Q335,103 340,95"/>
+  <path d="M320,105 Q325,98 330,105"/>
+  <path d="M320,105 Q325,112 330,105"/>
+</g>
+</svg>

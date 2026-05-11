@@ -1,11 +1,13 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 ![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
 
+<p align="center">
+  <img src="assets/grave.svg" alt="grave" width="500">
+</p>
+
+<div align="center"><strong>Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA</strong></div><br>
+
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NBISweden/grave)
-
-# grave
-
-**Graph Variant Explorer: Pangenomic analysis of ancient or modern DNA**
 
 ## Brief description
 

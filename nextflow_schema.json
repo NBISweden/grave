@@ -195,12 +195,12 @@
       "properties": {
         "aDNAkmerLength": {
           "type": "integer",
-          "default": 21,
+          "default": 19,
           "description": "K value when K-mer profiling ancient DNA samples and constructing graph indexes"
         },
         "aDNAwindowLength": {
           "type": "integer",
-          "default": 11,
+          "default": 5,
           "description": "Window size when constructing graph indexes for ancient DNA samples"
         },
         "modernKmerLength": {

@@ -2,6 +2,10 @@
 
 ## [ 2.2.0 - Unreleased ]
 
+### Logo
+
+- added repo logo
+
 ### Developer guidance
 
 - added guidance to any module with resources specifically set outside of `conf/base.config`

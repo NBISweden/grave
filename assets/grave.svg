@@ -36,7 +36,7 @@
   <!-- Tombstone (shadow drawn first, front face on top) -->
   <g transform="translate(135,40)">
     <!-- Right side -->
-    <path class="shadow" d="M65,75 L65,30 L69,26 L69,75 Z"/>
+    <path class="shadow" d="M65,75 L65,25 L69,26 L69,75 Z"/>
     <!-- Top -->
     <path class="shadow" d="M5,30 A30,30 0 0 1 65,30 L69,26 A32,30 0 0 0 5,30 Z"/>
     <!-- Front face -->

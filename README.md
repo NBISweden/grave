@@ -29,7 +29,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 1. [Install Pixi](https://pixi.sh/latest/installation/): `curl -fsSL https://pixi.sh/install.sh | sh`
 2. Clone the Workflow repository: `git clone https://github.com/NBISweden/grave.git`
-3. Run `pixi install`
+3. Run `cd grave && pixi install`
 
 >[!NOTE]
 >The pixi project contains two environments:<br><br>

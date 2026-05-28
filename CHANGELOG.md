@@ -1,5 +1,13 @@
 # Changelog
 
+#### Benchmarking branch specific commits
+
+- Expectations figures `benchmarking/expectations/*svg`
+
+- Benchmarking yml `tests/ovis-benchmarking.yml`
+
+- `benchmarking/workflow.qmd`
+
 ## [2.2.0-pre] (pre-release) 2026-05-28
 
 ### GAM filtering defaults

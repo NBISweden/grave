@@ -1,0 +1,39 @@
+
+# Step 1: run grave with 5 read sets (lengths 30, 40, 50, 60, 70), in two modes (19/5 and 15/5)
+
+- Run the same reads with BWA aln to get five BAMs for comparison (mapped only, no MAPQ filter)
+- Goal: get the 10 raw GAMs (mapped only, no MAPQ filter), and 5 BAMs from BWA (mapped only, no MAPQ filter)
+
+```
+# Running in commit 41b9783 (2.2.0-pre-release)
+# Run once with 19/5, once with 15/5
+
+pixi run nextflow main.nf -profile pdc_kth -params-file tests/ovis-benchmarking.yml --project naiss2025-22-725
+```
+
+# Step 2: run MAPQ filtering on the GAMs at a range of thresholds
+
+- GAMS, keep mapq unfiltered, add: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60
+- BAMS, add ONE MAPQ filter, whatever is the field standard for BWA (`$VAL?`)
+- 130 GAMs in total, of which 5 unfiltered
+- 10 BAMs, of which 5 unfiltered
+
+# Step 3: surject to BAM in reference space
+
+- 140 BAMs in total
+
+# Step 4: generate BED format files of the mapped reads
+
+- 140 BED files in total
+
+# Step 5: run liftover against the source assemblies
+
+- in this case, one source (reference genome) and one target (de novo assembly used for generating the reads)
+- 140 liftover files
+
+# Step 6: extract mapping accuracy stats from the liftover results
+
+
+# Step 7: plot yield & accuracy vs proportion
+
+

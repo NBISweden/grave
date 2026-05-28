@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 460" font-family="sans-serif" font-size="12">
+  <text x="330" y="22" text-anchor="middle" font-size="15" font-weight="bold">
+    Correctly-mapped reads per million input, by MAPQ threshold
+  </text>
+  <text x="330" y="40" text-anchor="middle" font-size="11" fill="#666">
+    peak = optimal MAPQ filter for that condition
+  </text>
+
+  <!-- Plot area -->
+  <rect x="70" y="55" width="450" height="345" fill="none" stroke="#333"/>
+
+  <!-- X axis: MAPQ 0..60 -->
+  <g stroke="#333">
+    <line x1="70"  y1="400" x2="70"  y2="405"/>
+    <line x1="145" y1="400" x2="145" y2="405"/>
+    <line x1="220" y1="400" x2="220" y2="405"/>
+    <line x1="295" y1="400" x2="295" y2="405"/>
+    <line x1="370" y1="400" x2="370" y2="405"/>
+    <line x1="445" y1="400" x2="445" y2="405"/>
+    <line x1="520" y1="400" x2="520" y2="405"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="70"  y="418">0</text>
+    <text x="145" y="418">10</text>
+    <text x="220" y="418">20</text>
+    <text x="295" y="418">30</text>
+    <text x="370" y="418">40</text>
+    <text x="445" y="418">50</text>
+    <text x="520" y="418">60</text>
+  </g>
+  <text x="295" y="442" text-anchor="middle" font-weight="bold">MAPQ threshold</text>
+
+  <!-- Y axis: 0 to 1,000,000 -->
+  <g stroke="#333">
+    <line x1="65" y1="400" x2="70" y2="400"/>
+    <line x1="65" y1="331" x2="70" y2="331"/>
+    <line x1="65" y1="262" x2="70" y2="262"/>
+    <line x1="65" y1="193" x2="70" y2="193"/>
+    <line x1="65" y1="124" x2="70" y2="124"/>
+    <line x1="65" y1="55"  x2="70" y2="55"/>
+  </g>
+  <g text-anchor="end">
+    <text x="60" y="404">0</text>
+    <text x="60" y="335">200k</text>
+    <text x="60" y="266">400k</text>
+    <text x="60" y="197">600k</text>
+    <text x="60" y="128">800k</text>
+    <text x="60" y="59">1.0M</text>
+  </g>
+  <text x="20" y="225" text-anchor="middle" font-weight="bold"
+        transform="rotate(-90 20 225)">correct reads / M input</text>
+
+  <!-- Gridlines (light) -->
+  <g stroke="#eee">
+    <line x1="70" y1="331" x2="520" y2="331"/>
+    <line x1="70" y1="262" x2="520" y2="262"/>
+    <line x1="70" y1="193" x2="520" y2="193"/>
+    <line x1="70" y1="124" x2="520" y2="124"/>
+  </g>
+
+  <!-- Curves: rise (accuracy gain) then fall (retention loss). Peak shifts left for longer reads. -->
+  <!-- X coords: MAPQ 0,5,10,15,20,30,40,50,60 = 70,107.5,145,182.5,220,295,370,445,520 -->
+
+  <!-- 30 bp solid: low yield, peaks ~MAPQ 20 -->
+  <polyline points="70,290 107,250 145,215 182,195 220,188 295,210 370,260 445,330 520,385"
+            fill="none" stroke="#d73027" stroke-width="2"/>
+  <!-- 30 bp dashed -->
+  <polyline points="70,310 107,270 145,238 182,215 220,205 295,220 370,265 445,330 520,385"
+            fill="none" stroke="#d73027" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <!-- 40 bp -->
+  <polyline points="70,230 107,185 145,150 182,128 220,118 295,128 370,170 445,240 520,330"
+            fill="none" stroke="#fc8d59" stroke-width="2"/>
+  <polyline points="70,250 107,205 145,170 182,148 220,138 295,145 370,185 445,250 520,335"
+            fill="none" stroke="#fc8d59" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <!-- 50 bp -->
+  <polyline points="70,170 107,128 145,98  182,82  220,75  295,82  370,115 445,180 520,275"
+            fill="none" stroke="#91cf60" stroke-width="2"/>
+  <polyline points="70,188 107,145 145,115 182,98  220,92  295,98  370,128 445,190 520,280"
+            fill="none" stroke="#91cf60" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <!-- 60 bp -->
+  <polyline points="70,125 107,90  145,72  182,65  220,62  295,68  370,95  445,155 520,245"
+            fill="none" stroke="#1a9850" stroke-width="2"/>
+  <polyline points="70,142 107,105 145,88  182,80  220,76  295,82  370,108 445,165 520,250"
+            fill="none" stroke="#1a9850" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <!-- 70 bp -->
+  <polyline points="70,95  107,72  145,62  182,58  220,57  295,62  370,82  445,140 520,225"
+            fill="none" stroke="#4575b4" stroke-width="2"/>
+  <polyline points="70,110 107,85  145,75  182,70  220,68  295,72  370,92  445,148 520,230"
+            fill="none" stroke="#4575b4" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <!-- Mark optimum on 50bp solid (MAPQ 20) -->
+  <circle cx="220" cy="75" r="5" fill="#fff" stroke="#91cf60" stroke-width="2"/>
+  <line x1="220" y1="75" x2="260" y2="50" stroke="#666"/>
+  <text x="265" y="48" font-size="10" fill="#333">optimum (50bp, k+w A)</text>
+  <text x="265" y="60" font-size="10" fill="#666">MAPQ ≈ 20</text>
+
+  <!-- Annotate regimes -->
+  <text x="110" y="395" font-size="10" fill="#888" font-style="italic">noise-dominated</text>
+  <text x="460" y="395" font-size="10" fill="#888" font-style="italic">over-filtered</text>
+
+  <!-- Legend -->
+  <g transform="translate(540,70)" font-size="11">
+    <text x="0" y="0" font-weight="bold">Read length</text>
+    <line x1="0" y1="14" x2="20" y2="14" stroke="#d73027" stroke-width="2"/><text x="25" y="18">30</text>
+    <line x1="0" y1="32" x2="20" y2="32" stroke="#fc8d59" stroke-width="2"/><text x="25" y="36">40</text>
+    <line x1="0" y1="50" x2="20" y2="50" stroke="#91cf60" stroke-width="2"/><text x="25" y="54">50</text>
+    <line x1="0" y1="68" x2="20" y2="68" stroke="#1a9850" stroke-width="2"/><text x="25" y="72">60</text>
+    <line x1="0" y1="86" x2="20" y2="86" stroke="#4575b4" stroke-width="2"/><text x="25" y="90">70</text>
+
+    <text x="0" y="115" font-weight="bold">k+w</text>
+    <line x1="0" y1="129" x2="20" y2="129" stroke="#333" stroke-width="2"/><text x="25" y="133">A</text>
+    <line x1="0" y1="147" x2="20" y2="147" stroke="#333" stroke-width="2" stroke-dasharray="5,4"/><text x="25" y="151">B</text>
+  </g>
+</svg>

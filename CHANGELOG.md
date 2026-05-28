@@ -1,6 +1,10 @@
 # Changelog
 
-## [ 2.2.0 - Unreleased ]
+## [2.2.0-pre] (pre-release) 2026-05-28
+
+### GAM filtering defaults
+
+- [Prelease]: running benchmarks
 
 ### Logo
 
@@ -38,9 +42,9 @@
 
 - updated schema with selected defaults
 
-### GAM filtering
+### GAM filtering defaults
 
-- TODO: #################
+- [Prelease]: running benchmarks, [release], set defaults
 
 ### Prioritise filtered graphs
 

@@ -13,7 +13,7 @@ process GIRAFFE {
     output:
     tuple val(meta), path("${meta.read_group}.filtered.gam"), env('ALIGNMENT_COUNT'), emit: ch_gam_counts
     path "${meta.read_group}.gam", optional: true, emit: ch_raw_gam
-    path "${meta.read_group}_raw-alignment-stats.txt", emit: ch_raw_alignment_stats
+    path "${meta.read_group}_raw-alignment-stats.txt", emit: ch_raw_alignment_stats, optional: true
     path "${meta.read_group}_filtered-alignment-stats.txt", emit: ch_filtered_alignment_stats
     tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
     tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
@@ -40,7 +40,10 @@ process GIRAFFE {
         vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -67,7 +70,10 @@ process GIRAFFE {
         vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.withzip.min --zipcode-name *.adna.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -102,7 +108,10 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -129,7 +138,10 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -161,7 +173,10 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
@@ -188,7 +203,10 @@ process GIRAFFE {
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
         # Report raw mapping statistics
-        vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        if [ "${params.rawMapStats}" == "true" ]
+            then
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+        fi
 
         # Filter GAM
         vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam

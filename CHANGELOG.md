@@ -1,6 +1,25 @@
 # Changelog
 
+## [2.2.0] - Unreleased
+
+### GAM filtering defaults
+
+- Set defaults based on benchmarking:
+    - TODO:
+
+### Stats on the raw GAM
+
+- Now optional via param `rawMapStats`
+
+### nf-core tools
+
+- Bumped to v4.0.2 in pixi env
+
 ## [2.2.0-pre] (pre-release) 2026-05-28
+
+### Benchmarking in 2.2.0-pre-release (41b9783)
+
+- Benchmarking of mapping accuracy to be done in 2.2.0-pre-release `41b9783` (though note there will be 1 or more commits for benchmarking related files - no code changes)
 
 ### GAM filtering defaults
 

@@ -149,6 +149,10 @@
           "type": "boolean",
           "description": "Publish raw GAM files in addition to standard filtered outputs"
         },
+        "rawMapStats": {
+          "type": "boolean",
+          "description": "Publish stats on the raw GAM (will include unmapped)"
+        },
         "keepRawVcf": {
           "type": "boolean",
           "description": "Publish raw VCF files in addition to standard filtered & normalised output"

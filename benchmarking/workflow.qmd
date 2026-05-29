@@ -2,6 +2,7 @@
 # Step 1: run grave with 5 read sets (lengths 30, 40, 50, 60, 70), in two modes (19/5 and 15/5)
 
 - Run the same reads with BWA aln to get five BAMs for comparison (mapped only, no MAPQ filter)
+- 100k subsampled reads per length, using noir assembly
 - Goal: get the 10 raw GAMs (mapped only, no MAPQ filter), and 5 BAMs from BWA (mapped only, no MAPQ filter)
 
 ```
@@ -13,10 +14,19 @@ pixi run nextflow main.nf -profile pdc_kth -params-file tests/ovis-benchmarking.
 
 # Step 2: run MAPQ filtering on the GAMs at a range of thresholds
 
-- GAMS, keep mapq unfiltered, add: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60
-- BAMS, add ONE MAPQ filter, whatever is the field standard for BWA (`$VAL?`)
+- GAMS, keep mapq filter 0, add: 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60
+- bwa BAMS, add two MAPQ filters, two field standards used in aDNA - 20 & 30  - see note below looking into BWA aln MAPQ definitions
 - 130 GAMs in total, of which 5 unfiltered
 - 10 BAMs, of which 5 unfiltered
+
+```{BWA aln MAPQ definitions}
+- `bwase.c` is the script in question
+- four possible paths for MAPQ setting, three are fixed values
+    - 0: multiple best hits, or unmapped read
+    - 25: unique best hit, but at the mismatch threshold
+    - 37: unique best hit, no alternative hits
+    - the fourth is capped at 23 and degrades based on number of alternative suboptimal hits: unique best hit, but multiple suboptimal hits
+```
 
 # Step 3: surject to BAM in reference space
 

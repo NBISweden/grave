@@ -1,3 +1,26 @@
+# Preparation
+
+## Read generation
+
+- Subsampling 100k reads from pre-merged and FASTP processed noirduvelay subsets
+
+```
+noirduvelay_30.1.1.fastp.fq.gz
+noirduvelay_40.1.1.fastp.fq.gz
+noirduvelay_50.1.1.fastp.fq.gz
+noirduvelay_60.1.1.fastp.fq.gz
+noirduvelay_70.1.1.fastp.fq.gz
+```
+
+- seqkit: 2.13.0
+
+```
+for i in *fastp.fq.gz; do
+    seqkit sample2 --non-deterministic --seq-type dna --number 100000 --two-pass $i > ${i%.fastp.fq.gz}.100k.fastp.fq
+done
+```
+
+- Committed to the benchmarking branch, in: `tests/data/fastq/benchmarking`
 
 # Step 1: run grave with 5 read sets (lengths 30, 40, 50, 60, 70), in two modes (19/5 and 15/5)
 

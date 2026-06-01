@@ -8,6 +8,8 @@
 
 - `benchmarking/workflow.qmd`
 
+- Reads in `tests/data/fastq/benchmarking`
+
 ## [2.2.0-pre] (pre-release) 2026-05-28
 
 ### GAM filtering defaults

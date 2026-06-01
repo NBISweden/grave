@@ -78,14 +78,22 @@ for i in *linear.mapped.MAPQ0.bam
     - the fourth is capped at 23 and degrades based on number of alternative suboptimal hits: unique best hit, but multiple suboptimal hits
 ```
 
-
-TODO: to check. Does surjection change MAPQ, or does it retain vg MAPQ values?
-- Is there documentation on VG MAPQ?
+TODO: generate a table of the numbers of alignments for each condition at this point
 
 
 # Step 3: surject to BAM in reference space
 
+```
+for i in *gam
+    do
+        vg surject -t 4 -x sheep_pangenome_v20260417.d3.gbz --bam-output $i | \
+        samtools sort --threads 4 --output-fmt BAM - > ${i%.gam}surjected.sorted.bam
+    done
+```
+
 - 145 BAMs in total
+
+
 
 # Step 4: generate BED format files of the mapped reads
 

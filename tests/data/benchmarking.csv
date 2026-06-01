@@ -1,0 +1,6 @@
+sample_id,library_id,repeat_number,sample_type,merged,fastq_1,fastq_2
+noirduvelay_30,1,1,ancient,true,./tests/data/fastq/benchmarking/noirduvelay_30.1.1.100k.fastp.fq.gz,,
+noirduvelay_40,1,1,ancient,true,./tests/data/fastq/benchmarking/noirduvelay_40.1.1.100k.fastp.fq.gz,,
+noirduvelay_50,1,1,ancient,true,./tests/data/fastq/benchmarking/noirduvelay_50.1.1.100k.fastp.fq.gz,,
+noirduvelay_60,1,1,ancient,true,./tests/data/fastq/benchmarking/noirduvelay_60.1.1.100k.fastp.fq.gz,,
+noirduvelay_70,1,1,ancient,true,./tests/data/fastq/benchmarking/noirduvelay_70.1.1.100k.fastp.fq.gz,,

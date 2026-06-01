@@ -107,8 +107,10 @@ if [ "$CLUSTER" == "dardel" ]; then
 elif [ "$CLUSTER" == "nac" ]; then
     module load Singularity
     launch_workflow
+elif [ "$CLUSTER" == "pelle" ]; then
+    launch_workflow
 else
     echo "WARN: this launch script contains no configuration for '$CLUSTER'." >&2
-    echo "Hint: you may need to pre-load the requested container platform (e.g. Apptainer/Singularity)" >&2
+    echo "Hint: if receiving an Apptainer/Singularity error, you may need to pre-load the requested container platform (e.g. Apptainer/Singularity)" >&2
     launch_workflow
 fi

@@ -15,29 +15,68 @@ process GAM_TO_TAGGED_SORTED_BAM {
 
     output:
     tuple val(meta), path("${meta.read_group}*.bam"), emit: ch_surjected_bams
-    tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
-    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
+    tuple val(meta), path("*.bam.flagstats")        , emit: ch_surjected_bam_stats
+    tuple val(task.process), val('vg')      , eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"')       , topic: versions
 
     script:
     def args = task.ext.args ?: ''
 
     if (!params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// Default reference paths, GAM not interleaved
         """
-        # Surject GAM, add read group tags, coordinate sort
-        vg surject -t ${task.cpus} -x ${graph} --bam-output ${mapped_gam} | \
-        samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-        samtools sort --threads ${task.cpus} --output-fmt BAM - > \
+        # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
+        vg surject \\
+            -t ${task.cpus} \\
+            -x ${graph} \\
+            --bam-output \\
+            ${mapped_gam} | \\
+        samtools addreplacerg \\
+            --threads ${task.cpus} \\
+            -u \\
+            --output-fmt BAM \\
+            -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
+            - | \\
+        samtools view \\
+            ${args} \\
+            --uncompressed \\
+            - | \\
+        samtools sort \\
+            --threads ${task.cpus} \\
+            --output-fmt BAM \\
+            - > \\
         ${meta.read_group}.bam
+
+        # Get stats on what survived surjection
+        samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
         """
 
     else if (!params.multiple_references && meta.type == "modern" && meta.merged == false)	// Default reference paths, GAM interleaved
         """
-        # Surject GAM, add read group tags, coordinate sort
-        vg surject -t ${task.cpus} -x ${graph} --interleaved --bam-output ${mapped_gam} | \
-        samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-        samtools sort --threads ${task.cpus} --output-fmt BAM - > \
+        # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
+        vg surject \\
+            -t ${task.cpus} \\
+            -x ${graph} \\
+            --interleaved \\
+            --bam-output \\
+            ${mapped_gam} | \\
+        samtools addreplacerg \\
+            --threads ${task.cpus} \\
+            -u \\
+            --output-fmt BAM \\
+            -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
+            - | \\
+        samtools view \\
+            ${args} \\
+            --uncompressed \\
+            - | \\
+        samtools sort \\
+            --threads ${task.cpus} \\
+            --output-fmt BAM \\
+            - > \\
         ${meta.read_group}.bam
 
+        # Get stats on what survived surjection
+        samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
         """
 
     else if (params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// User provided reference paths, GAM not interleaved
@@ -46,10 +85,30 @@ process GAM_TO_TAGGED_SORTED_BAM {
         for i in *.paths
             do
                 PREFIX=`echo \$i | sed 's/\\.paths//'`
-                vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --bam-output ${mapped_gam} | \
-                samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-                samtools sort --threads ${task.cpus} --output-fmt BAM - > \
+                vg surject \\
+                    -t ${task.cpus} \\
+                    -x ${graph} \\
+                    --into-paths \$i \\
+                    --bam-output \\
+                    ${mapped_gam} | \\
+                samtools addreplacerg \\
+                    --threads ${task.cpus} \\
+                    -u \\
+                    --output-fmt BAM \\
+                    -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
+                    - | \\
+                samtools view \\
+                    ${args} \\
+                    --uncompressed \\
+                    - | \\
+                samtools sort \\
+                    --threads ${task.cpus} \\
+                    --output-fmt BAM \\
+                    - > \\
                 ${meta.read_group}.\$PREFIX.bam
+
+                # Get stats on what survived surjection
+                samtools flagstat ${meta.read_group}.\$PREFIX.bam > ${meta.read_group}.\$PREFIX.bam.flagstats
             done
         """
 
@@ -59,10 +118,31 @@ process GAM_TO_TAGGED_SORTED_BAM {
         for i in *.paths
             do
                 PREFIX=`echo \$i | sed 's/\\.paths//'`
-                vg surject -t ${task.cpus} -x ${graph} --into-paths \$i --interleaved --bam-output ${mapped_gam} | \
-                samtools addreplacerg --threads ${task.cpus} --output-fmt BAM -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' - | \
-                samtools sort --threads ${task.cpus} --output-fmt BAM - > \
+                vg surject \\
+                    -t ${task.cpus} \\
+                    -x ${graph} \\
+                    --into-paths \$i \\
+                    --interleaved \\
+                    --bam-output \\
+                    ${mapped_gam} | \\
+                samtools addreplacerg \\
+                    --threads ${task.cpus} \\
+                    -u \\
+                    --output-fmt BAM \\
+                    -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
+                    - | \\
+                samtools view \\
+                    ${args} \\
+                    --uncompressed \\
+                    - | \\
+                samtools sort \\
+                    --threads ${task.cpus} \\
+                    --output-fmt BAM \\
+                    - > \\
                 ${meta.read_group}.\$PREFIX.bam
+
+                # Get stats on what survived surjection
+                samtools flagstat ${meta.read_group}.\$PREFIX.bam > ${meta.read_group}.\$PREFIX.bam.flagstats
             done
         """
 

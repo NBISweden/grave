@@ -11,6 +11,16 @@
 
 - Now optional via param `rawMapStats`
 
+### Surjection stats...
+
+- Surjection does not automatically remove reads that become unmapped during the process. This is true even if the upstream GAM was filtered for mapped reads only, as this is relative to the graph
+
+- Therefore, if users asked for the GAM to be filtered to mapped reads only, we now implicitly pass this command on to the surjection process. When samtools is done adding readgroups, the BAM now passes through `view` before sorting, where it will be filtered for mapped reads (if `gamDiscardUnmapped` = true), else passed through unchanged
+
+- If this filter is applied, our GAM alignment stats might be misleading, so we also run flagstats on the BAM
+
+- Relatedly, took this opportunity to clean up some of the stats file names to be more informative as to what file they refer to
+
 ### nf-core tools
 
 - Bumped to v4.0.2 in pixi env

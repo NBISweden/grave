@@ -13,10 +13,9 @@ process GIRAFFE {
     output:
     tuple val(meta), path("${meta.read_group}.filtered.gam"), env('ALIGNMENT_COUNT'), emit: ch_gam_counts
     path "${meta.read_group}.gam", optional: true, emit: ch_raw_gam
-    path "${meta.read_group}_raw-alignment-stats.txt", emit: ch_raw_alignment_stats, optional: true
-    path "${meta.read_group}_filtered-alignment-stats.txt", emit: ch_filtered_alignment_stats
-    tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"'), topic: versions
-    tuple val(task.process), val('vg'), eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
+    path "*vg-stats"             , emit: ch_gam_stats
+    tuple val(task.process), val('kmc'), eval('kmc version | head -n 1 | sed "s/.*ver. //; s/ .*//"')     , topic: versions
+    tuple val(task.process), val('vg') , eval('vg version | head -n 1 | sed "s/vg version v//g; s/ .*//"'), topic: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -42,7 +41,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -55,10 +54,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
@@ -72,7 +71,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -85,10 +84,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == false) // Arrives paired, output interleaved
@@ -110,7 +109,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -123,10 +122,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff readfiles
@@ -140,7 +139,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -153,10 +152,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
         """
 
     else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged, output not interleaved
@@ -175,7 +174,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -188,10 +187,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
 
         # Remove sample specific indexes
         rm *.${meta.read_group}.* *.kff
@@ -205,7 +204,7 @@ process GIRAFFE {
         # Report raw mapping statistics
         if [ "${params.rawMapStats}" == "true" ]
             then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}_raw-alignment-stats.txt
+                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
         fi
 
         # Filter GAM
@@ -218,10 +217,10 @@ process GIRAFFE {
         fi
 
         # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}_filtered-alignment-stats.txt
+        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
 
         # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}_filtered-alignment-stats.txt | awk '{print \$3}')
+        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
         """
 
 }

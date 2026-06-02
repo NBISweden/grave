@@ -37,14 +37,16 @@ workflow ALIGN_READS {
         mapped_gam      = branched_gam.passed
         failed_samples  = branched_gam.failed
         raw_gam         = GIRAFFE.out.ch_raw_gam
-        alignment_stats = GIRAFFE.out.ch_raw_alignment_stats.mix(GIRAFFE.out.ch_filtered_alignment_stats)
+        gam_stats       = GIRAFFE.out.ch_gam_stats
 
         GAM_TO_TAGGED_SORTED_BAM (
             reference,
             paths,
             mapped_gam
         )
-        mapped_bam = GAM_TO_TAGGED_SORTED_BAM.out.ch_surjected_bams
+        mapped_bam      = GAM_TO_TAGGED_SORTED_BAM.out.ch_surjected_bams
+        alignment_stats = gam_stats.mix(GAM_TO_TAGGED_SORTED_BAM.out.ch_surjected_bam_stats)
+
     // Run in linear reference mode
     } else if ( reference_type == "linear" ) {
         // Split samples by type
@@ -66,7 +68,7 @@ workflow ALIGN_READS {
             indexed_reference,
         )
         // Mix outputs
-        mapped_bam = BWA_ALN_SAMSE.out.ch_bam.mix(BWA_MEM.out.ch_bam)
+        mapped_bam      = BWA_ALN_SAMSE.out.ch_bam.mix(BWA_MEM.out.ch_bam)
         alignment_stats = BWA_ALN_SAMSE.out.ch_flagstat.mix(BWA_MEM.out.ch_flagstat)
     }
 

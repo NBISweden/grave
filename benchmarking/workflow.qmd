@@ -45,6 +45,7 @@ Output:
 
 - Since this is exploratory, run a large range of MAPQ filters
 
+```
 mapq_values=(5 10 15 20 25 30 35 40 45 50 55 60)
 
 for i in *MAPQ00.gam
@@ -54,6 +55,7 @@ for i in *MAPQ00.gam
                 vg filter --min-mapq "$mapq" -t 4 -x sheep_pangenome_v20260417.d3.gbz -v "$i" > "${i%MAPQ0.gam}MAPQ${mapq}.gam"
             done
     done
+```
 
 ## Linear BAMs
 
@@ -78,10 +80,8 @@ for i in *linear.mapped.MAPQ0.bam
     - the fourth is capped at 23 and degrades based on number of alternative suboptimal hits: unique best hit, but multiple suboptimal hits
 ```
 
-TODO: generate a table of the numbers of alignments for each condition at this point
 
-
-# Step 3: surject to BAM in reference space
+# Step 3: surject to BAM in reference space & refilter for mapped only
 
 ```
 for i in *gam
@@ -91,18 +91,39 @@ for i in *gam
     done
 ```
 
+```
+# Running separately so we can also guage loss rate during surjection, if any
+for i in *surjected.sorted.bam; do samtools view --with-header --exclude-flags 4 $i > ${i%bam}mapped.bam; done
+```
+
 - 145 BAMs in total
 
-
+- generated a table of counts per condition at this point (drive: `grave benchmarking counts`)
 
 # Step 4: generate BED format files of the mapped reads
 
-- 145 BED files in total
+- Output 145 BED files, with `RAMB1_chr   chromStart   chromEnd   read_name_with_source_coords`
+
+- Need RAMB1 with simple headers, `e.g. NC_056054.1`
+
+- need noirduvely assembly with simple headers: `e.g. >T0_RID4246203_S1_CBDTXI010000012.1`
+
+```
+# graph BAM structure
+
+T0_RID4246203_S1_CBDTXI010000012.1:1234643-1234712_length:70_mod0000    16      RAMB1#0#NW_024599814.1  9667    60      70M     *       0       0       GTTGGTTAAAACTCAAGATTCTGAAAACTAAGATCATGGCATCTGTCCCCATCACTTCATGGCAAATAAA  GCJGJCC=GGGJGCJJGJJG=JJGJJCJJJGJCJJ=JJJJGJ8JJCJGJGJCJJJGJGGGGGGG=G=C=C  AS:i:80
+
+# linear BAM structure
+
+T0_RID11531224_S1_CBDTXI010000002.1:69822-69891_length:70_mod0000       16      NC_056054.1     62661   37      70M     *       0       0       GGGACGAGAAGTCGAGGAATTTTCAGAGGATGATGATGAAGACTGGGATGATTCCAAAGCAGAAAAGCAA  GJCJJJGJJJJJGJJJCJJCJJGCJJJJJCJJJCJGJCJJJGGGJJGGCCJJJGJGJGG1GGGGGGGC=1  RG:Z:noirduvelay_70.1.1 XT:A:U  NM:i:0  X0:i:1  X1:i:0  XM:i:0  XO:i:0  XG:i:0  MD:Z:70
+```
+
 
 # Step 5: run liftover against the source assemblies
 
-- in this case, one source (reference genome) and one target (de novo assembly used for generating the reads)
-- 145 liftover files
+TODO: possibly need to implement minimap2 if BLAT underperforms? Start with a test.
+
+- 145 lifted beds
 
 # Step 6: extract mapping accuracy stats from the liftover results
 

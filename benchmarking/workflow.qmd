@@ -87,7 +87,7 @@ TODO: generate a table of the numbers of alignments for each condition at this p
 for i in *gam
     do
         vg surject -t 4 -x sheep_pangenome_v20260417.d3.gbz --bam-output $i | \
-        samtools sort --threads 4 --output-fmt BAM - > ${i%.gam}surjected.sorted.bam
+        samtools sort --threads 4 --output-fmt BAM - > ${i%gam}surjected.sorted.bam
     done
 ```
 

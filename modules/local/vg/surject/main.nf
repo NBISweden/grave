@@ -38,6 +38,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
             - | \\
         samtools view \\
             ${args} \\
+            --with-header \\
             --uncompressed \\
             - | \\
         samtools sort \\
@@ -67,6 +68,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
             - | \\
         samtools view \\
             ${args} \\
+            --with-header \\
             --uncompressed \\
             - | \\
         samtools sort \\
@@ -99,6 +101,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
                     - | \\
                 samtools view \\
                     ${args} \\
+                    --with-header \\
                     --uncompressed \\
                     - | \\
                 samtools sort \\
@@ -133,6 +136,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
                     - | \\
                 samtools view \\
                     ${args} \\
+                    --with-header \\
                     --uncompressed \\
                     - | \\
                 samtools sort \\

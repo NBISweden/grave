@@ -102,24 +102,58 @@ for i in *surjected.sorted.bam; do samtools view --with-header --exclude-flags 4
 
 # Step 4: generate BED format files of the mapped reads
 
-- Output 145 BED files, with `RAMB1_chr   chromStart   chromEnd   read_name_with_source_coords`
+- Output: 145 BED files, with `RAMB1_chr   chromStart   chromEnd   read_name_with_source_coords`
 
-- Need RAMB1 with simple headers, `e.g. NC_056054.1`
-
-- need noirduvely assembly with simple headers: `e.g. >T0_RID4246203_S1_CBDTXI010000012.1`
+- Running a sanity check that confirmed everything is relative to RAMB1 in the surjected BAMs
 
 ```
-# graph BAM structure
-
-T0_RID4246203_S1_CBDTXI010000012.1:1234643-1234712_length:70_mod0000    16      RAMB1#0#NW_024599814.1  9667    60      70M     *       0       0       GTTGGTTAAAACTCAAGATTCTGAAAACTAAGATCATGGCATCTGTCCCCATCACTTCATGGCAAATAAA  GCJGJCC=GGGJGCJJGJJG=JJGJJCJJJGJCJJ=JJJJGJ8JJCJGJGJCJJJGJGGGGGGG=G=C=C  AS:i:80
-
-# linear BAM structure
-
-T0_RID11531224_S1_CBDTXI010000002.1:69822-69891_length:70_mod0000       16      NC_056054.1     62661   37      70M     *       0       0       GGGACGAGAAGTCGAGGAATTTTCAGAGGATGATGATGAAGACTGGGATGATTCCAAAGCAGAAAAGCAA  GJCJJJGJJJJJGJJJCJJCJJGCJJJJJCJJJCJGJCJJJGGGJJGGCCJJJGJGJGG1GGGGGGGC=1  RG:Z:noirduvelay_70.1.1 XT:A:U  NM:i:0  X0:i:1  X1:i:0  XM:i:0  XO:i:0  XG:i:0  MD:Z:70
+for i in *surjected.sorted.mapped.bam; do samtools view $i | awk '{print $3}' >> all_targets.txt; done
+cat all_targets.txt | sort | uniq
 ```
 
+```
+#Convert the BAMs to BED
+for i in *bam; do bedtools bamtobed -i $i > ${i%bam}bed; done
+```
+
+```
+#aln BEDs already ready:
+NC_056054.1     23782   23852   T0_RID945749_S0_CBDTXI010000019.1:57267121-57267190_length:70_mod0100   0       -
+```
+
+```
+# graph BED structure - not ready (PAN-SN format chrom)
+RAMB1#0#NW_024599814.1  9666    9736    T0_RID4246203_S1_CBDTXI010000012.1:1234643-1234712_length:70_mod0000    60      -
+```
+
+```
+# convert graph beds to format needed for liftover
+for i in *surjected.sorted.mapped.bed
+    do
+        awk 'BEGIN{OFS="\t"} {gsub(/.*#/, "", $1); print}' $i > ${i%bed}converted.bed
+    done
+```
 
 # Step 5: run liftover against the source assemblies
+
+- Output: 145 lifted BED files
+
+- Step 1, get source assembly (`RAMB1`) into simple header format to match BEDs. `e.g. NC_056054.1`
+
+`sed -i '/^>/s/ .*//' GCF_016772045.2_ARS-UI_Ramb_v3.0_genomic.fna`
+
+- Step 2, get target assembly (`noirduvelay`) into simple header format
+
+```
+datasets download genome accession GCA_965363385.1
+# unpack, md5sum, etc.
+
+
+```
+
+
+
+
 
 TODO: possibly need to implement minimap2 if BLAT underperforms? Start with a test.
 

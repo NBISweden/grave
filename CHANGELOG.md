@@ -6,9 +6,11 @@
 
 - Benchmarking yml `tests/ovis-benchmarking.yml`
 
-- `benchmarking/workflow.qmd`
-
 - Reads in `tests/data/fastq/benchmarking`
+
+- Many commits for working on the `benchmarking/workflow.qmd`
+
+- `bin/mapping_accuracy.sh` for calculating accuracy from a BED file (see `workflow.qmd`)
 
 ## [2.2.0-pre] (pre-release) 2026-05-28
 

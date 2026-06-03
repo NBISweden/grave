@@ -92,7 +92,7 @@ for i in *gam
 ```
 
 ```
-# Running separately so we can also guage loss rate during surjection, if any
+# Running separately so we can also gauge loss rate during surjection, if any
 for i in *surjected.sorted.bam; do samtools view --with-header --exclude-flags 4 $i > ${i%bam}mapped.bam; done
 ```
 
@@ -151,19 +151,21 @@ datasets download genome accession GCA_965363385.1
 sed -i '/^>/s/ .*//' GCA_965363385.1.fna
 ```
 
-- Step 3, prepare `nf-chain` inputs and run (BLAT version)
+- Step 3, prepared `nf-chain` input samplesheets and ran (BLAT version)
 
+### Iterate step 3... liftover improvements
 
+- TODO: comparison to existing workflow, at the code level, examining the chain, and re-lifting BEDs using that chain (run the lift via nf-chain) - IN PROGRESS
 
-- TODO: running liftover now
+- TODO: nf-chain - clean up main branch. Remove chainbridge, bring in any improvements, docs around aligners & gff
 
-- TODO: possibly need to implement minimap2 if BLAT underperforms?
-
-- TODO: reboot vscode - ripgrep working now?
-
+- TODO: nf-chain - work on minimap2 branch and test that also
 
 # Step 6: extract mapping accuracy stats from the liftover results
 
+- Run `bin/accuracy.sh` on the lifted BEDs
+
+- TODO: depending on step 5 improvements, use different final BEDs
 
 # Step 7: plot yield & accuracy vs proportion
 

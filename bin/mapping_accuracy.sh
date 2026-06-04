@@ -64,7 +64,7 @@ BEGIN {
 END {
     d = (total > 0) ? total : 1
     if (fmt == "table") {
-        printf "file\tthreshold_pct\ttotal\tunmapped_n\tunmapped_pct\tparse_fail_n\tparse_fail_pct\twrong_contig_n\twrong_contig_pct\tno_overlap_n\tno_overlap_pct\tpartial_n\tpartial_pct\taccurate_n\taccurate_pct\tmean_start_err_bp\n"
+        printf "file\tthreshold_pct\ttotal_lifted\tunmapped_n\tunmapped_pct\tparse_fail_n\tparse_fail_pct\twrong_contig_n\twrong_contig_pct\tcorrect_tig_no_overlap_n\tcorrect_tig_no_overlap_pct\tsub_threshold_n\tsub_threshold_pct\taccurate_n\taccurate_pct\tmean_start_err_bp\n"
         printf "%s\t%.0f\t%d\t%d\t%.2f\t%d\t%.2f\t%d\t%.2f\t%d\t%.2f\t%d\t%.2f\t%d\t%.2f\t%.1f\n", \
             FILENAME, thr*100, total, \
             unmapped,  unmapped/d*100,  \

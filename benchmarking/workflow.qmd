@@ -151,21 +151,31 @@ datasets download genome accession GCA_965363385.1
 sed -i '/^>/s/ .*//' GCA_965363385.1.fna
 ```
 
-- Step 3, prepared `nf-chain` input samplesheets and ran (BLAT version)
+- Step 3, prepared `nf-chain` input samplesheets and ran (nf-chain v1: BLAT)
 
-### Iterate step 3... liftover improvements
+- Now also run the same with nf-chain v2: BLAT & minimap2
 
-- TODO: comparison to existing workflow, at the code level, examining the chain, and re-lifting BEDs using that chain (run the lift via nf-chain) - IN PROGRESS
+- Chain coverage looks best in minimap2, and this has the least number of failed lifts on BED lines
 
-- TODO: nf-chain - clean up main branch. Remove chainbridge, bring in any improvements, docs around aligners & gff
-
-- TODO: nf-chain - work on minimap2 branch and test that also
+- But we now need to compare accuracy, since more lifts doesn't necessarily mean more correct lifts
 
 # Step 6: extract mapping accuracy stats from the liftover results
 
-- Run `bin/accuracy.sh` on the lifted BEDs
+- Run `accuracy.sh` on the lifted BEDs (found in grave repo benchmarking branch, in `bin/mapping_accuracy.sh`)
+
+```
+for i in *bed
+    do
+        ./accuracy.sh $i 0.7 table | grep -v threshold_pct >> results.tsv
+    done
+```
+
+
+
 
 - TODO: depending on step 5 improvements, use different final BEDs
+
+
 
 # Step 7: plot yield & accuracy vs proportion
 

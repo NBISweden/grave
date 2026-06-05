@@ -1,0 +1,184 @@
+---
+title: "Read attrition per aligner/workflow step"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+## Overview
+
+Visualises read attrition at each step of graph/linear + benchmarking pipelines
+
+| Data dimensions | Values |
+|:--|:--|
+| **Aligner** | `grave_15_5`, `grave_19_5`, `bwa_aln` |
+| **Read length** | 30, 40, 50, 60, 70 bp |
+| **MAPQ threshold** | 0 – 60 in steps of 5 (13 values) |
+
+**Pipeline steps (x-axis):**
+`Initial (100k starting reads)` → `Post Align` → `Post MAPQ` → `Post Surjection` → `Post Liftover`
+
+Steps 1–2 are independent of MAPQ threshold and will appear constant across MAPQ slider frames.
+
+Note that `bwa-aln` also only has values at 0, 20, and 30 MAPQ thresholds (i.e. no filtering + the two field standard MAPQs).
+
+---
+
+## Test setup
+
+```{python}
+import sys
+import numpy as np
+print("Hello world")
+print("I am using python version " + str(sys.version))
+print("I am using numpy version " + str(np.__version__))
+```
+
+## Tool import
+```{python}
+#| label: setup
+import numpy as np
+import pandas as pd
+import plotly.express as px
+from plotnine import (
+    ggplot, aes,
+    geom_line, geom_point,
+    facet_grid,
+    scale_color_cmap, scale_y_continuous,
+    labs, theme_bw, theme, element_text,
+)
+from mizani.formatters import percent_format
+```
+
+# Constants
+```{python}
+#| label: constants
+ALIGNERS     = ['graph_15_5', 'graph_19_5', 'bwa_aln']
+READ_LENGTHS = [30, 40, 50, 60, 70]
+MAPQ_THRESH  = list(range(0, 65, 5))   # 0, 5, 10 ... 60
+BASE_COUNT   = 100_000
+
+STEP_ORDER  = ['initial', 'post_align', 'post_mapq', 'post_surject', 'post_lift']
+STEP_LABELS = {
+    'initial':         'Initial',
+    'post_align':      'Post Align',
+    'post_mapq':       'Post MAPQ',
+    'post_surject':    'Post Surjection',
+    'post_lift':       'Post Liftover',
+}
+RL_ORDER = [f'{r} bp' for r in READ_LENGTHS]
+```
+
+# Data enrich function
+```{python}
+#| label: helpers
+def _enrich(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    df['step'] = pd.Categorical(df['step'], categories=STEP_ORDER, ordered=True)
+    df['step_label'] = pd.Categorical(
+        df['step'].map(STEP_LABELS),
+        categories=[STEP_LABELS[s] for s in STEP_ORDER],
+        ordered=True,
+    )
+
+    init_counts = (
+        df.loc[df['step'] == 'initial', ['aligner', 'read_length', 'mapq', 'count']]
+        .rename(columns={'count': 'initial_count'})
+    )
+    df = df.merge(init_counts, on=['aligner', 'read_length', 'mapq'], how='left')
+    df['proportion'] = df['count'] / df['initial_count']
+
+    df['read_len_label'] = pd.Categorical(
+        df['read_length'].astype(str) + ' bp',
+        categories=RL_ORDER,
+        ordered=True,
+    )
+    return df
+```
+
+# Load data
+```{python}
+#| label: load-data
+def load_data(path: str) -> pd.DataFrame:
+    df = pd.read_csv(path)
+
+    # Data has missing values for bwa-aln (not all MAPQs present)
+    # Create complete cartesian product to ensure proper animation rendering
+    # Fills missing MAPQ/aligner combinations with NaN
+    all_aligners = sorted(df['aligner'].unique())
+    all_read_lengths = sorted(df['read_length'].unique())
+    all_mapqs = sorted(df['mapq'].unique())
+    all_steps = sorted(df['step'].unique())
+
+    complete_combos = pd.MultiIndex.from_product(
+        [all_aligners, all_read_lengths, all_mapqs, all_steps],
+        names=['aligner', 'read_length', 'mapq', 'step']
+    ).to_frame(index=False)
+
+    df = complete_combos.merge(df, on=['aligner', 'read_length', 'mapq', 'step'], how='left')
+
+    return _enrich(df)
+
+df = load_data('./data/loss.csv')
+
+# Sort by aligner, read_length, mapq, and step to ensure correct line rendering
+df = df.sort_values(['aligner', 'read_length', 'mapq', 'step'])
+
+df.head()
+```
+
+# Plot attrition curves
+```{python}
+#| label: plotly-interactive
+fig = px.line(
+    df,
+    x='step_label',
+    y='count',
+    color='read_len_label',
+    facet_col='aligner',
+    animation_frame='mapq',
+    markers=True,
+    category_orders={
+        'step_label':     [STEP_LABELS[s] for s in STEP_ORDER],
+        'read_len_label': RL_ORDER,
+        'aligner':        ALIGNERS,
+    },
+    color_discrete_sequence=px.colors.qualitative.Set1[:5],
+    labels={
+        'aligner':        'Aligner',
+        'step_label':     'Pipeline Step',
+        'count':          'Read Count',
+        'read_len_label': 'Read Length',
+        'mapq': 'MAPQ ≥',
+    },
+    title='Read attrition for mapping workflows',
+    height=500,
+)
+
+# Remove redundant "aligner=..." prefix
+fig.for_each_annotation(lambda a: a.update(text=a.text.split('=')[-1]))
+
+# Fix y-axis range across animation
+fig.update_yaxes(range=[0, BASE_COUNT * 1.06], showgrid=True, gridcolor='#ebebeb')
+fig.update_xaxes(tickangle=-20, showgrid=True, gridcolor='#ebebeb', title_text='')
+
+fig.update_layout(
+    plot_bgcolor='white',
+    paper_bgcolor='white',
+    font=dict(family='Arial, sans-serif', size=12),
+    legend_title_text='Read Length',
+    margin=dict(t=80, b=100, l=60, r=20),
+)
+fig.layout.sliders[0].currentvalue.update(prefix='MAPQ ≥ ', font=dict(size=13))
+
+fig.show()
+```

@@ -1,0 +1,22 @@
+[workspace]
+authors = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
+channels = ["conda-forge", "bioconda"]
+name = "statistical_plotting"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+kernel-register = "python -m ipykernel install --user --name grave-pixi --display-name 'grave (pixi)'"
+render-loss     = "quarto render loss.qmd"
+
+[dependencies]
+python     = "3.11.*"
+plotnine   = ">=0.15.5,<0.16"
+matplotlib = ">=3.10.9,<4"
+numpy      = "==2.4.6"
+pandas     = ">=3.0.3,<4"
+mizani     = ">=0.14.4,<0.15"
+plotly     = ">=6.8.0,<7"
+quarto     = ">=1.9.38,<2"
+ipykernel  = ">=6.29,<7"
+jupyter    = ">=1.1,<2"

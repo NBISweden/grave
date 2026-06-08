@@ -261,12 +261,11 @@
         },
         "minimumMapQFilter": {
           "type": "integer",
-          "default": 30,
+          "default": 20,
           "description": "GAM: MAPQ threshold applied when filtering (< INT), requires --gamFilterMapQ"
         },
         "alignIdentityFilter": {
           "type": "boolean",
-          "default": true,
           "description": "GAM: Apply alignment fraction identity filtering"
         },
         "minimumScorePrimaryAlign": {

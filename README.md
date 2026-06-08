@@ -150,12 +150,14 @@ Use `pixi run help` to see the available parameters and their descriptions.
 > For aDNA reads, which are usually short and highly degraded, achieving more exact matches to minimisers involves reducing specificity via a lower `k`.
 > Meanwhile, minimiser density in the index can be boosted via lowering `w`.
 > Reducing either of these values can increase alignment runtime. <br><br>
-> The `grave` aDNA default settings (`k` = 19, `w` = 5) are selected to balance sensitivity/specificity with computational runtime.
+> The `grave` aDNA default settings (`k` = 15, `w` = 5) are selected to achieve good sensitivity even at short read length.
 > Users may find that adjusting these parameters for their particular use case can improve performance. <br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).<br>
 > As the authors note, there is no single best combination setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
 **Comparison of alignment parameters**<br>
+
+Note that the table below does not consider accuracy. Please see the paper for full benchmarking.
 
 | Alignment tool                 | \|---      | Percent aligned | ---\|    | \|---   | Runtime | ---\|   |
 | :------:                       |  :-:       | :-----:         | :-:      | :--:    | :---:   | :--:    |

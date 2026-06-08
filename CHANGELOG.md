@@ -5,7 +5,13 @@
 ### GAM filtering defaults
 
 - Set defaults based on benchmarking:
-    - TODO:
+    - set GAM filtering mapq to 20, which achieves a reasonable balance between yield and error
+    - recommended settings would range from 20 to 30. Below 20 error becomes too high, above 30 or even 25, error is already so low that you are throwing away accurate alignments (and a lot of them)
+    - turned off default identity filtering (since it's an untested filter)
+
+### Further improvement of k + w default
+
+- Full benchmarking showed `15 + 5` performed better for short reads (30-50), and had no cost above this. Until even more options have been tested, this is the best balance yet.
 
 ### Stats on the raw GAM
 

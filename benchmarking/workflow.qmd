@@ -61,14 +61,14 @@ for i in *MAPQ00.gam
 
 - two MAPQ filters used in aDNA - 20 & 30  - see note below looking into BWA aln MAPQ definitions
 
-for i in *linear.mapped.MAPQ0.bam
+for i in *linear.mapped.MAPQ00.bam
     do
-        samtools view -b -q 20 $i > ${i%MAPQ0.bam}MAPQ20.bam
+        samtools view -b -q 20 $i > ${i%MAPQ00.bam}MAPQ20.bam
     done
 
-for i in *linear.mapped.MAPQ0.bam
+for i in *linear.mapped.MAPQ00.bam
     do
-        samtools view -b -q 30 $i > ${i%MAPQ0.bam}MAPQ30.bam
+        samtools view -b -q 30 $i > ${i%MAPQ00.bam}MAPQ30.bam
     done
 
 ```{BWA aln MAPQ definitions}
@@ -81,7 +81,7 @@ for i in *linear.mapped.MAPQ0.bam
 ```
 
 
-# Step 3: surject to BAM in reference space & refilter for mapped only
+# Step 3: (GAMS only) - surject to BAM in reference space & refilter for mapped only
 
 ```
 for i in *gam
@@ -214,11 +214,9 @@ microbial_60.fq.gz      100000
 microbial_70.fq.gz      100000
 ```
 
-## Run in the same way as the sheep data
+## Running through the workflow, exactly the same as above
 
-###
-
-
+- TODO
 
 
 

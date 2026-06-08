@@ -1,0 +1,6 @@
+sample_id,library_id,repeat_number,sample_type,merged,fastq_1,fastq_2
+microbial_30,1,1,ancient,true,./tests/data/fastq/microbial/microbial_30.fq.gz,,
+microbial_40,1,1,ancient,true,./tests/data/fastq/microbial/microbial_40.fq.gz,,
+microbial_50,1,1,ancient,true,./tests/data/fastq/microbial/microbial_50.fq.gz,,
+microbial_60,1,1,ancient,true,./tests/data/fastq/microbial/microbial_60.fq.gz,,
+microbial_70,1,1,ancient,true,./tests/data/fastq/microbial/microbial_70.fq.gz,,

@@ -1,0 +1,17 @@
+# Ovis benchmarking (filtered graph)
+
+steps              : 'preprocess,index,align'
+input              : 'tests/data/microbe.csv'
+reference          : 'local_files/sheep_pangenome_v20260417.d3.gbz'
+reference_type     : 'filtered_graph'
+reference_stats    : false
+tracing            : true
+keepRawGam         : true
+aDNAkmerLength     : 19
+aDNAwindowLength   : 5
+#aDNAkmerLength     : 15
+#aDNAwindowLength   : 5
+gamDiscardUnmapped : true
+gamFilterMapQ      : false
+alignIdentityFilter: false
+gamDefrayEnds      : false

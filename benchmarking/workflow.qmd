@@ -163,20 +163,39 @@ sed -i '/^>/s/ .*//' GCA_965363385.1.fna
 
 - Run `accuracy.sh` on the lifted BEDs (found in grave repo benchmarking branch, in `bin/mapping_accuracy.sh`)
 
+- Started by treating accurate as:
+    - Correct contig
+    - Coordinates have min-70% overlap with true coords
+- However, this is problematic since it biases against the very reads we might rescue with a graph - i.e. variant not represented in the linear reference, so the lift is only partial
+- Therefore, we now check how much it extends past the true coordinates left or right. New accuracy definition:
+    - Correct contig
+    - No threshold for overlap is applied
+    - A left and right extension tolerance is applied (3bp in this run). Anything that extends beyond this is excluded as inaccurate (partial)
+
 ```
 for i in *bed
     do
-        ./accuracy.sh $i 0.7 table | grep -v threshold_pct >> results.tsv
+        ./accuracy.sh $i 0 3 3 table | grep -v threshold_pct >> results.tsv
     done
 ```
 
+- Did some manual processing in google sheets
+
+- For step 7, starting with the minimap2 liftover results, but will run the scripts on BLAT v2 results also.
+
+# Step 7: plots
+
+- Developing in `benchmarking/statistical_plotting`, starting with interactive plots
+
+- TODO final pulication quality plots
+
+# Beyond this round of benchmarking
+
+1. The impact of which lift tech is used. Does BLAT impact the results?
+2. Further grave settings graph settings
+3. Further grave alignment settings
 
 
 
-- TODO: depending on step 5 improvements, use different final BEDs
-
-
-
-# Step 7: plot yield & accuracy vs proportion
 
 

@@ -176,10 +176,10 @@ ggsave(plot, 'graph_vs_bwa_comparison.png', width=20, height=8, dpi=300)
 ggsave(plot, 'graph_vs_bwa_comparison.pdf', width=20, height=8, dpi=300)
 ```
 
-## Summary Statistics
+## Summary Statistics MAPQ 30
 
 ```{python}
-#| label: summary-stats
+#| label: summary-stats-mapq30
 # Compare performance at MAPQ threshold 30
 print("=" * 70)
 print("SUMMARY: Accuracy Yields at MAPQ ≥ 30")

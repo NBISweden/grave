@@ -187,12 +187,23 @@ for i in *bed
 
 - Developing in `benchmarking/statistical_plotting`, starting with interactive plots, then moving on to key static plots
 
-- Key static plot: bwa vs graph 15_5
+- yield plots are the most useful endpoint
+
+- Key static plot: bwa vs graph 15_5 yield
+
+- Did a quick eyeball test of which lift tool is used. Using the BLAT chain file negatively impacted the results in this case, so it was predictable from the summary stats reported by nf-chain
+
+
+# Step 8
+
+- Contamination benchmarking
+
+
+
+
 
 # Beyond this round of benchmarking
 
-1. The impact of which lift tech is used. Does BLAT impact the results?
-2. Further grave settings graph settings
-3. Further grave alignment settings
-4. contamination benchmarking
+1. Further grave settings graph settings
+2. Further grave alignment settings
 

@@ -1,0 +1,163 @@
+---
+title: "Read retention versus mapping accuracy"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+## Overview
+
+Visualises read retention for different aligners/params, read lengths, and MAPQs, plus the relationships between these and final mapping accuracy
+
+**Percent retention (x-axis):**
+
+**Percent accuracy (y-axis)**
+
+---
+
+## Test setup
+
+```{python}
+import sys
+import numpy as np
+print("Hello world")
+print("I am using python version " + str(sys.version))
+print("I am using numpy version " + str(np.__version__))
+```
+
+## Tool import
+```{python}
+#| label: setup
+import pandas as pd
+import plotly.graph_objects as go
+from plotnine import (
+    ggplot, aes,
+    geom_line, geom_point,
+    facet_grid,
+    scale_color_cmap, scale_y_continuous,
+    labs, theme_bw, theme, element_text,
+)
+```
+
+# Load data
+```{python}
+#| label: load-data
+
+df = pd.read_csv('./data/retention_vs_accuracy.csv')
+
+aligners = sorted(df["aligner"].unique())
+lengths  = sorted(df["read_length"].unique())
+
+df.head()
+```
+
+# Plot
+```{python}
+#| label: plotly
+
+# Define visual separators for aligners and read lengths
+aligner_color = dict(zip(aligners, ["#0072B2", "#D55E00", "#009E73"]))
+_dashes  = ["solid", "dash", "dot", "dashdot", "longdashdot"]
+_symbols = ["circle", "square", "diamond", "triangle-up", "cross"]
+length_dash   = dict(zip(lengths, _dashes))
+length_symbol = dict(zip(lengths, _symbols))
+
+# Traces
+fig = go.Figure()
+trace_meta = []
+
+for aligner in aligners:
+    for length in lengths:
+        sub = (
+            df[(df["aligner"] == aligner) & (df["read_length"] == length)]
+            .sort_values("mapq")  # ensures curve runs low→high MAPQ (right→left)
+        )
+        if sub.empty:
+            continue
+
+        trace_meta.append((aligner, length))
+        fig.add_trace(go.Scatter(
+            x=sub["retention"],
+            y=sub["accuracy"],
+            mode="lines+markers",
+            name=f"{aligner} | {length}bp",
+            line=dict(
+                color=aligner_color[aligner],
+                dash=length_dash[length],
+                width=2
+            ),
+            marker=dict(
+                symbol=length_symbol[length],
+                size=8,
+                color=aligner_color[aligner]
+            ),
+            customdata=sub[["mapq"]].values,
+            hovertemplate=(
+                "<b>%{fullData.name}</b><br>"
+                "Retention : %{x:.2f}%<br>"
+                "Accuracy  : %{y:.2f}%<br>"
+                "MAPQ ≥ %{customdata[0]}<extra></extra>"
+            ),
+        ))
+
+n = len(trace_meta)
+
+# --- Utility button helper ---
+# "legendonly" = hidden but still listed in legend (re-clickable)
+def make_visible(pred):
+    return [True if pred(a, l) else "legendonly" for a, l in trace_meta]
+
+show_hide = [
+    dict(label="Show all", method="restyle", args=[{"visible": [True] * n}]),
+    dict(label="Hide all", method="restyle", args=[{"visible": ["legendonly"] * n}]),
+]
+by_aligner = [
+    dict(label=f"Only {a}", method="restyle",
+         args=[{"visible": make_visible(lambda al, _l, a=a: al == a)}])
+    for a in aligners
+]
+by_length = [
+    dict(label=f"Only {l}bp", method="restyle",
+         args=[{"visible": make_visible(lambda _a, ln, l=l: ln == l)}])
+    for l in lengths
+]
+
+# --- Layout ---
+fig.update_layout(
+    title="Retention vs. Accuracy — MAPQ calibration",
+    xaxis=dict(title="Retention (%)", range=[0, 101]),
+    yaxis=dict(title="Accuracy (%)",  range=[50, 101]),
+    hovermode="closest",
+    legend=dict(
+        title="<b>Aligner | Length</b><br><sup>click = toggle, dbl = isolate</sup>",
+        itemclick="toggle",
+        itemdoubleclick="toggleothers",
+    ),
+    updatemenus=[
+        dict(type="buttons", buttons=show_hide,
+             direction="right", showactive=False,
+             x=0.0, y=1.22, xanchor="left", yanchor="top",
+             bgcolor="#EEEEEE", bordercolor="#AAAAAA"),
+        dict(type="buttons", buttons=by_aligner,
+             direction="right", showactive=True,
+             x=0.0, y=1.13, xanchor="left", yanchor="top",
+             bgcolor="#DDEEFF", bordercolor="#AAAAAA"),
+        dict(type="buttons", buttons=by_length,
+             direction="right", showactive=True,
+             x=0.0, y=1.04, xanchor="left", yanchor="top",
+             bgcolor="#DDFFF0", bordercolor="#AAAAAA"),
+    ],
+    margin=dict(t=160, r=20, b=60, l=60),
+    width=1000, height=650,
+)
+
+fig.show()
+```

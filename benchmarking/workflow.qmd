@@ -185,17 +185,14 @@ for i in *bed
 
 # Step 7: plots
 
-- Developing in `benchmarking/statistical_plotting`, starting with interactive plots
+- Developing in `benchmarking/statistical_plotting`, starting with interactive plots, then moving on to key static plots
 
-- TODO final pulication quality plots
+- Key static plot: bwa vs graph 15_5
 
 # Beyond this round of benchmarking
 
 1. The impact of which lift tech is used. Does BLAT impact the results?
 2. Further grave settings graph settings
 3. Further grave alignment settings
-
-
-
-
+4. contamination benchmarking
 

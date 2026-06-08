@@ -1,0 +1,254 @@
+---
+title: "Graph vs BWA Comparison: Five-Panel Yield Figure"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: false
+    code-fold: false
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+Five-panel figure comparing `graph_15_5` and `bwa_aln` accuracy yields per million across different read lengths (30, 40, 50, 60, 70 bp).
+
+Each panel shows:
+- **Filled markers**: Accurately mapped reads per million
+- **Hollow markers**: Inaccurately mapped reads per million
+- **X-axis**: MAPQ threshold (mapping quality)
+- **Y-axis**: Reads per million input reads
+
+## Import Required Libraries
+
+```{python}
+#| label: imports
+import pandas as pd
+import numpy as np
+from plotnine import *
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+## Load and Prepare Data
+
+```{python}
+#| label: load-data
+# Load the yield data
+df = pd.read_csv('./data/yield.csv')
+
+# Filter for only graph_15_5 and bwa_aln
+aligners_of_interest = ['graph_15_5', 'bwa_aln']
+df_filtered = df[df['aligner'].isin(aligners_of_interest)].copy()
+
+# Ensure read lengths are sorted
+read_lengths = sorted(df_filtered['read_length'].unique())
+print(f"Read lengths in data: {read_lengths}")
+print(f"Shape of filtered data: {df_filtered.shape}")
+print(f"\nData preview:")
+print(df_filtered.head())
+```
+
+## Prepare Data for Plotting
+
+```{python}
+#| label: reshape-data
+# Reshape from wide to long format for plotnine
+# Create two dataframes - one for accurate, one for inaccurate
+
+df_accurate = df_filtered[['read_length', 'aligner', 'mapq', 'accurate_per_million']].copy()
+df_accurate['read_type'] = 'Accurate'
+df_accurate.rename(columns={'accurate_per_million': 'reads_per_million'}, inplace=True)
+
+df_inaccurate = df_filtered[['read_length', 'aligner', 'mapq', 'inaccurate_per_million']].copy()
+df_inaccurate['read_type'] = 'Inaccurate'
+df_inaccurate.rename(columns={'inaccurate_per_million': 'reads_per_million'}, inplace=True)
+
+# Combine both dataframes
+df_plot = pd.concat([df_accurate, df_inaccurate], ignore_index=True)
+
+print(f"Plot data shape: {df_plot.shape}")
+print(f"\nPlot data preview:")
+print(df_plot.head(10))
+```
+
+## Plot settings
+
+```{python}
+#| label: theme-setup
+# Color scheme for aligners
+aligner_colors = {
+    'graph_15_5': '#0072B2',  # Blue
+    'bwa_aln': '#D55E00'      # Orange
+}
+
+# Create base theme for consistency across panels
+base_theme = theme_minimal() + theme(
+    figure_size=(14, 12),
+    axis_title=element_text(size=11, face='bold'),
+    axis_text=element_text(size=10),
+    strip_text=element_text(size=12, face='bold'),
+    panel_grid_major=element_line(color='#CCCCCC', size=0.3),
+    panel_grid_minor=element_blank(),
+    legend_position='right',
+    legend_title=element_text(size=10, face='bold'),
+    legend_text=element_text(size=9),
+    plot_title=element_text(size=13, face='bold', hjust=0.5)
+)
+```
+
+## Plot
+
+```{python}
+#| label: create-plot
+# Create the main plot
+
+plot = (
+    ggplot(df_plot, aes(x='mapq', y='reads_per_million', color='aligner')) +
+    # Accurate reads with filled markers
+    geom_line(
+        data=df_plot[df_plot['read_type'] == 'Accurate'],
+        size=1
+    ) +
+    geom_point(
+        aes(fill='aligner'),
+        data=df_plot[df_plot['read_type'] == 'Accurate'],
+        size=3,
+        shape='o'
+    ) +
+    # Inaccurate reads with hollow markers
+    geom_line(
+        data=df_plot[df_plot['read_type'] == 'Inaccurate'],
+        linetype='dashed',
+        size=1
+    ) +
+    geom_point(
+        data=df_plot[df_plot['read_type'] == 'Inaccurate'],
+        fill='white',
+        size=3,
+        shape='o',
+        stroke=1.5
+    ) +
+    # Facet by read length
+    facet_wrap(
+        '~ read_length',
+        labeller=labeller(read_length=lambda x: f'{x} bp'),
+        ncol=5
+    ) +
+    # Scales
+    scale_x_continuous(
+        name='MAPQ Threshold',
+        limits=[0, 60],
+        breaks=range(0, 61, 10)
+    ) +
+    scale_y_continuous(
+        name='Reads per Million Input',
+        limits=[0, 1000000],
+        breaks=[0, 250000, 500000, 750000, 1000000],
+        labels=lambda breaks: [f'{int(b/1000)}k' if b > 0 else '0' for b in breaks]
+    ) +
+    scale_color_manual(
+        name='Aligner',
+        values=aligner_colors
+    ) +
+    scale_fill_manual(
+        name='Aligner',
+        values=aligner_colors
+    ) +
+    # Labels and title
+    labs(
+        title='Yield Comparison: graph_15_5 vs bwa_aln\n(Filled = Accurate, Dashed = Inaccurate)'
+    ) +
+    base_theme
+)
+```
+
+## Save
+
+```{python}
+#| label: save-png
+ggsave(plot, 'graph_vs_bwa_comparison.png', width=20, height=8, dpi=300)
+```
+
+```{python}
+#| label: save-pdf
+ggsave(plot, 'graph_vs_bwa_comparison.pdf', width=20, height=8, dpi=300)
+```
+
+## Summary Statistics
+
+```{python}
+#| label: summary-stats
+# Compare performance at MAPQ threshold 30
+print("=" * 70)
+print("SUMMARY: Accuracy Yields at MAPQ ≥ 30")
+print("=" * 70)
+
+mapq_threshold = 30
+summary_data = []
+
+for length in sorted(read_lengths):
+    for aligner in aligners_of_interest:
+        subset = df_filtered[
+            (df_filtered['read_length'] == length) & 
+            (df_filtered['aligner'] == aligner) &
+            (df_filtered['mapq'] == mapq_threshold)
+        ]
+        
+        if not subset.empty:
+            accurate = subset['accurate_per_million'].values[0]
+            inaccurate = subset['inaccurate_per_million'].values[0]
+            total = accurate + inaccurate
+            accuracy_pct = (accurate / total * 100) if total > 0 else 0
+            
+            summary_data.append({
+                'Read Length': f"{length} bp",
+                'Aligner': aligner,
+                'Accurate/M': f"{accurate:,.0f}",
+                'Inaccurate/M': f"{inaccurate:,.0f}",
+                'Accuracy %': f"{accuracy_pct:.1f}%"
+            })
+
+summary_df = pd.DataFrame(summary_data)
+print(summary_df.to_string(index=False))
+print("=" * 70)
+```
+
+
+```{python}
+#| label: summary-stats
+# Compare performance at MAPQ threshold 20
+print("=" * 70)
+print("SUMMARY: Accuracy Yields at MAPQ ≥ 20")
+print("=" * 70)
+
+mapq_threshold = 20
+summary_data = []
+
+for length in sorted(read_lengths):
+    for aligner in aligners_of_interest:
+        subset = df_filtered[
+            (df_filtered['read_length'] == length) & 
+            (df_filtered['aligner'] == aligner) &
+            (df_filtered['mapq'] == mapq_threshold)
+        ]
+        
+        if not subset.empty:
+            accurate = subset['accurate_per_million'].values[0]
+            inaccurate = subset['inaccurate_per_million'].values[0]
+            total = accurate + inaccurate
+            accuracy_pct = (accurate / total * 100) if total > 0 else 0
+            
+            summary_data.append({
+                'Read Length': f"{length} bp",
+                'Aligner': aligner,
+                'Accurate/M': f"{accurate:,.0f}",
+                'Inaccurate/M': f"{inaccurate:,.0f}",
+                'Accuracy %': f"{accuracy_pct:.1f}%"
+            })
+
+summary_df = pd.DataFrame(summary_data)
+print(summary_df.to_string(index=False))
+print("=" * 70)
+```

@@ -83,6 +83,7 @@ for i in *linear.mapped.MAPQ00.bam
 
 # Step 3: (GAMS only) - surject to BAM in reference space & refilter for mapped only
 
+## Surject
 ```
 for i in *gam
     do
@@ -91,6 +92,7 @@ for i in *gam
     done
 ```
 
+## Filter for mapped only (MAPQ > 0)
 ```
 # Running separately so we can also gauge loss rate during surjection, if any
 for i in *surjected.sorted.bam; do samtools view --with-header --exclude-flags 4 $i > ${i%bam}mapped.bam; done
@@ -218,7 +220,9 @@ microbial_70.fq.gz      100000
 
 - TODO
 
+## Furthermore, forking and tweaking Nikolay microbial script
 
+- Run this as a back to back to see if we can allow lower mapq with microbial masking
 
 
 

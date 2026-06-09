@@ -68,6 +68,9 @@ df_inaccurate.rename(columns={'inaccurate_per_million': 'reads_per_million'}, in
 # Combine both dataframes
 df_plot = pd.concat([df_accurate, df_inaccurate], ignore_index=True)
 
+# Create a combined group for legend
+df_plot['group'] = df_plot['aligner'] + ' (' + df_plot['read_type'] + ')'
+
 print(f"Plot data shape: {df_plot.shape}")
 print(f"\nPlot data preview:")
 print(df_plot.head(10))
@@ -86,14 +89,11 @@ aligner_colors = {
 # Create base theme for consistency across panels
 base_theme = theme_minimal() + theme(
     figure_size=(14, 12),
-    axis_title=element_text(size=11, face='bold'),
-    axis_text=element_text(size=10),
-    strip_text=element_text(size=12, face='bold'),
+    axis_title=element_text(size=15, face='bold'),
+    axis_text=element_text(size=13),
+    strip_text=element_text(size=13, face='bold'),
     panel_grid_major=element_line(color='#CCCCCC', size=0.3),
     panel_grid_minor=element_blank(),
-    legend_position='right',
-    legend_title=element_text(size=10, face='bold'),
-    legend_text=element_text(size=9),
     plot_title=element_text(size=13, face='bold', hjust=0.5)
 )
 ```
@@ -105,14 +105,14 @@ base_theme = theme_minimal() + theme(
 # Create the main plot
 
 plot = (
-    ggplot(df_plot, aes(x='mapq', y='reads_per_million', color='aligner')) +
+    ggplot(df_plot, aes(x='mapq', y='reads_per_million', color='group')) +
     # Accurate reads with filled markers
     geom_line(
         data=df_plot[df_plot['read_type'] == 'Accurate'],
         size=1
     ) +
     geom_point(
-        aes(fill='aligner'),
+        aes(fill='group'),
         data=df_plot[df_plot['read_type'] == 'Accurate'],
         size=3,
         shape='o'
@@ -124,8 +124,8 @@ plot = (
         size=1
     ) +
     geom_point(
+        aes(fill='group'),
         data=df_plot[df_plot['read_type'] == 'Inaccurate'],
-        fill='white',
         size=3,
         shape='o',
         stroke=1.5
@@ -138,30 +138,62 @@ plot = (
     ) +
     # Scales
     scale_x_continuous(
-        name='MAPQ Threshold',
+        name='MAPQ threshold',
         limits=[0, 60],
         breaks=range(0, 61, 10)
     ) +
     scale_y_continuous(
-        name='Reads per Million Input',
+        name='Reads per million input',
         limits=[0, 1000000],
-        breaks=[0, 250000, 500000, 750000, 1000000],
+        breaks=[0, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000],
         labels=lambda breaks: [f'{int(b/1000)}k' if b > 0 else '0' for b in breaks]
     ) +
     scale_color_manual(
-        name='Aligner',
-        values=aligner_colors
+        name='',
+        values={
+            'graph_15_5 (Accurate)': aligner_colors['graph_15_5'],
+            'graph_15_5 (Inaccurate)': aligner_colors['graph_15_5'],
+            'bwa_aln (Accurate)': aligner_colors['bwa_aln'],
+            'bwa_aln (Inaccurate)': aligner_colors['bwa_aln']
+        }
     ) +
     scale_fill_manual(
-        name='Aligner',
-        values=aligner_colors
+        name='',
+        values={
+            'bwa_aln (Accurate)': aligner_colors['bwa_aln'],
+            'bwa_aln (Inaccurate)': 'white',
+            'graph_15_5 (Accurate)': aligner_colors['graph_15_5'],
+            'graph_15_5 (Inaccurate)': 'white'
+        },
+        labels={
+            'bwa_aln (Accurate)': 'Accurate (bwa aln)',
+            'bwa_aln (Inaccurate)': 'Inaccurate (bwa aln)',
+            'graph_15_5 (Accurate)': 'Accurate (grave: k-15, w-5)',
+            'graph_15_5 (Inaccurate)': 'Inaccurate (grave: k-15, w-5)'
+        }
     ) +
-    # Labels and title
-    labs(
-        title='Yield Comparison: graph_15_5 vs bwa_aln\n(Filled = Accurate, Dashed = Inaccurate)'
+    # Manual legend control with exact point and line styling
+    guides(
+        fill=guide_legend(
+            override_aes={
+                'linetype': ['solid', 'dashed', 'solid', 'dashed'],
+                'color': [aligner_colors['bwa_aln'], aligner_colors['graph_15_5'], aligner_colors['bwa_aln'], aligner_colors['graph_15_5']],
+                'fill': [aligner_colors['bwa_aln'], aligner_colors['graph_15_5'], 'white', 'white'],
+                'stroke': [0.5, 0.5, 1.5, 1.5],
+                'size': [4, 4, 3, 3]
+            }
+        ),
+        color=False
     ) +
-    base_theme
+    base_theme +
+    theme(
+        legend_position=(0.85, 0.35),
+        legend_background=element_rect(fill='white', size=0),
+        legend_text=element_text(size=14),
+        legend_title=element_blank()
+    )
 )
+plot
 ```
 
 ## Save

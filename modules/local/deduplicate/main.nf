@@ -12,6 +12,7 @@ process DEDUPLICATE {
 
     output:
     tuple val(meta), path("${meta.id}*.dedup.bam"), path("${meta.id}*.dedup.bam.bai"), emit: ch_deduplicated_bams
+    tuple val(meta), path("*.dedup.bam.flagstats"), emit: ch_dedup_flagstats
     path "*.dedup_metrics.txt", emit: ch_dedup_metrics
     tuple val(task.process), val('picard'), eval('picard MarkDuplicates --version 2>&1 | grep Version | sed "s/.*://"'), topic: versions
 
@@ -37,6 +38,9 @@ process DEDUPLICATE {
 
         # Index BAM
         samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
+
+        # Stats
+        samtools flagstat ${meta.id}.dedup.bam > ${meta.id}.dedup.bam.flagstats
         """
 
     else if (!params.multiple_references && meta.type == "modern") // Use only 5' mapping positions
@@ -57,6 +61,9 @@ process DEDUPLICATE {
 
         # Index BAM
         samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
+
+        # Stats
+        samtools flagstat ${meta.id}.dedup.bam > ${meta.id}.dedup.bam.flagstats
         """
 
     else if (params.multiple_references && meta.type == "ancient")
@@ -80,6 +87,7 @@ process DEDUPLICATE {
                     ${args}
 
                 samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
+                samtools flagstat ${meta.id}.\$PREFIX.dedup.bam > ${meta.id}.\$PREFIX.dedup.bam.flagstats
             done
         """
 
@@ -103,6 +111,7 @@ process DEDUPLICATE {
                     --ASSUME_SORT_ORDER coordinate
 
                 samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
+                samtools flagstat ${meta.id}.\$PREFIX.dedup.bam > ${meta.id}.\$PREFIX.dedup.bam.flagstats
             done
         """
 

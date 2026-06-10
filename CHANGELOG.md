@@ -2,30 +2,45 @@
 
 ## [2.2.0] - Unreleased
 
-### GAM filtering defaults
+### TODO: GAM filtering defaults
 
 - Set defaults based on benchmarking:
     - set GAM filtering mapq to 20, which achieves a reasonable balance between yield and error
     - recommended settings would range from 20 to 30. Below 20 error becomes too high, above 30 or even 25, error is already so low that you are throwing away accurate alignments (and a lot of them)
     - turned off default identity filtering (since it's an untested filter)
 
-### Further improvement of k + w default
+### TODO Further improvement of k + w default
 
 - Full benchmarking showed `15 + 5` performed better for short reads (30-50), and had no cost above this. Until even more options have been tested, this is the best balance yet.
+
+### Grave now publishes library level BAMs
+
+- previously we published: per-library filtered GAMs, per-library raw GAMs (if requested), and per-sample merged/deduplicated BAMs
+- We now also publish the per-library BAMs (`graph mode` = surjected, RG tagged, mapped only, sorted. `linear mode` = RG tagged, mapped only, sorted)
+- This adds utility for debugging library issues & also for benchmarking tasks that run only up to alignment
 
 ### Stats on the raw GAM
 
 - Now optional via param `rawMapStats`
 
-### Surjection stats...
+### Unmapped reads in graph modes & correcting surjection stats
 
-- Surjection does not automatically remove reads that become unmapped during the process. This is true even if the upstream GAM was filtered for mapped reads only, as this is relative to the graph
+- If users request the GAM to be filtered for mapped only, we previously filtered the library-level GAM only (i.e. remove unmapped relative to the graph)
 
-- Therefore, if users asked for the GAM to be filtered to mapped reads only, we now implicitly pass this command on to the surjection process. When samtools is done adding readgroups, the BAM now passes through `view` before sorting, where it will be filtered for mapped reads (if `gamDiscardUnmapped` = true), else passed through unchanged
+- If that GAM goes on to be surjected to the linear backbone, some reads can become unmapped during that process (i.e. relative to linear coordinates)
 
-- If this filter is applied, our GAM alignment stats might be misleading, so we also run flagstats on the BAM
+- Now, if users ask to filter the GAM for mapped reads only, we also implicitly pass this through to the post-surjection BAM processing (samtools add readgroups, `view --exclude-flags 4`, sort. If they don't request GAM filtering, no filter is applied to the BAM either
 
-- Relatedly, took this opportunity to clean up some of the stats file names to be more informative as to what file they refer to
+- The other implication is that GAM alignment stats alone were misleading, since not all those filtered alignments survive surjection. We now also run flagstats on the surjected and processed BAM
+
+### Stats on the final merged BAMs
+
+- Added stats for the final merged BAMs
+
+### Output publishing tweaks
+
+- Due to all the additional stats reporting, reorganised the publishing directories for clarity
+- Also cleaned up some of the stats file names to be more informative
 
 ### nf-core tools
 

@@ -16,5 +16,6 @@ workflow DEDUPLICATE_BAM {
     emit:
     deduplicated_bams     = DEDUPLICATE.out.ch_deduplicated_bams
     deduplication_metrics = DEDUPLICATE.out.ch_dedup_metrics
+    dedup_flagstats       = DEDUPLICATE.out.ch_dedup_flagstats
 
 }

@@ -77,11 +77,11 @@ workflow {
     }
 
     // Align reads (GAM + BAM produced in graph mode, & BAM in linear). Also adds read groups and sorts BAMs
-    mapped_gam      = channel.empty()
-    failed_samples  = channel.empty()
-    raw_gam         = channel.empty()
-    alignment_stats = channel.empty()
-    mapped_bam      = channel.empty()
+    mapped_gam       = channel.empty()
+    failed_libraries = channel.empty()
+    raw_gam          = channel.empty()
+    alignment_stats  = channel.empty()
+    mapped_bam       = channel.empty()
     if ( 'align' in workflow_steps ) {
         ALIGN_READS (
             params.reference_type,
@@ -90,11 +90,11 @@ workflow {
             reference,
             indexed_reference
         )
-        mapped_gam      = ALIGN_READS.out.mapped_gam
-        failed_samples  = ALIGN_READS.out.failed_samples
-        raw_gam         = ALIGN_READS.out.raw_gam
-        alignment_stats = ALIGN_READS.out.alignment_stats
-        mapped_bam      = ALIGN_READS.out.mapped_bam
+        mapped_gam       = ALIGN_READS.out.mapped_gam
+        failed_libraries = ALIGN_READS.out.failed_libraries
+        raw_gam          = ALIGN_READS.out.raw_gam
+        alignment_stats  = ALIGN_READS.out.alignment_stats
+        mapped_bam       = ALIGN_READS.out.mapped_bam
     }
 
     // Merge library-level BAMs to sample-level for downstream analysis
@@ -110,6 +110,7 @@ workflow {
     // Deduplicate sample-level BAMs
     deduplicated_bams     = channel.empty()
     deduplication_metrics = channel.empty()
+    dedup_flagstats       = channel.empty()
     if ( 'deduplicate' in workflow_steps ) {
         DEDUPLICATE_BAM (
             paths,
@@ -117,6 +118,7 @@ workflow {
         )
         deduplicated_bams     = DEDUPLICATE_BAM.out.deduplicated_bams
         deduplication_metrics = DEDUPLICATE_BAM.out.deduplication_metrics
+        dedup_flagstats       = DEDUPLICATE_BAM.out.dedup_flagstats
     }
 
     // Damage profile ancient samples if they are present
@@ -200,12 +202,14 @@ workflow {
     fastp_fastqc_report        = fastp_fastqc_report
     // ALIGN_READS
     mapped_gam                 = mapped_gam
-    failed_samples             = failed_samples
+    failed_libraries           = failed_libraries
     raw_gam                    = raw_gam
     alignment_stats            = alignment_stats
+    mapped_bam                 = mapped_bam
     // DEDUPLICATE_BAM
     deduplicated_bams          = deduplicated_bams
     deduplication_metrics      = deduplication_metrics
+    dedup_flagstats            = dedup_flagstats
     // PROFILE_PMD
     damage_profiler            = damage_profiler
     // GENOTYPE
@@ -250,24 +254,30 @@ output {
     }
     // ALIGN_READS
     mapped_gam {
-        path '04_mapped_reads/gams'
+        path '04_mapped_reads/library/gams'
     }
-    failed_samples {
-        path '04_mapped_reads/failed_samples'
+    mapped_bam {
+        path '04_mapped_reads/library/bams'
+    }
+    failed_libraries {
+        path '04_mapped_reads/library/failed'
     }
     raw_gam {
-        path '04_mapped_reads/gams'
+        path '04_mapped_reads/library/raw_gams'
         enabled params.keepRawGam
     }
     alignment_stats {
-        path '04_mapped_reads/alignment_statistics'
+        path '04_mapped_reads/library/alignment_statistics'
     }
     // DEDUPLICATE_BAM
     deduplicated_bams {
-        path '04_mapped_reads/bams_processed'
+        path '04_mapped_reads/sample/bams'
     }
     deduplication_metrics {
-        path '04_mapped_reads/deduplication_statistics'
+        path '04_mapped_reads/sample/deduplication_statistics'
+    }
+    dedup_flagstats {
+        path '04_mapped_reads/sample/bams_statistics'
     }
     // PROFILE_PMD
     damage_profiler {

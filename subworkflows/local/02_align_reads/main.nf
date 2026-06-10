@@ -13,11 +13,11 @@ workflow ALIGN_READS {
     indexed_reference
 
     main:
-    mapped_gam      = channel.empty()
-    failed_samples  = channel.empty()
-    raw_gam         = channel.empty()
-    alignment_stats = channel.empty()
-    mapped_bam      = channel.empty()
+    mapped_gam       = channel.empty()
+    failed_libraries = channel.empty()
+    raw_gam          = channel.empty()
+    alignment_stats  = channel.empty()
+    mapped_bam       = channel.empty()
 
     // Run alignment to pangenome graph
     if ( reference_type == "unfiltered_graph" || reference_type == "filtered_graph" ) {
@@ -25,7 +25,7 @@ workflow ALIGN_READS {
             fastp_reads,
             indexed_reference
         )
-        // Branch passed/failed samples to separate channels
+        // Branch passed/failed libraries to separate channels
         GIRAFFE.out.ch_gam_counts
             .branch { meta, gam, alignment_count ->
                 passed: alignment_count.toInteger() > 0
@@ -34,10 +34,10 @@ workflow ALIGN_READS {
                     return [ meta, gam ]
             }
             .set { branched_gam }
-        mapped_gam      = branched_gam.passed
-        failed_samples  = branched_gam.failed
-        raw_gam         = GIRAFFE.out.ch_raw_gam
-        gam_stats       = GIRAFFE.out.ch_gam_stats
+        mapped_gam       = branched_gam.passed
+        failed_libraries = branched_gam.failed
+        raw_gam          = GIRAFFE.out.ch_raw_gam
+        gam_stats        = GIRAFFE.out.ch_gam_stats
 
         GAM_TO_TAGGED_SORTED_BAM (
             reference,
@@ -49,7 +49,7 @@ workflow ALIGN_READS {
 
     // Run in linear reference mode
     } else if ( reference_type == "linear" ) {
-        // Split samples by type
+        // Split libraries by type
         fastp_reads
             .branch { meta, reads ->
                 ancient: meta.type == "ancient"
@@ -57,12 +57,12 @@ workflow ALIGN_READS {
                 return tuple( meta, reads )
             }
             .set { reads }
-        // Run BWA aln and samse for ancient samples (always pre-merged)
+        // Run BWA aln and samse for ancient libraries (always pre-merged)
         BWA_ALN_SAMSE (
             reads.ancient,
             indexed_reference
         )
-        // Run BWA mem for modern samples
+        // Run BWA mem for modern libraries
         BWA_MEM (
             reads.modern,
             indexed_reference,
@@ -73,10 +73,10 @@ workflow ALIGN_READS {
     }
 
     emit:
-    mapped_gam      = mapped_gam
-    failed_samples  = failed_samples
-    raw_gam         = raw_gam
-    alignment_stats = alignment_stats
-    mapped_bam      = mapped_bam
+    mapped_gam       = mapped_gam
+    failed_libraries = failed_libraries
+    raw_gam          = raw_gam
+    alignment_stats  = alignment_stats
+    mapped_bam       = mapped_bam
 
 }

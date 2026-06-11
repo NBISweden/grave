@@ -51,6 +51,11 @@
 - Added `workflow.containerEngine in ['singularity', 'apptainer']` across all modules using containers, to allow use of the pre-built `sif`
 - `apptainer` would previously evaluate to false on this check and pull/convert the docker image. No reason to do this & adds some overhead
 
+### Profile to turn off scratch globally
+
+- added `no_scratch` profile for testing/development purposes, included after the institutional profile in order to override any settings there
+- should only be used on small test datasets to avoid slow IO and disk quota issues
+
 ## [2.2.0-pre] (pre-release) 2026-05-28
 
 ### Benchmarking in 2.2.0-pre-release (41b9783)

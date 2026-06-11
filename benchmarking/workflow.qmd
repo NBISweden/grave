@@ -216,17 +216,27 @@ microbial_60.fq.gz      100000
 microbial_70.fq.gz      100000
 ```
 
-## Running through the workflow, exactly the same as above
+## Running through the workflow above, steps 1-4 (ending with beds in reference perspective)
 
-- TODO
+- Generated 145 beds containing levels of contamination mapping
 
-## Furthermore, forking and tweaking Nikolay microbial script
+- These represent the `before` condition
 
-- Run this as a back to back to see if we can allow lower mapq with microbial masking
+### After conditions
+
+- Question to answer: can we run with a lower MAPQ + microbial masking, or do we really need to run with high MAPQ
+
+- End points will be two BEDs, mask intersect these out of the microbial mapping beds
+
+1. A modified version of `MCworkflow` -> `cormackinsella/MCWorkflow` (`troubleshooting` branch) (this has been PR'd but not yet merged)
 
 
+2. `ncbi-fcs-fx`
 
 
+- Apart from microbial masking, we also need to check whether this punishes sheep BEDs
+
+- And further, is there a clear preference in tool for masking? Can we implement it in grave?
 
 
 # Beyond this round of benchmarking

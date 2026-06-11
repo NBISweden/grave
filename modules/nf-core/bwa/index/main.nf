@@ -4,7 +4,7 @@ process BWA_INDEX {
     label 'process_medium'
     conda "${moduleDir}/environment.yml"
     // NOTE: update version string manually
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d7/d7e24dc1e4d93ca4d3a76a78d4c834a7be3985b0e1e56fddd61662e047863a8a/data' :
         'community.wave.seqera.io/library/bwa_htslib_samtools:83b50ff84ead50d0' }"
     storeDir { fasta.toRealPath().parent.resolve("${fasta.baseName}_indexes") }

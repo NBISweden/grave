@@ -2,7 +2,7 @@ process FREEBAYES {
 
     tag "${meta.id}"
     label 'process_medium'
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:0a559cef58513a6f' :
         'community.wave.seqera.io/library/bamtools_bcftools_freebayes_htslib:4a6a1795bbef9fd5' }"
 

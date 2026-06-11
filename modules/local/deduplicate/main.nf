@@ -2,7 +2,7 @@ process DEDUPLICATE {
 
     tag "${meta.id}"
     label 'process_medium'
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/picard-slim_samtools:6bcbd97a9beb7f4a' :
         'community.wave.seqera.io/library/picard-slim_samtools:988127ec6146bc80' }"
 

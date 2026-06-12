@@ -265,12 +265,22 @@ microbial_70.fq.gz      100000
 - However we could potentially be doing better with prefiltering out contamination. If this would be working well, we could lower the default to `MAPQ20`
 
 
-# LAST TASKS:
+# NEXT TASKS:
 
-- what do EAGER/DNAHarvester do about contamination?
-- https://academic.oup.com/bib/article/26/1/bbae646/7923980
-- Does the GAM identity filter do anything to help?
 - does prefiltering against GTDB help?
+- https://academic.oup.com/bib/article/26/1/bbae646/7923980
+- what do EAGER/DNAHarvester do about contamination?
+- Does the GAM identity filter do anything to help?
+
+## Prefiltering
+
+- What this would entail. Grabbing the very large GTDB kraken2 database (`aria2` package on conda-forge is up to date - wget managed 17GB / hour, aria2 ~80GB / hour)
+
+`pixi run aria2c -d . -o "$TAR_FILE" -x 16 -k 100M "$TAR_URL"` # Note x != threads, but parallel connections. This test is running on 2 cores.
+
+- Running kraken2 on each read set & removing any with hits above a certain confidence threshold
+
+- then aligning to the graph with only the surviving (in normal grave operation). For benchmarking we're running it after the fact, to check what would have been removed, both from sheep and microbes
 
 
 # Beyond this round of benchmarking

@@ -222,22 +222,41 @@ microbial_70.fq.gz      100000
 
 - These represent the `before` condition
 
-### After conditions
+### Mask microbes (`after` conditions)
 
 - Question to answer: can we run with a lower MAPQ + microbial masking, or do we really need to run with high MAPQ
+- End points will be a BED from MCWorkflow, and an output from ncbi-fcs-fx that I need to post-process into a BED
+- These need to be intersected with the microbial mapping beds as masking regions
 
-- End points will be two BEDs, mask intersect these out of the microbial mapping beds
+#### Modification of `MCworkflow` -> `cormackinsella/MCWorkflow` (`troubleshooting` branch) (PR'd)
 
-1. A modified version of `MCworkflow` -> `cormackinsella/MCWorkflow` (`troubleshooting` branch) (this has been PR'd but not yet merged)
+- `troubleshooting` is the code used for our test. `dev` is now the branch for any further commits
 
+    Issues log:
+    - the custom script is sequential, single threaded. For single assembly (~human/sheep size) run time is acceptable, but if running across many (or large) assemblies, parallelising this into nextflow modules would be preferable
+    - merge bam writes many intermediate files that should be streamed
+    - check if the removal of intermediate files in exogenous detection is needed, or if streaming could be used instead
+    - some fragile filename editing patterns. Workflow needs a robust metadata ingestion instead at the start
+    - related, metadata is sporadically updated via map functions, but not stored in a meta object (added into the tuple). Move all of that to the ingestion step
+    - Some development needed on the parsing scripts: What QC is done on the mappings? How confident are we that the regions are actually microbe-like? Some benchmarking might be needed. From experience, mapping microbe reads to an assembly gets high quality alignments - often spurious
 
-2. `ncbi-fcs-fx`
+#### `ncbi-fcs-fx`
 
+- Main database not suitable for a test profile (470 GB). Needs to be moved into `tempfs` also. 
 
-- Apart from microbial masking, we also need to check whether this punishes sheep BEDs
+### Results on microbial filtering
 
-- And further, is there a clear preference in tool for masking? Can we implement it in grave?
+- `fcs-gx`: Did not identify contamination. The only hits were to 5 highly repetitive regions, which were flagged as potentially from fish. These are repeat arrays common in eukaryotes
 
+- MCWorkflow identified many regions for masking (though see above - I'm not sure of the confidence level), but almost none of these intersected with our microbial mappings
+
+- Take home point: Most likely, the genome is pretty clean, and microbial mappings in `grave` or `bwa-aln` are purely spurious rather than hits to assembly microbial contamination
+
+### Effect on sheep reads
+
+- Based on above results, no need in this case to check the effect. 
+
+- If a mask would be applied, we'd need to first check whether it punishes sheep BEDs
 
 # Beyond this round of benchmarking
 

@@ -244,19 +244,34 @@ microbial_70.fq.gz      100000
 
 - Main database not suitable for a test profile (470 GB). Needs to be moved into `tempfs` also. 
 
-### Results on microbial filtering
+##### Results on microbial filtering
 
 - `fcs-gx`: Did not identify contamination. The only hits were to 5 highly repetitive regions, which were flagged as potentially from fish. These are repeat arrays common in eukaryotes
 
 - MCWorkflow identified many regions for masking (though see above - I'm not sure of the confidence level), but almost none of these intersected with our microbial mappings
+    - Interestingly, the ONLY masked microbial mappings were in each `bwa aln` set. No graph mappings whatsoever were masked
+    - Running theory is that this represents a true microbial contaminant region of the assembly. In the `bwa aln` context, the reads had one target and best mapped to that region. In the graph context, the reads likely had a better contaminant region in a different assembly, and they mapped there. During surjection that region was not in the reference, so they get lost at this stage.
+    - So while graphs are more robust to assembly contamination, they are particularly vulnerable to **spurious mapping**. Here, bad mappings to actual sheep sequence can occur across a much larger number of assemblies, and when you surject you're laminating all those spurious mappings together
 
 - Take home point: Most likely, the genome is pretty clean, and microbial mappings in `grave` or `bwa-aln` are purely spurious rather than hits to assembly microbial contamination
 
-### Effect on sheep reads
+- NOTE: Effect on sheep reads
+    - Based on above results, no need in this case to check the effect
+    - If a mask would be applied, we'd need to first check whether it punishes sheep BEDs
 
-- Based on above results, no need in this case to check the effect. 
+# Step 9: plot raw microbial mappings across MAPQ thresholds, aligners, and read lengths
 
-- If a mask would be applied, we'd need to first check whether it punishes sheep BEDs
+- `MAPQ30` is acceptable for graph mappings, and allows the better k + w setting of 15/5
+- However we could potentially be doing better with prefiltering out contamination. If this would be working well, we could lower the default to `MAPQ20`
+
+
+# LAST TASKS:
+
+- what do EAGER/DNAHarvester do about contamination?
+- https://academic.oup.com/bib/article/26/1/bbae646/7923980
+- Does the GAM identity filter do anything to help?
+- does prefiltering against GTDB help?
+
 
 # Beyond this round of benchmarking
 

@@ -233,27 +233,28 @@ microbial_70.fq.gz      100000
 - `troubleshooting` is the code used for our test. `dev` is now the branch for any further commits
 
     Issues log:
+    TODO: add theses as issues on the upstream
     - the custom script is sequential, single threaded. For single assembly (~human/sheep size) run time is acceptable, but if running across many (or large) assemblies, parallelising this into nextflow modules would be preferable
     - merge bam writes many intermediate files that should be streamed
     - check if the removal of intermediate files in exogenous detection is needed, or if streaming could be used instead
     - some fragile filename editing patterns. Workflow needs a robust metadata ingestion instead at the start
     - related, metadata is sporadically updated via map functions, but not stored in a meta object (added into the tuple). Move all of that to the ingestion step
-    - Some development needed on the parsing scripts: What QC is done on the mappings? How confident are we that the regions are actually microbe-like? Some benchmarking might be needed. From experience, mapping microbe reads to an assembly gets high quality alignments - often spurious
+    - Parsing scripts: README could add clarification, or could add some options for QC on the mappings. Setting confidence levels. 1 mapped read is considered a microbial-like hit. How confident are we that the regions are actually microbe-like? From experience, mapping microbe reads to an assembly gets high quality alignments - often spurious
+
+- MCWorkflow identified many regions for masking (though see above - I'm not sure of the confidence level), but almost none of these intersected with our microbial mappings
+    - Interestingly, the ONLY intersected microbial mappings were in each `bwa aln` set. No graph mappings whatsoever were intersected out
+    - Running theory is that this represents a true microbial contaminant region of the assembly. In the `bwa aln` context, the reads only had one target and their best mapping was to that region. In the graph context, reads like this had a better contaminant region in a different assembly, and mapped there. During surjection that region was not in the reference, so they get lost at this stage.
+    - So while graphs are likely more robust to true assembly contamination, they are particularly vulnerable to **spurious mapping**. Here, spurious mappings to actual sheep sequence can occur across a much larger number of assemblies, and when you surject you're laminating all those spurious mappings together
 
 #### `ncbi-fcs-fx`
 
-- Main database not suitable for a test profile (470 GB). Needs to be moved into `tempfs` also. 
+- Main database is not suitable for a nextflow test profile (470 GB). Needs to be moved into `tempfs`
 
-##### Results on microbial filtering
+- `fcs-gx`: Did not identify contamination in the sheep reference. The only hits were to 5 highly repetitive regions, which were flagged as potentially from fish. These are repeat arrays common in eukaryotes
 
-- `fcs-gx`: Did not identify contamination. The only hits were to 5 highly repetitive regions, which were flagged as potentially from fish. These are repeat arrays common in eukaryotes
+##### Take home point from these two tools
 
-- MCWorkflow identified many regions for masking (though see above - I'm not sure of the confidence level), but almost none of these intersected with our microbial mappings
-    - Interestingly, the ONLY masked microbial mappings were in each `bwa aln` set. No graph mappings whatsoever were masked
-    - Running theory is that this represents a true microbial contaminant region of the assembly. In the `bwa aln` context, the reads had one target and best mapped to that region. In the graph context, the reads likely had a better contaminant region in a different assembly, and they mapped there. During surjection that region was not in the reference, so they get lost at this stage.
-    - So while graphs are more robust to assembly contamination, they are particularly vulnerable to **spurious mapping**. Here, bad mappings to actual sheep sequence can occur across a much larger number of assemblies, and when you surject you're laminating all those spurious mappings together
-
-- Take home point: Most likely, the genome is pretty clean, and microbial mappings in `grave` or `bwa-aln` are purely spurious rather than hits to assembly microbial contamination
+- Take home point: Most likely, the reference genome is pretty clean. Microbial mappings in `grave` or `bwa-aln` are mostly spurious rather than hits to assembly microbial contamination
 
 - NOTE: Effect on sheep reads
     - Based on above results, no need in this case to check the effect
@@ -264,19 +265,34 @@ microbial_70.fq.gz      100000
 - `MAPQ30` is acceptable for graph mappings, and allows the better k + w setting of 15/5
 - However we could potentially be doing better with prefiltering out contamination. If this would be working well, we could lower the default to `MAPQ20`
 
-
 # NEXT TASKS:
 
 - does prefiltering against GTDB help?
-- https://academic.oup.com/bib/article/26/1/bbae646/7923980
+    - https://academic.oup.com/bib/article/26/1/bbae646/7923980
 - what do EAGER/DNAHarvester do about contamination?
-- Does the GAM identity filter do anything to help?
+    - DNAHarvester has an option to run kraken2 on the reads and keep unclassified
+- Does the GAM identity filter do anything to help? (in progress)
 
 ## Prefiltering
 
-- What this would entail. Grabbing the very large GTDB kraken2 database (`aria2` package on conda-forge is up to date - wget managed 17GB / hour, aria2 ~80GB / hour)
+- Testing kraken2 GTDB database (k 35, l 31) (500GB download)
+- uncompressed main index is ~650 GB. Docs would need to reflect disk requirements for prefiltering (1.2 TB disk free, of which ~650 can be stored )
+- Better to run the download & extract as a pixi task, helper script, or storedir? Needs an md5 check also.
+
+### Download
+
+-`aria2` on conda-forge is up to date. In testing, `wget` managed 17GB/hour, `aria2` ~90GB/hour
 
 `pixi run aria2c -d . -o "$TAR_FILE" -x 16 -k 100M "$TAR_URL"` # Note x != threads, but parallel connections. This test is running on 2 cores.
+    - TODO db should be cached at the process level, e.g. in case an institutional profile uses scratch
+    - storeDir?
+
+### Kraken2 run
+
+- Attempting RAM loading (default) just stalls forever on this size db. `--memory-mapping` needed, and then all samples finished in ~38 minutes, of which around 30 mins was copying the db to node scratch. Thus, in a nextflow context, it might be good to batch samples based on size or number, to copy the db a limited number of times. Each batch would be run in a sequential manner.
+
+- For benchmarking, we need to explore confidence thresholds. One can use the confidence metric within kraken2 (per read, proportion of read k-mers in LCA or descendents / number of unambiguous k-mers in the read (no ambigious characters)). I think this is dynamic, such that a read failing the confidence threshold will have it's assignment moved up the tree until it passes the threshold. If it hits the root without passing, it's unclassified.
+- Alternatively, there is a post-processing tool called `conifer` that can calculate both the LCA style confidence, and a RTL confidence (which includes not just LCA and descendents, but also ancestors)
 
 - Running kraken2 on each read set & removing any with hits above a certain confidence threshold
 

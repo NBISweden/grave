@@ -9,7 +9,7 @@ process BWA_ALN_SAMSE {
         'community.wave.seqera.io/library/bwa_htslib_samtools:83b50ff84ead50d0' }"
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta)      , path(reads)
     tuple path(reference), path(indexes)
 
     output:
@@ -19,27 +19,27 @@ process BWA_ALN_SAMSE {
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
-    def args   = task.ext.args   ?: ''
-    def args2   = task.ext.args2   ?: ''
-    def prefix = task.ext.prefix ?: "${meta.read_group}"
+    def args       = task.ext.args   ?: ''
+    def args2      = task.ext.args2  ?: ''
+    def prefix     = task.ext.prefix ?: "${meta.read_group}"
     def read_group = meta.read_group ? "-r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}'" : ""
 
     """
     INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
 
     bwa aln \\
-        $args \\
-        -t $task.cpus \\
+        ${args} \\
+        -t ${task.cpus} \\
          \$INDEX_PREFIX \\
         ${reads} | \\
     bwa samse \\
-        $args2 \\
-        $read_group \\
+        ${read_group} \\
         \$INDEX_PREFIX \\
         - \\
-        $reads | \\
+        ${reads} | \\
     samtools view \\
         --exclude-flags 4 \\
+        ${args2} \\
         --with-header \\
         --uncompressed \\
         - | \\

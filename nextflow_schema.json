@@ -199,7 +199,7 @@
       "properties": {
         "aDNAkmerLength": {
           "type": "integer",
-          "default": 19,
+          "default": 15,
           "description": "K value when K-mer profiling ancient DNA samples and constructing graph indexes"
         },
         "aDNAwindowLength": {
@@ -262,7 +262,7 @@
         "minimumMapQFilter": {
           "type": "integer",
           "default": 20,
-          "description": "GAM: MAPQ threshold applied when filtering (< INT), requires --gamFilterMapQ"
+          "description": "GAM: MAPQ threshold applied when filtering, requires --gamFilterMapQ"
         },
         "alignIdentityFilter": {
           "type": "boolean",
@@ -283,6 +283,16 @@
           "type": "integer",
           "default": 999,
           "description": "GAM: When clipping, sets max number of bases to clip from read ends, requires --gamDefrayEnds"
+        },
+        "bwaFilterMapQ": {
+          "type": "boolean",
+          "default": true,
+          "description": "BAM (linear mode only): Apply MAPQ filtering"
+        },
+        "bwaMinimumMapQFilter": {
+          "type": "integer",
+          "default": 20,
+          "description": "BAM (linear mode only): MAPQ threshold applied when filtering, requires --bwaFilterMapQ"
         }
       }
     },

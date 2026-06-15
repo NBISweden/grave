@@ -1,4 +1,6 @@
 Changes in component 'nf-core/bwa/aln'
+'modules/nf-core/bwa/aln/environment.yml' is unchanged
+'modules/nf-core/bwa/aln/meta.yml' is unchanged
 Changes in 'bwa/aln/main.nf':
 --- modules/nf-core/bwa/aln/main.nf
 +++ modules/nf-core/bwa/aln/main.nf
@@ -12,14 +14,15 @@ Changes in 'bwa/aln/main.nf':
      label 'process_medium'
 -
      conda "${moduleDir}/environment.yml"
-     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
++    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
          'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d7/d7e24dc1e4d93ca4d3a76a78d4c834a7be3985b0e1e56fddd61662e047863a8a/data' :
          'community.wave.seqera.io/library/bwa_htslib_samtools:83b50ff84ead50d0' }"
  
      input:
 -    tuple val(meta) , path(reads)
 -    tuple val(meta2), path(index)
-+    tuple val(meta), path(reads)
++    tuple val(meta)      , path(reads)
 +    tuple path(reference), path(indexes)
  
      output:
@@ -34,10 +37,11 @@ Changes in 'bwa/aln/main.nf':
 +    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
  
      script:
-     def args   = task.ext.args   ?: ''
+-    def args   = task.ext.args   ?: ''
 -    def prefix = task.ext.prefix ?: "${meta.id}"
-+    def args2   = task.ext.args2   ?: ''
-+    def prefix = task.ext.prefix ?: "${meta.read_group}"
++    def args       = task.ext.args   ?: ''
++    def args2      = task.ext.args2  ?: ''
++    def prefix     = task.ext.prefix ?: "${meta.read_group}"
 +    def read_group = meta.read_group ? "-r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}'" : ""
  
 -    if (meta.single_end) {
@@ -53,18 +57,18 @@ Changes in 'bwa/aln/main.nf':
 -            \$INDEX \\
 -            ${reads}
 +    bwa aln \\
-+        $args \\
-+        -t $task.cpus \\
++        ${args} \\
++        -t ${task.cpus} \\
 +         \$INDEX_PREFIX \\
 +        ${reads} | \\
 +    bwa samse \\
-+        $args2 \\
-+        $read_group \\
++        ${read_group} \\
 +        \$INDEX_PREFIX \\
 +        - \\
-+        $reads | \\
++        ${reads} | \\
 +    samtools view \\
 +        --exclude-flags 4 \\
++        ${args2} \\
 +        --with-header \\
 +        --uncompressed \\
 +        - | \\
@@ -130,8 +134,6 @@ Changes in 'bwa/aln/main.nf':
 -    }
  }
 
-'modules/nf-core/bwa/aln/environment.yml' is unchanged
-'modules/nf-core/bwa/aln/meta.yml' is unchanged
 'modules/nf-core/bwa/aln/tests/main.nf.test.snap' is unchanged
 'modules/nf-core/bwa/aln/tests/main.nf.test' is unchanged
 ************************************************************

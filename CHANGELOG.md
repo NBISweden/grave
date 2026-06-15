@@ -57,7 +57,7 @@
 
 ### Graph snarls needs more HPC memory
 
-- Bumped to 100GB
+- Bumped to 120GB + process_high
 
 ### Profile to turn off scratch globally
 

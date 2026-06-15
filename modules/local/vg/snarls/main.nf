@@ -2,7 +2,7 @@ process COMPUTE_SNARLS {
 
     tag "${graph.baseName}_graph"
     // NOTE: memory handled in conf/tool_resources.config
-    label 'process_medium'
+    label 'process_high'
     // NOTE: update version string manually
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.73.0--645b5a4f32c11ace' :

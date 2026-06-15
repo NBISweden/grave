@@ -55,6 +55,10 @@
 
 - Added two params to allow mapq filtering in linear mode (one to set mapq filtering off/on (default true), one for the value (default 20))
 
+### Graph snarls needs more HPC memory
+
+- Bumped to 100GB
+
 ### Profile to turn off scratch globally
 
 - added `no_scratch` profile for testing/development purposes, included after the institutional profile in order to override any settings there

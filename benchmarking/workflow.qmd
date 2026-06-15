@@ -265,21 +265,23 @@ microbial_70.fq.gz      100000
 - `MAPQ30` is acceptable for graph mappings, and allows the better k + w setting of 15/5
 - However we could potentially be doing better with prefiltering out contamination. If this would be working well, we could lower the default to `MAPQ20`
 
-# NEXT TASKS:
+# Step 10: attempt prefiltering with kraken2 & GTDB
 
 - does prefiltering against GTDB help?
     - https://academic.oup.com/bib/article/26/1/bbae646/7923980
 - what do EAGER/DNAHarvester do about contamination?
     - DNAHarvester has an option to run kraken2 on the reads and keep unclassified
-- Does the GAM identity filter do anything to help? (in progress)
 
-## Prefiltering
+
+# Database
 
 - Testing kraken2 GTDB database (k 35, l 31) (500GB download)
 - uncompressed main index is ~650 GB. Docs would need to reflect disk requirements for prefiltering (1.2 TB disk free, of which ~650 can be stored )
 - Better to run the download & extract as a pixi task, helper script, or storedir? Needs an md5 check also.
 
-### Download
+The GTDB database is large. For grave we could probably handle download, but should at least accept a local db that users can download in advance. It would be vital we cache the unpacked database, as each download + unpack will take ~6.5 hrs (with optimisation using aria2 instead of wget). Unpacking not yet optimised.
+
+## Download
 
 -`aria2` on conda-forge is up to date. In testing, `wget` managed 17GB/hour, `aria2` ~90GB/hour
 
@@ -287,20 +289,72 @@ microbial_70.fq.gz      100000
     - TODO db should be cached at the process level, e.g. in case an institutional profile uses scratch
     - storeDir?
 
-### Kraken2 run
+## RAM use
+
+Normally you'd load the db into RAM, but one this large stalls forever in kraken2, even on a machine with enough RAM. We skip RAM loading and then it runs pretty fast.
 
 - Attempting RAM loading (default) just stalls forever on this size db. `--memory-mapping` needed, and then all samples finished in ~38 minutes, of which around 30 mins was copying the db to node scratch. Thus, in a nextflow context, it might be good to batch samples based on size or number, to copy the db a limited number of times. Each batch would be run in a sequential manner.
 
+## Scratch use
+
+Some institutional profiles copy files into node-local SSD storage for faster operation. Given the db size, this takes ~30 mins alone. Options are:
+- disable scratch for kraken2 tasks and run them in parallel (not viable - significant slow down)
+- allow scratch but run all samples sequentially in one task, or batches of samples per task - viable option
+- allow scratch and run each sample in parallel - not tested, but bad idea: most of the time will be spent copying files
+
+```
+# db copy speed:
+34:48
+ 
+# classification speed on test files, using node local storage
+~4-7 seconds per test file
+
+# classification speed without node local
+~6 minutes per test file
+```
+
+## Classification performance
+
+- We need a good balance of results filtering that maximises microbial exclusion and minimises endogenous exclusion. There are two key things we can tweak here:
+- number of distinct l-mers required to support a classification: raising this seems to reduce endogenous exclusion more than microbial. This makes sense, as we're not classifying reads with one or a few chance hits to the db - only those with consistent distinct matches to the db
+- It's read length dependent, so longer reads have more l-mers that can be queried. When increasing this param, shorter reads with fewer l-mers are more severely penalised (more unclassified reads), up until the point they don't have enough l-mers to meet the threshold at all, at which point they're 100% unclassified. This might be ok if by design we are aiming to target modern bacterial contamination rather than ancient microbiome. For this it would be advantageous, as kraken2 would essentially skip short reads, and only longer reads with sufficient classified l-mers would be filtered out.
+
+- The other thing we can tweak is confidence. Kraken2 can calculate a confidence score from it's k-mer hit table for each read. Given a classification to the LCA, it calculates the proportion of k-mer matches to that LCA or it's descendents, over the total number of k-mers (excluding any with ambiguous characters). 
+- The issue with this is that this emphasises classification to a particular rank in the db taxonomy. Hits to another bacterial clade outside of the "LCA + descendents" count against the confidence score.
+- For our purposes we are more interested in bacterial vs non-bacterial. There is another package (conifer) that can calculate root to leaf confidence scores, such that kmers in the read that are outside the LCA + descendents group, but within ancestral taxonomy ranks of the LCA are counted.
+- Some quick testing suggests that this score is more effective for our purposes than the raw kraken2 confidence
+- But I guess even this score isn't exactly what we want. Given GTDB is just bacteria and archaea, I wonder if we could calculate a score for total classified k-mers at any rank.
+
+
 - For benchmarking, we need to explore confidence thresholds. One can use the confidence metric within kraken2 (per read, proportion of read k-mers in LCA or descendents / number of unambiguous k-mers in the read (no ambigious characters)). I think this is dynamic, such that a read failing the confidence threshold will have it's assignment moved up the tree until it passes the threshold. If it hits the root without passing, it's unclassified.
 - Alternatively, there is a post-processing tool called `conifer` that can calculate both the LCA style confidence, and a RTL confidence (which includes not just LCA and descendents, but also ancestors)
+    - `for i in *out; do conifer -i $i --db ../db/aria2/taxo.k2d --all --both_scores > $i.conifer; done`
 
 - Running kraken2 on each read set & removing any with hits above a certain confidence threshold
 
-- then aligning to the graph with only the surviving (in normal grave operation). For benchmarking we're running it after the fact, to check what would have been removed, both from sheep and microbes
+- then intersecting with the reads that got lifted to the graph for new accurate/inaccurate counts. For benchmarking we're running it after the fact, in normal operation it would have been first.
+
+
+
+## Database choice
+
+- GTDB in a way makes things simple. It will be explicitly for removing bacterial contamination (plus archaea, but we don't expect much). Post-processing optimisation can just focus on minimising endogenous loss and maximising microbial loss, without worrying about taxonomic levels
+
+- If we want to go to another type of database, e.g. RefSeq, then we need to consider a more nuanced parsing that doesn't just focus on classified/not classified, but also on taxon assignments. We would also probably not remove unclassified reads in this case.
+
+
+## Investigate profile of the current microbill readset
+
+- TODO The microbial dataset isn't pure bacteria, need to run a taxonomy lookup on this to get a better understanding
+- If only benchmarking GTDB for bacterial removal, potentially create a better microbial test set
+
 
 
 # Beyond this round of benchmarking
 
-1. Further grave settings graph settings
-2. Further grave alignment settings
+1. Further grave settings graph settings - seeding 30 bp reads...
+2. Further grave alignment settings - identity filter
+    - Does the GAM identity filter do anything to help? (in progress)
+
+
 

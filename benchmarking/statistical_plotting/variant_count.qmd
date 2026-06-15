@@ -1,0 +1,86 @@
+---
+title: "Raw vcf stats (grave_15_5 vs bwa-aln, both mapq20)"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+#| label: imports
+import pandas as pd
+import numpy as np
+from plotnine import *
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+
+```{python}
+#| label: load-data
+df = pd.read_csv('./data/variants.csv')
+
+# Ensure ordered factors for consistent axis / facet ordering
+df['read_length'] = pd.Categorical(df['read_length'], categories=[30, 40, 50, 60, 70], ordered=True)
+df['aligner']     = pd.Categorical(df['aligner'],     categories=['bwa_aln', 'grave_15_5'], ordered=True)
+df['type']        = pd.Categorical(df['type'],         categories=['SNPs', 'MNPs', 'Indels', 'Other'], ordered=True)
+
+ALIGNER_LABELS = {'bwa_aln': 'BWA aln', 'grave_15_5': 'grave (15, 5)'}
+ALIGNER_COLOURS = {'bwa_aln': '#0072B2', 'grave_15_5': '#D55E00'}
+
+df['aligner_label'] = df['aligner'].map(ALIGNER_LABELS)
+df['aligner_label'] = pd.Categorical(
+    df['aligner_label'],
+    categories=[ALIGNER_LABELS[a] for a in ['bwa_aln', 'grave_15_5']],
+    ordered=True
+)
+```
+
+```{python}
+#| label: plot
+#| fig-width: 10
+#| fig-height: 7
+
+p = (
+    ggplot(df, aes(x='factor(read_length)', y='count', fill='aligner_label'))
+    + geom_col(position=position_dodge(width=0.75), width=0.7)
+    + facet_wrap('~ type', scales='free_y', ncol=2)
+    + scale_fill_manual(
+        values={
+            ALIGNER_LABELS['bwa_aln']:    '#3A7DBF',
+            ALIGNER_LABELS['grave_15_5']: '#E8874A',
+        },
+        name='Aligner'
+    )
+    + scale_y_continuous(labels=lambda lst: [f'{v/1000:.0f}k' if v >= 1000 else f'{int(v)}' for v in lst])
+    + labs(
+        x='Read length (bp)',
+        y='Variant count',
+        title='Variant counts by type, aligner and read length',
+    )
+    + theme_bw(base_size=12)
+    + theme(
+        figure_size=(10, 7),
+        panel_grid_major_x=element_blank(),
+        panel_grid_minor=element_blank(),
+        strip_background=element_rect(fill='#f0f0f0', colour='#cccccc'),
+        strip_text=element_text(size=11, face='bold'),
+        legend_position='bottom',
+        legend_title=element_text(size=10),
+        legend_text=element_text(size=10),
+        plot_title=element_text(size=13, face='bold'),
+        axis_title=element_text(size=11),
+    )
+)
+
+p.save('variant_counts.png', dpi=300, bbox_inches='tight')
+p
+```
+

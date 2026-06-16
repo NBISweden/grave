@@ -2,16 +2,21 @@
 
 ## [2.2.0] - Unreleased
 
-### TODO: GAM filtering defaults
+### GAM filtering defaults
 
-- Set defaults based on benchmarking:
-    - set GAM filtering mapq to 20, which achieves a reasonable balance between yield and error
-    - recommended settings would range from 20 to 30. Below 20 error becomes too high, above 30 or even 25, error is already so low that you are throwing away accurate alignments (and a lot of them)
-    - turned off default identity filtering (since it's an untested filter)
+- set default GAM filtering mapq to 30, which achieves a reasonable balance between yield, error, and microbial contamination removal
+    - recommended settings would range from 20 to 30 depending on the level of sample contamination. Pure/high quality samples, use 20. Typical aDNA, use 30.
+    - Below 20, mapping inaccuracy becomes too high. Above 30, you lose many good alignments for diminishing improvements to error rate
+    - on the microbial side, 20 to 25 get quite a lot of mappings. 30 does a good job of removal.
+- Thus 30 is the choice until we can implement effective & conservative prefiltering of microbial reads
 
-### TODO Further improvement of k + w default
+### Identity filter
 
-- Full benchmarking showed `15 + 5` performed better for short reads (30-50), and had no cost above this. Until even more options have been tested, this is the best balance yet.
+- turned off the default identity filtering (since it's an untested filter). See issue [#36](https://github.com/NBISweden/grave/issues/36)
+
+### Current k + w default
+
+- Full benchmarking showed `15 + 5` performed better for short reads (30-50), and had no cost above this. Until even more options have been tested to optimise the 30bp category, this will be the default 
 
 ### Grave now publishes library level BAMs
 

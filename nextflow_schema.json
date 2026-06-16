@@ -261,7 +261,7 @@
         },
         "minimumMapQFilter": {
           "type": "integer",
-          "default": 20,
+          "default": 30,
           "description": "GAM: MAPQ threshold applied when filtering, requires --gamFilterMapQ"
         },
         "alignIdentityFilter": {

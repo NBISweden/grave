@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.?.?] - unreleased
+
+### Identity filter benchmark results
+
+
+### README
+
+
+### Prefiltering, and any effects on default MAPQ
+
+
 ## [2.2.0] - 20260616
 
 ### GAM filtering defaults

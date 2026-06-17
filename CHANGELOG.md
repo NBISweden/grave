@@ -10,6 +10,10 @@
 
 ### Prefiltering, and any effects on default MAPQ
 
+### Graph index storedir
+
+- Existing storeDir target made rerunning with different `k` / `w` values prone to error (nextflow sees it as stored, but it should be re-run)
+- Target name now includes `k` + `w` - respective indexes are properly stored for each iteration
 
 ## [2.2.0] - 20260616
 

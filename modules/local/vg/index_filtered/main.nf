@@ -6,7 +6,7 @@ process INDEX_FILTERED_GRAPH {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/vg:1.73.0--645b5a4f32c11ace' :
         'community.wave.seqera.io/library/vg:1.73.0--e9dad0f50dfcdf46' }"
-    storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes/min_dist") }
+    storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes_${params.aDNAkmerLength}-${params.aDNAwindowLength}/min_dist") }
 
     input:
     path (graph)

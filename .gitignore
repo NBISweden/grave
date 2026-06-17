@@ -5,9 +5,9 @@ work/
 # Grave
 results/
 results-*/
-tests/data/graph/*_indexes
+tests/data/graph/*_indexes_*
 tests/data/linear/*_indexes
-tests/data/graph/additional_graphs/*_indexes
+tests/data/graph/additional_graphs/*_indexes_*
 
 # nf-test
 .nf-test.log

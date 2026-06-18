@@ -360,15 +360,15 @@ Some institutional profiles copy files into node-local SSD storage for faster op
 - longer reads are more robust to removal than short. But we're still talking small effect sizes for short reads.
 - unfortunately does not appear to have a disproportionate filtering effect on microbial reads, which is what we were hoping for. I think we can leave it off by default.
 - take home point: identity filter can be left in the code as a niche filter, but does not replace MAPQ generally, or really add to it.
-- TODO: For example, it might serve as a replacement filter for ultra-short reads, where MAPQ is depressed due to high numbers of secondary alignments, and we lose good alignments. In this case, we should assess whether the identity filter alone can filter for accurate reads without applying MAPQ
+- For example, it might serve as a replacement filter for ultra-short reads, where MAPQ is depressed due to high numbers of secondary alignments, and we lose good alignments. In this case, we should assess whether the identity filter alone can filter for accurate reads without applying MAPQ
+    - answer: no. It categorically is worse at removing inaccurate reads than MAPQ. Why? Probably repeats. Identity filter pass = read looks good! But no information on how often that sequence exists, which MAPQ does capture.
 - For longer reads I don't currently seewhere it would add value
-- take home point 2: default off, default 0.85
+- take home point 2: default off, default 0.85, no current recommended use case
 
 
 # Remaining tasks
 
-- can identity filter replace mapq for e.g. 30 bp reads and improve yield?
-- can we improve the situation for 30bp reads?
+- can we improve the situation for 30bp reads? via k / w
 - microbial prefiltering to achieve MAPQ 20-25 default
 
 

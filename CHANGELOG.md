@@ -4,7 +4,7 @@
 
 ### Identity filter benchmark results
 
-- Excepting the possibility of a niche filter for ultra-short reads (still to be tested), we found no major benefit of applying the identity filter by default
+- We found no major benefit of applying the identity filter by default (it also does a bad job at replacing MAPQ for ultra-short reads, due to repeats. These can pass identity filters, but would fail MAPQ due to multi-mapping)
 - Default set to `false`, and when turned on, `0.85`
 
 ### README

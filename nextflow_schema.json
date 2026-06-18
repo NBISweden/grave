@@ -270,7 +270,7 @@
         },
         "minimumScorePrimaryAlign": {
           "type": "number",
-          "default": 0.8,
+          "default": 0.85,
           "description": "GAM: Fraction identity required to keep primary alignment during filtering, requires --alignIdentityFilter",
           "minimum": 0,
           "maximum": 1

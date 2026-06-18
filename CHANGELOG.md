@@ -4,6 +4,8 @@
 
 ### Identity filter benchmark results
 
+- Excepting the possibility of a niche filter for ultra-short reads (still to be tested), we found no major benefit of applying the identity filter by default
+- Default set to `false`, and when turned on, `0.85`
 
 ### README
 

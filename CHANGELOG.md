@@ -2,15 +2,28 @@
 
 ## [2.?.?] - unreleased
 
+### Prefiltering, and any effects on default MAPQ
+
+- TODO: kraken2
+
+### README updates
+
+#### Workflow image
+
+- TODO: Add workflow image to readme
+
+#### Updated guidance on k + w
+
+- TODO: update guidance
+- TODO: update table to include accuracy metrics
+
+
+
+
 ### Identity filter benchmark results
 
-- We found no major benefit of applying the identity filter by default (it also does a bad job at replacing MAPQ for ultra-short reads, due to repeats. These can pass identity filters, but would fail MAPQ due to multi-mapping)
-- Default set to `false`, and when turned on, `0.85`
-
-### README
-
-
-### Prefiltering, and any effects on default MAPQ
+- We found no major benefit of applying the identity filter by default (it also does a bad job at replacing MAPQ for ultra-short reads, likely due to repeats. These can pass identity filters, but would fail MAPQ due to multi-mapping)
+- Default set to `false`, and when turned on, `0.85`. Should always be run alongside a suitable MAPQ filter.
 
 ### Graph index storedir
 

@@ -1,0 +1,67 @@
+---
+title: "Run times"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+#| label: imports
+import pandas as pd
+import numpy as np
+from plotnine import *
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+
+```{python}
+#| label: load-data
+df = pd.read_csv('./data/run_time.csv')
+
+# Melt from wide to long format
+df_long = df.melt(id_vars='aligner', var_name='read_length', value_name='time_seconds')
+
+# Extract numeric read length (e.g. '30_bp_s' -> 30)
+df_long['read_length'] = df_long['read_length'].str.extract(r'(\d+)').astype(int)
+df_long['read_length'] = pd.Categorical(df_long['read_length'], categories=sorted(df_long['read_length'].unique()))
+
+print(df_long.head(10))
+```
+
+```{python}
+#| label: plot
+#| fig-width: 10
+#| fig-height: 6
+
+grey_shades = ['#d9d9d9', '#bdbdbd', '#969696', '#636363', '#252525']
+
+p = (
+    ggplot(df_long, aes(x='aligner', y='time_seconds', fill='factor(read_length)'))
+    + geom_col(position=position_dodge(width=0.8), width=0.7)
+    + scale_fill_manual(values=grey_shades)
+    + labs(
+        title='Aligner run times by read length (100k reads)',
+        x='Aligner',
+        y='Wall-clock time (seconds)',
+        fill='Read length (bp)',
+    )
+    + theme_bw()
+    + theme(
+        axis_text_x=element_text(angle=35, hjust=1),
+        figure_size=(10, 6),
+    )
+)
+
+p.save('runtime.png', dpi=300, bbox_inches='tight')
+p
+```
+

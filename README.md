@@ -95,7 +95,7 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 - Running in unfiltered graph mode utilises *K*-mer profiling of the reads to sample representative haplotypes from the graph for mapping, read more [here](https://www.nature.com/articles/s41592-024-02407-2) and [here](https://github.com/vgteam/vg/wiki/Haplotype-Sampling).
 
 > [!IMPORTANT]
-> See the above section, users should consider (or test) whether an unfiltered graph is appropriate for their samples
+> See the above section, users should consider (or test) whether an unfiltered graph is appropriate for their samples.
 
 - To build an unfiltered graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required).
 

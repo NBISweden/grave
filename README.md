@@ -143,7 +143,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 > Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too long for minimiser computation. Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read.<br><br>
 > To address these issues, `grave` uses different `k` and `w` defaults for modern and ancient reads:<br><br>
 > Modern samples are run with `giraffe` defaults, emphasising higher specificity (`k` = 29, `w` = 11).<br><br>
-> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones. The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants. Users may find that adjusting these parameters for their particular use case can improve performance.<br><br>
+> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones. The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants. Users may find that adjusting these parameters for their particular dataset can improve performance.<br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687). As the authors note, there is no single best setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
 **Comparison of alignment parameters**<br>
@@ -151,7 +151,8 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 | Alignment tool | \|--- | Accurate| reads&nbsp;per | million | ---\| | \|--- | Inaccurate | reads&nbsp;per  | million | ---\| |
 | :-:                                |  :-:        | :-:         | :-:         | :-:         | :-:         | :-:   | :-:   | :-:   | :-:   | :-:   |
 | *Read length*\*                    | *30*        | *40*        | *50*        | *60*        | *70*        | *30*  | *40*  | *50*  | *60*  | *70*  |
-| `grave`: `k-15, w-3`               | 459,420     | **654,470** | **754,550** | 803,160     | 837,050     | 2,790 | 4,420 | 4,910 | 3,980 | 4,840 |
+| `grave`: `k-13, w-3`               | 516,840     | **660,570** | 749,380     | 797,680     | 831,130     | 2,980 | 4,430 | 4,270 | 4,160 | 5,290 |
+| `grave`: `k-15, w-3`               | 459,420     | 654,470     | **754,550** | 803,160     | 837,050     | 2,790 | 4,420 | 4,910 | 3,980 | 4,840 |
 | `grave`: `k-15, w-5`               | 354,410     | 627,050     | 744,380     | 797,360     | 831,850     | 3,330 | 4,610 | 4,970 | 4,150 | 5,040 |
 | `grave`: `k-19, w-3`               | 396,080     | 603,760     | 740,410     | **805,890** | **841,830** | 6,910 | 4,600 | 5,150 | 4,500 | 4,910 |
 | `grave`: `k-19, w-5`               | 410,240     | 578,510     | 724,250     | 797,790     | 836,140     | 8,750 | 5,350 | 5,250 | 4,830 | 5,000 |

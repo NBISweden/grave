@@ -1,0 +1,209 @@
+---
+title: "Read yield versus MAPQ threshold"
+jupyter: grave-pixi
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: flatly
+execute:
+  echo: true
+  warning: false
+---
+
+## Overview
+
+Visualises accurate and inaccurate reads per million input reads across different MAPQ thresholds, aligners, and read lengths.
+
+| Data dimensions | Values |
+|:--|:--|
+| **Aligner** | see data |
+| **Read length** | 5 different lengths (bp) |
+| **MAPQ threshold** | Multiple thresholds (0-60) |
+| **Read type** | Accurate (filled markers), Inaccurate (hollow markers) |
+
+**Axes:**
+- **X-axis (MAPQ):** Minimum mapping quality threshold
+- **Y-axis (Reads per million):** Count of accurately or inaccurately mapped reads per million input reads
+
+---
+
+## Test setup
+
+```{python}
+import sys
+import numpy as np
+print("Hello world")
+print("I am using python version " + str(sys.version))
+print("I am using numpy version " + str(np.__version__))
+```
+
+## Tool import
+```{python}
+#| label: setup
+import pandas as pd
+import plotly.graph_objects as go
+```
+
+# Load data
+```{python}
+#| label: load-data
+
+df = pd.read_csv('./data/yield3.csv')
+
+aligners = sorted(df["aligner"].unique())
+lengths  = sorted(df["read_length"].unique())
+
+print(f"Aligners: {aligners}")
+print(f"Read lengths: {lengths}")
+print(f"Shape: {df.shape}")
+df.head()
+```
+
+# Plot
+```{python}
+#| label: plotly
+
+# Define visual separators
+_palette = [
+    "#0072B2", "#D55E00", "#009E73", "#CC79A7",
+    "#F0E442", "#56B4E9", "#E69F00", "#999999",
+    "#44AA99", "#882255", "#000000",
+]
+aligner_color = {a: _palette[i % len(_palette)] for i, a in enumerate(aligners)}
+_dashes  = ["solid", "dash", "dot", "dashdot", "longdashdot"]
+_symbols = ["circle", "square", "diamond", "triangle-up", "cross"]
+length_dash   = {l: _dashes[i % len(_dashes)]   for i, l in enumerate(lengths)}
+length_symbol = {l: _symbols[i % len(_symbols)] for i, l in enumerate(lengths)}
+
+# Traces
+fig = go.Figure()
+trace_meta = []
+
+for aligner in aligners:
+    for length in lengths:
+        sub = (
+            df[(df["aligner"] == aligner) & (df["read_length"] == length)]
+            .sort_values("mapq")  # ensures curve runs low→high MAPQ
+        )
+        if sub.empty:
+            continue
+
+        trace_meta.append((aligner, length, "accurate"))
+        # Accurate reads trace (filled markers)
+        fig.add_trace(go.Scatter(
+            x=sub["mapq"],
+            y=sub["accurate_per_million"],
+            mode="lines+markers",
+            name=f"{aligner} | {length}bp (accurate)",
+            line=dict(
+                color=aligner_color[aligner],
+                dash=length_dash[length],
+                width=2
+            ),
+            marker=dict(
+                symbol=length_symbol[length],
+                size=8,
+                color=aligner_color[aligner]
+            ),
+            customdata=sub[["mapq"]].values,
+            hovertemplate=(
+                "<b>%{fullData.name}</b><br>"
+                "MAPQ ≥ %{customdata[0]}<br>"
+                "Accurate reads/million: %{y:,.0f}<extra></extra>"
+            ),
+        ))
+        
+        trace_meta.append((aligner, length, "inaccurate"))
+        # Inaccurate reads trace (hollow markers)
+        fig.add_trace(go.Scatter(
+            x=sub["mapq"],
+            y=sub["inaccurate_per_million"],
+            mode="lines+markers",
+            name=f"{aligner} | {length}bp (inaccurate)",
+            line=dict(
+                color=aligner_color[aligner],
+                dash=length_dash[length],
+                width=2
+            ),
+            marker=dict(
+                symbol=length_symbol[length],
+                size=8,
+                color="rgba(255,255,255,0)",  # transparent fill
+                line=dict(color=aligner_color[aligner], width=2)
+            ),
+            customdata=sub[["mapq"]].values,
+            hovertemplate=(
+                "<b>%{fullData.name}</b><br>"
+                "MAPQ ≥ %{customdata[0]}<br>"
+                "Inaccurate reads/million: %{y:,.0f}<extra></extra>"
+            ),
+        ))
+
+n = len(trace_meta)
+
+# --- Utility button helper ---
+# "legendonly" = hidden but still listed in legend (re-clickable)
+def make_visible(pred):
+    return [True if pred(a, l, t) else "legendonly" for a, l, t in trace_meta]
+
+show_hide = [
+    dict(label="Show all", method="restyle", args=[{"visible": [True] * n}]),
+    dict(label="Hide all", method="restyle", args=[{"visible": ["legendonly"] * n}]),
+]
+only_accurate = [
+    dict(label="Only accurate", method="restyle",
+         args=[{"visible": make_visible(lambda a, l, t, t_type="accurate": t == t_type)}]),
+]
+only_inaccurate = [
+    dict(label="Only inaccurate", method="restyle",
+         args=[{"visible": make_visible(lambda a, l, t, t_type="inaccurate": t == t_type)}]),
+]
+by_aligner = [
+    dict(label=f"Only {a}", method="restyle",
+         args=[{"visible": make_visible(lambda al, _l, _t, a=a: al == a)}])
+    for a in aligners
+]
+by_length = [
+    dict(label=f"Only {l}bp", method="restyle",
+         args=[{"visible": make_visible(lambda _a, ln, _t, l=l: ln == l)}])
+    for l in lengths
+]
+
+# --- Layout ---
+fig.update_layout(
+    title="Yield — Accurate Reads vs. MAPQ Threshold",
+    xaxis=dict(title="MAPQ Threshold", gridwidth=1, range=[0, 60]),
+    yaxis=dict(title="Reads per Million Input", range=[0, 1000000]),
+    hovermode="closest",
+    legend=dict(
+        title="<b>Aligner | Length</b><br><sup>click = toggle, dbl = isolate</sup>",
+        itemclick="toggle",
+        itemdoubleclick="toggleothers",
+    ),
+    updatemenus=[
+        dict(type="buttons", buttons=show_hide,
+             direction="right", showactive=False,
+             x=0.0, y=1.30, xanchor="left", yanchor="top",
+             bgcolor="#EEEEEE", bordercolor="#AAAAAA"),
+        dict(type="buttons", buttons=only_accurate + only_inaccurate,
+             direction="right", showactive=True,
+             x=0.0, y=1.21, xanchor="left", yanchor="top",
+             bgcolor="#FFDDDD", bordercolor="#AAAAAA"),
+        dict(type="buttons", buttons=by_aligner,
+             direction="right", showactive=True,
+             x=0.0, y=1.12, xanchor="left", yanchor="top",
+             bgcolor="#DDEEFF", bordercolor="#AAAAAA"),
+        dict(type="buttons", buttons=by_length,
+             direction="right", showactive=True,
+             x=0.0, y=1.03, xanchor="left", yanchor="top",
+             bgcolor="#DDFFF0", bordercolor="#AAAAAA"),
+    ],
+    margin=dict(t=160, r=20, b=60, l=80),
+    width=1000, height=650,
+)
+
+fig.show()
+```

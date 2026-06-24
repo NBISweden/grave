@@ -12,7 +12,7 @@ execute:
   warning: false
 ---
 
-Five-panel figure comparing `graph_15_3` and `bwa_aln` accuracy yields per million across different read lengths (30, 40, 50, 60, 70 bp).
+Five-panel figure comparing `graph_13_3` and `bwa_aln` accuracy yields per million across different read lengths (30, 40, 50, 60, 70 bp).
 
 Each panel shows:
 - **Filled markers**: Accurately mapped reads per million
@@ -39,13 +39,15 @@ warnings.filterwarnings('ignore')
 # Load the yield data
 #df = pd.read_csv('./data/yield.csv')
 
-df = pd.read_csv('./data/yield2.csv')
+#df = pd.read_csv('./data/yield2.csv')
+df = pd.read_csv('./data/yield3.csv')
 
 # Filter for only graph_15_5 and bwa_aln
 #aligners_of_interest = ['graph_15_5', 'bwa_aln']
 
+#aligners_of_interest = ['graph_15_3', 'bwa_aln']
 
-aligners_of_interest = ['graph_15_3', 'bwa_aln']
+aligners_of_interest = ['graph_13_3', 'bwa_aln']
 df_filtered = df[df['aligner'].isin(aligners_of_interest)].copy()
 
 # Ensure read lengths are sorted
@@ -88,7 +90,7 @@ print(df_plot.head(10))
 #| label: theme-setup
 # Color scheme for aligners
 aligner_colors = {
-    'graph_15_3': '#0072B2',  # Blue
+    'graph_13_3': '#0072B2',  # Blue
     'bwa_aln': '#D55E00'      # Orange
 }
 
@@ -157,8 +159,8 @@ plot = (
     scale_color_manual(
         name='',
         values={
-            'graph_15_3 (Accurate)': aligner_colors['graph_15_3'],
-            'graph_15_3 (Inaccurate)': aligner_colors['graph_15_3'],
+            'graph_13_3 (Accurate)': aligner_colors['graph_13_3'],
+            'graph_13_3 (Inaccurate)': aligner_colors['graph_13_3'],
             'bwa_aln (Accurate)': aligner_colors['bwa_aln'],
             'bwa_aln (Inaccurate)': aligner_colors['bwa_aln']
         }
@@ -168,14 +170,14 @@ plot = (
         values={
             'bwa_aln (Accurate)': aligner_colors['bwa_aln'],
             'bwa_aln (Inaccurate)': 'white',
-            'graph_15_3 (Accurate)': aligner_colors['graph_15_3'],
-            'graph_15_3 (Inaccurate)': 'white'
+            'graph_13_3 (Accurate)': aligner_colors['graph_13_3'],
+            'graph_13_3 (Inaccurate)': 'white'
         },
         labels={
             'bwa_aln (Accurate)': 'Accurate (bwa aln)',
             'bwa_aln (Inaccurate)': 'Inaccurate (bwa aln)',
-            'graph_15_3 (Accurate)': 'Accurate (grave: k-15, w-3)',
-            'graph_15_3 (Inaccurate)': 'Inaccurate (grave: k-15, w-3)'
+            'graph_13_3 (Accurate)': 'Accurate (grave: k-13, w-3)',
+            'graph_13_3 (Inaccurate)': 'Inaccurate (grave: k-13, w-3)'
         }
     ) +
     # Manual legend control with exact point and line styling
@@ -183,8 +185,8 @@ plot = (
         fill=guide_legend(
             override_aes={
                 'linetype': ['solid', 'dashed', 'solid', 'dashed'],
-                'color': [aligner_colors['bwa_aln'], aligner_colors['graph_15_3'], aligner_colors['bwa_aln'], aligner_colors['graph_15_3']],
-                'fill': [aligner_colors['bwa_aln'], aligner_colors['graph_15_3'], 'white', 'white'],
+                'color': [aligner_colors['bwa_aln'], aligner_colors['graph_13_3'], aligner_colors['bwa_aln'], aligner_colors['graph_13_3']],
+                'fill': [aligner_colors['bwa_aln'], aligner_colors['graph_13_3'], 'white', 'white'],
                 'stroke': [0.5, 0.5, 1.5, 1.5],
                 'size': [4, 4, 3, 3]
             }
@@ -206,7 +208,7 @@ plot
 
 ```{python}
 #| label: save-png
-ggsave(plot, 'graph_vs_bwa_comparison2.png', width=20, height=8, dpi=300)
+ggsave(plot, 'graph_vs_bwa_comparison3.png', width=20, height=8, dpi=300)
 ```
 
 ```{python}

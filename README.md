@@ -43,12 +43,12 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 - At minimum, `grave` can be run with `Nextflow` and either `Apptainer`, `Singularity`, or `Docker` installed in `$PATH`
 - However, it is recommended to run it via `pixi`
-- `pixi` is a drop-in replacement for `conda`, and `grave` uses it to install its basic dependencies
+- `pixi` is a drop-in replacement for `conda`, and `grave` uses it to install its basic dependencies.
 - `pixi` environments have an editable manifest file, the `pixi.toml`
-- Solved environments also have a `pixi.lock` file, which fixes the versions of all dependencies including transitive ones. The lockfile in this repository represents an environment that has been tested on Linux systems
+- Solved environments also have a `pixi.lock` file, which fixes the versions of all dependencies including transitive ones. The lockfile in this repository represents an environment that has been tested on Linux systems.
 - Installed `pixi` environments are found in the hidden folder `.pixi/envs`
-- `pixi` will automatically install an environment it lacks, if implied by another command (e.g., `pixi run -e apptainer ...` will install the `apptainer` environment if it is not found)
-- You can run commands in a `pixi` environment by prefixing them with `pixi run` (or in a specific environment with `pixi run -e <environment>`)
+- `pixi` will automatically install an environment it lacks, if implied by another command (e.g., `pixi run -e apptainer ...` will install the `apptainer` environment if it is not found).
+- You can run commands in a `pixi` environment by prefixing them with `pixi run` (or in a specific environment with `pixi run -e <environment>`).
 - Alternatively you can enter a software environment with `pixi shell` (or a specific environment with `pixi shell -e <environment>`), similar to `conda activate <environment>`
 - To delete an environment: `rm -rf .pixi/envs/<environment_name>`
 
@@ -70,25 +70,25 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 
 #### Generate or provide a reference
 
-- `grave` accepts three types of reference: `filtered_graph`, `unfiltered_graph`, or `linear` (i.e., FASTA assembly)
+- `grave` accepts three types of reference: `filtered_graph`, `unfiltered_graph`, or `linear` (i.e., FASTA assembly).
 
-- Graphs should be in `.gbz` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), a workflow within the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Graph indexes are not required - `grave` will create the necessary indexes for ancient and/or modern input samples
+- Graphs should be in `.gbz` format, such as those produced by [Minigraph-Cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md), a workflow within the [Cactus package](https://github.com/ComparativeGenomicsToolkit/cactus). Graph indexes are not required - `grave` will create the necessary indexes for ancient and/or modern input samples.
 
-- When using `Minigraph-Cactus` for graph construction, keep input assembly contig headers simple ([see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)), and without special characters
+- When using `Minigraph-Cactus` for graph construction, keep input assembly contig headers simple ([see the official guidance here](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#contig-names)), and without special characters.
 
 ##### Filtered graphs
 
-- A filtered graph is one with depth filtering applied, i.e., nodes not represented in at least *`depth`* haplotypes are removed from the graph. Typically this is set to around 10% of the number of haplotypes (i.e., `40 pseudohaploid assemblies` or `20 phased assemblies` -> `depth 4`)
+- A filtered graph is one with depth filtering applied, i.e., nodes not represented in at least *`depth`* haplotypes are removed from the graph. Typically this is set to around 10% of the number of haplotypes (i.e., `40 pseudohaploid assemblies` or `20 phased assemblies` -> `depth 4`).
 
 - The `MiniGraph-Cactus` option `--giraffe` generates a graph filtered to depth 2. Depth is adjusted with the `--filter` parameter, e.g.: `--giraffe --filter 10`
 
 - The resulting graph can be provided to `grave` with `--reference graph.d10.gbz --reference_type filtered_graph`
 
-- The cost of depth filtering is that rarer variants are lost from the graph. This should be considered when users are building a graph from relatively divergent assemblies, or when some constituent species have fewer haplotypes than others (e.g., an outgroup has a single haplotype, while the ingroup has many)
+- The cost of depth filtering is that rarer variants are lost from the graph. This should be considered when users are building a graph from relatively divergent assemblies, or when some constituent species have fewer haplotypes than others (e.g., an outgroup has a single haplotype, while the ingroup has many).
 
 > [!IMPORTANT]
->- For samples with high coverage (e.g., 20X) and high purity in terms of endogenous content, the current best practice is to use an [unfiltered graph](#unfiltered-graphs). With this approach, *K*-mers from the reads are used to sample representative haplotypes from the graph, and reads are aligned to the subset
->- For samples with degraded, short, and low coverage endogenous content, plus high levels of contamination, **filtered graphs are likely to be preferable**, as we expect the *K*-mer-based subsampling to underperform
+>- For samples with high coverage (e.g., 20X) and high purity in terms of endogenous content, the current best practice is to use an [unfiltered graph](#unfiltered-graphs). With this approach, *K*-mers from the reads are used to sample representative haplotypes from the graph, and reads are aligned to the subset.
+>- For samples with degraded, short, and low coverage endogenous content, plus high levels of contamination, **filtered graphs are likely to be preferable**, as we expect the *K*-mer-based subsampling to underperform.
 
 ##### Unfiltered graphs
 
@@ -97,13 +97,13 @@ It is recommended to construct the graph with [Minigraph-Cactus](https://github.
 > [!IMPORTANT]
 > See the above section, users should consider (or test) whether an unfiltered graph is appropriate for their samples
 
-- To build an unfiltered graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required)
+- To build an unfiltered graph, run `MiniGraph-Cactus` with option: `--haplo` (`--giraffe` is not required).
 
 - The clipped, unfiltered graph can be provided to `grave` with `--reference graph.gbz --reference_type unfiltered_graph`
 
 #### Fill out the samplesheet
 
-Complete a `samplesheet.csv` file, detailing file system paths to your reads. The layout is shown below.
+Complete a `samplesheet.csv` file, detailing file system paths to your reads. The layout is shown below:
 
 >[!TIP]
 > The table below is an example. The file provided to `grave` must be in `.csv` format
@@ -132,26 +132,26 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 #### Customise run parameters
 
-- Custom parameters should be set by editing a `params.yml` file, and providing it on the command line when you execute the workflow (`-params-file params.yml`)
+- Custom parameters should be set by editing a `params.yml` file, and providing it on the command line when you execute the workflow (`-params-file params.yml`).
 
-- An important parameter is `--steps`, a string specifying which pipeline subworkflows to run, e.g., (`--steps 'index,preprocess'`). Each requested step has further dependencies which the user will be prompted to provide. The default is to run all steps for a graph reference input
+- An important parameter is `--steps`, a string specifying which pipeline subworkflows to run, e.g., (`--steps 'index,preprocess'`). Each requested step has further dependencies which the user will be prompted to provide. The default is to run all steps for a graph reference input.
 
-- Use `pixi run help` to see available parameters and their descriptions
+- Use `pixi run help` to see available parameters and their descriptions.
 
 > [!IMPORTANT]
-> The graph aligner `vg giraffe` uses a seed, cluster, chain, and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`)
-> During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value
-> The seeding stage of alignment involves computing exact matches between these minimisers and reads
-> Nearby seeds are clustered and chained together via ungapped alignment, with high-scoring chains serving as the starting point for extension
-> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too long for minimiser computation
-> Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read<br><br>
-> To address these issues, `grave` uses different `k` and `w` defaults for modern and ancient reads<br><br>
-> Modern samples are run with `giraffe` defaults, emphasising higher specificity (`k` = 29, `w` = 11)<br><br>
-> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones
-> The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants
-> Users may find that adjusting these parameters for their particular use case can improve performance <br><br>
+> The graph aligner `vg giraffe` uses a seed, cluster, chain, and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`).<br>
+> During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value.<br>
+> The seeding stage of alignment involves computing exact matches between these minimisers and reads.<br>
+> Nearby seeds are clustered and chained together via ungapped alignment, with high-scoring chains serving as the starting point for extension.<br>
+> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too long for minimiser computation.<br>
+> Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read.<br><br>
+> To address these issues, `grave` uses different `k` and `w` defaults for modern and ancient reads:<br><br>
+> Modern samples are run with `giraffe` defaults, emphasising higher specificity (`k` = 29, `w` = 11).<br><br>
+> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones.<br>
+> The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants.<br>
+> Users may find that adjusting these parameters for their particular use case can improve performance.<br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687).<br>
-> As the authors note, there is no single best setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads
+> As the authors note, there is no single best setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
 **Comparison of alignment parameters**<br>
 
@@ -176,13 +176,13 @@ Timings refer to the entire alignment modules, not just the aligners themselves.
 
 - `Minigraph-Cactus` requires at least one [reference sample](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md#Reference-Sample), usually the most contiguous reference assembly, e.g.: `cactus-pangenome --reference GRCh38`
 
-- If your graph has a single reference sample, you can skip this section
+- If your graph has a single reference sample, you can skip this section.
 
-- Paths through the reference sample are called _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others
+- Paths through the reference sample are called _reference paths_. Unless configured otherwise, `grave` will assume __a single reference sample__, and use rational defaults that assume the same, for example `surject` will transform GAM alignments to linear BAM relative to __all reference paths__ in the graph. If there is more than one reference sample in the graph, this will cause undesirable outputs in certain steps, and errors in others.
 
-- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiple_references`, and to provide one or more `.paths` files
+- Therefore, if your graph was built with multiple reference samples, e.g.: `cactus-pangenome --reference GRCh38 chimp gorilla`, it is required to run `grave` with `--multiple_references`, and to provide one or more `.paths` files.
 
-- Each `.paths` file contains a list of the reference paths in one reference sample, with one path name per line
+- Each `.paths` file contains a list of the reference paths in one reference sample, with one path name per line.
 
 - __The name of the `.paths` file matters__: the prefix must match a reference sample name provided in the `seqFile` of `Minigraph-Cactus`, and the suffix must be `.paths`, e.g.: `GRCh38.paths`, `chimp.paths`, and `gorilla.paths`
 
@@ -207,9 +207,9 @@ unknownSimian.1.gorilla.bam
 
 - It is usually good practice to run `grave` via a `tmux` or `screen` session rather than directly on the login node. An editable shell script that will do this for you is available in `bin/slurm_submission.sh`
 
-- Institutional profiles are available via `nf-core` for many major HPC centres, see [here](https://nf-co.re/configs/). The example command below configures `grave` for the Dardel cluster in Stockholm, Sweden
+- Institutional profiles are available via `nf-core` for many major HPC centres, see [here](https://nf-co.re/configs/). The example command below configures `grave` for the Dardel cluster in Stockholm, Sweden.
 
-- When running on a cluster using the `slurm` job scheduler, ensure you provide a project allocation number using the `--project` parameter. This can be on the command line or via the `params.yml` file
+- When running on a cluster using the `slurm` job scheduler, ensure you provide a project allocation number using the `--project` parameter. This can be on the command line or via the `params.yml` file.
 
 `pixi run nextflow main.nf -profile pdc_kth -params-file params.yml --project example-allocation-12345`
 
@@ -242,30 +242,30 @@ unknownSimian.1.gorilla.bam
 
 #### vg deconstruct
 
-- `vg deconstruct` produces a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct)
+- `vg deconstruct` produces a VCF file with a line for every snarl (bubble) in the graph. Allele information (reference vs alt) is taken from paths in the graph, read more [here](https://github.com/vgteam/vg/wiki/VCF-export-with-vg-deconstruct).
 
 #### vg call
 
-- `vg call` genotypes graph variants present in each mapped sample (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph)
-- It takes GAM files as input, and therefore users should note that no deduplication is done prior to genotyping, see [here](https://github.com/vgteam/vg/issues/3283)
+- `vg call` genotypes graph variants present in each mapped sample (i.e., no novel variant calling), read more [here](https://github.com/vgteam/vg/wiki/SV-Genotyping-and-variant-calling#genotyping-a-VCF-using-the-graph).
+- It takes GAM files as input, and therefore users should note that no deduplication is done prior to genotyping, see [here](https://github.com/vgteam/vg/issues/3283).
 
 ### Provided variant calling tools
 
 #### Freebayes
 
-- `Freebayes` is integrated in `grave`, read more [here](https://github.com/freebayes/freebayes)
+- `Freebayes` is integrated in `grave`, read more [here](https://github.com/freebayes/freebayes).
 
 #### DeepVariant
 
-- `DeepVariant` is integrated in `grave` (currently recommended for human input data only), read more [here](https://github.com/google/deepvariant)
+- `DeepVariant` is integrated in `grave` (currently recommended for human input data only), read more [here](https://github.com/google/deepvariant).
 
 ## Linear reference mode
 
-- `grave` can be run in linear reference mode, mapping reads against a single FASTA reference instead of a graph
+- `grave` can be run in linear reference mode, mapping reads against a single FASTA reference instead of a graph.
 
-- Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) and modern DNA with `BWA MEM` (default settings)
+- Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) and modern DNA with `BWA MEM` (default settings).
 
-- To configure linear mode, set the parameter `reference_type` to `linear`, and provide a FASTA reference with the `reference` parameter
+- To configure linear mode, set the parameter `reference_type` to `linear`, and provide a FASTA reference with the `reference` parameter.
 
 ## Workflow DAG
 

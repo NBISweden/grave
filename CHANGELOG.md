@@ -1,24 +1,18 @@
 # Changelog
 
-## [2.?.?] - unreleased
-
-### Prefiltering, and any effects on default MAPQ
-
-- TODO: kraken2
+## [2.2.1] - 20260624
 
 ### README updates
 
-#### Workflow image
+- added dag
+- added run-time plot
+- updated indexing storeDir image
+- updated k+w guidance
+- updated table to include accuracy metrics
 
-- TODO: Add workflow image to readme
+### Seed density for aDNA improves performance, particularly at 30bp
 
-#### Updated guidance on k + w
-
-- TODO: update guidance
-- TODO: update table to include accuracy metrics
-
-
-
+- updated `w` default to `3`
 
 ### Identity filter benchmark results
 
@@ -29,6 +23,7 @@
 
 - Existing storeDir target made rerunning with different `k` / `w` values prone to error (nextflow sees it as stored, but it should be re-run)
 - Target name now includes `k` + `w` - respective indexes are properly stored for each iteration
+- Compute snarls now stores to a snarls directory, no re-run required - but was previously alongside the indexes
 
 ## [2.2.0] - 20260616
 

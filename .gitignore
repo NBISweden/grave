@@ -6,6 +6,7 @@ work/
 results/
 results-*/
 tests/data/graph/*_indexes_*
+tests/data/graph/*_snarls
 tests/data/linear/*_indexes
 tests/data/graph/additional_graphs/*_indexes_*
 

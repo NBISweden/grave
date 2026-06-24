@@ -204,7 +204,7 @@
         },
         "aDNAwindowLength": {
           "type": "integer",
-          "default": 5,
+          "default": 3,
           "description": "Window size when constructing graph indexes for ancient DNA samples"
         },
         "modernKmerLength": {

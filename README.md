@@ -11,7 +11,7 @@
 
 ## Brief description
 
-`grave` is a Nextflow workflow for aligning, genotyping, and variant calling ancient or modern short-readsets against a pangenome graph. A simplified summary of workflow steps is found [here](#workflow-dag). A Wiki with further detail is available [here](https://github.com/NBISweden/grave/wiki).
+`grave` is a Nextflow workflow for aligning, genotyping, and variant calling ancient or modern short-reads against a pangenome graph. A simplified summary of workflow steps is found [here](#workflow-dag). A Wiki with further detail is available [here](https://github.com/NBISweden/grave/wiki).
 
 Typically, the inputs to `grave` are a pangenome graph in `.gbz` format and a `.csv` samplesheet specifying `FASTQ` files (paired-end or merged/single-end).
 

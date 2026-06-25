@@ -140,7 +140,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 > [!IMPORTANT]
 > The graph aligner `vg giraffe` uses a seed, cluster, chain, and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`). During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value. The seeding stage of alignment involves computing exact matches between these minimisers and reads. Nearby seeds are clustered and chained together via ungapped alignment, with high-scoring chains serving as the starting point for extension.<br><br>
-> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too long for minimiser computation. Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read.<br><br>
+> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too short for minimiser computation. Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read.<br><br>
 > To address these issues, `grave` uses different `k` and `w` defaults for modern and ancient reads:<br><br>
 > Modern samples are run with `giraffe` defaults, emphasising higher specificity (`k` = 29, `w` = 11).<br><br>
 > For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones. The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants. Users may find that adjusting these parameters for their particular dataset can improve performance.<br><br>
@@ -164,7 +164,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 ![Run times](assets/runtimes.png)
 
-Timings refer to the entire alignment modules, not just the aligners themselves.<br>Note that `bwa` defaults to use 6 cpus, while `grave` uses 64.
+Timings refer to the entire alignment modules, not just the aligners themselves.<br>Note that within `grave,` `bwa` defaults to use 6 cpus, while `vg giraffe` uses 64.
 
 #### Was your graph built with more than one reference sample?
 

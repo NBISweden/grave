@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.0] - Unreleased
+
+### Prefiltering, and any effects on default MAPQ
+
+- TODO: kraken2
+
 ## [2.2.1] - 20260624
 
 ### README updates

@@ -148,7 +148,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 **Comparison of alignment parameters**<br>
 
-| Alignment tool | \|--- | Accurate| reads&nbsp;per | million | ---\| | \|--- | Inaccurate | reads&nbsp;per  | million | ---\| |
+| Alignment&nbsp;tool | \|--- | Accurate| reads&nbsp;per | million | ---\| | \|--- | Inaccurate | reads&nbsp;per  | million | ---\| |
 | :-:                                |  :-:        | :-:         | :-:         | :-:         | :-:         | :-:   | :-:   | :-:   | :-:   | :-:   |
 | *Read length*\*                    | *30*        | *40*        | *50*        | *60*        | *70*        | *30*  | *40*  | *50*  | *60*  | *70*  |
 | `grave`: `k-13, w-3`               | 516,840     | **660,570** | 749,380     | 797,680     | 831,130     | 2,980 | 4,430 | 4,270 | 4,160 | 5,290 |

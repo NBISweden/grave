@@ -1,10 +1,28 @@
 # Changelog
 
-## [2.3.0] - Unreleased
+## [2.4.0] - Unreleased
 
 ### Prefiltering, and any effects on default MAPQ
 
 - TODO: kraken2
+
+## [2.3.0] - Unreleased
+
+### GPU accelerated Giraffe
+
+- Implementing parabricks giraffe
+- New switch to control this (`--gpu_giraffe`)
+
+
+- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
+
+### Schema
+
+- Simplified help messages in most cases
+
+### General
+
+- README fixes, added 13/3 performance to table
 
 ## [2.2.1] - 20260624
 

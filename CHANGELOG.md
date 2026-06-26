@@ -23,6 +23,8 @@
 ### General
 
 - README fixes, added 13/3 performance to table
+- Fixed last occurences of Apptainer defaulting to pull + convert Docker image vs using sif
+- Locally executing modules now also use a container
 
 ## [2.2.1] - 20260624
 

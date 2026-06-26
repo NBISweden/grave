@@ -84,6 +84,7 @@ workflow {
     mapped_bam       = channel.empty()
     if ( 'align' in workflow_steps ) {
         ALIGN_READS (
+            params.gpu_giraffe,
             params.reference_type,
             paths,
             fastp_reads,

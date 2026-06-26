@@ -1,4 +1,5 @@
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
+include { GPU_GIRAFFE              } from '../../../modules/local/parabricks/vg_giraffe/main'
 include { GAM_TO_TAGGED_SORTED_BAM } from '../../../modules/local/vg/surject/main'
 include { BWA_ALN_SAMSE            } from '../../../modules/nf-core/bwa/aln/main'
 include { BWA_MEM                  } from '../../../modules/nf-core/bwa/mem/main'
@@ -6,6 +7,7 @@ include { BWA_MEM                  } from '../../../modules/nf-core/bwa/mem/main
 workflow ALIGN_READS {
 
     take:
+    gpu_giraffe
     reference_type
     paths
     fastp_reads
@@ -21,10 +23,22 @@ workflow ALIGN_READS {
 
     // Run alignment to pangenome graph
     if ( reference_type == "unfiltered_graph" || reference_type == "filtered_graph" ) {
-        GIRAFFE (
-            fastp_reads,
-            indexed_reference
-        )
+        if ( gpu_giraffe ) {
+            // Run GPU accelerated Giraffe
+            GPU_GIRAFFE (
+                fastp_reads,
+                indexed_reference
+            )
+        } //else {
+            // Run CPU Giraffe
+            GIRAFFE (
+                fastp_reads,
+                indexed_reference
+            )
+        //}
+
+        //TODO mix outputs from GPU and CPU Giraffe. Unsure if parabricks has the other tooling, or if GPU needs separate module for stats/filtering etc.
+
         // Branch passed/failed libraries to separate channels
         GIRAFFE.out.ch_gam_counts
             .branch { meta, gam, alignment_count ->

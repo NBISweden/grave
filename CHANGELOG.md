@@ -12,7 +12,20 @@
 
 - Implementing parabricks giraffe
 - New switch to control this (`--gpu_giraffe`)
+- Flag for apptainer support (nv & nvccli)
 
+```
+# To test your local system can support it:
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey |   sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi -L
+
+# If the final command returns your GPU, e.g. `GPU 0: NVIDIA...` - parabricks should run locally via Docker
+```
 
 - TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
 

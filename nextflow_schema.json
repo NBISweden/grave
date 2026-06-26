@@ -134,6 +134,12 @@
         "gpu_giraffe": {
           "type": "boolean",
           "description": "Use a GPU accelerated version of giraffe"
+        },
+        "apptainer_gpu_flag": {
+          "type": "string",
+          "description": "Flag for Apptainer/Singularity GPU support",
+          "default": "nvccli",
+          "enum": ["nvccli", "nv"]
         }
       }
     },

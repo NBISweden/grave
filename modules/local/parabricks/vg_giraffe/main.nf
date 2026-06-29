@@ -8,7 +8,10 @@ process GPU_GIRAFFE {
     tuple val(meta), path(reads)
     tuple path(graph), path(indexes)
 
-    //output:
+    output:
+    tuple val(meta), path("${meta.read_group}*.bam"), emit: ch_bams
+    tuple val(task.process), val('parabricks'), eval("pbrun --version | grep pbrun | sed 's/.*: //'"), topic: versions
+    tuple val(task.process), val('gpu_giraffe'), eval("pbrun giraffe --version | grep VG-giraffe | sed 's/.*\t//'"), topic: versions
 
     script:
     def args = task.ext.args ?: ''

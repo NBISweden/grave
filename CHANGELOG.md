@@ -14,6 +14,7 @@
 
 - does not support GAM output
 - does not support custom alignment scoring
+- requires use of an older version of vg for index construction
 
 #### Implementation details
 

@@ -137,9 +137,17 @@
         },
         "apptainer_gpu_flag": {
           "type": "string",
-          "description": "Flag for Apptainer/Singularity GPU support",
-          "default": "nvccli",
-          "enum": ["nvccli", "nv"]
+          "description": "Apptainer/Singularity GPU support: 'nv' for NVIDIA, 'nvccli' for NVIDIA container CLI, 'rocm' for AMD",
+          "default": "nv",
+          "enum": ["nv", "nvccli", "rocm"]
+        },
+        "gpu_partition": {
+          "type": "string",
+          "description": "GPU partition name, defaults to 'gpu'"
+        },
+        "gpu_resources": {
+          "type": "string",
+          "description": "GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)"
         }
       }
     },

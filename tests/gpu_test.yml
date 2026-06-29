@@ -1,0 +1,7 @@
+# Ovis filtered graph
+
+steps         : 'preprocess,index,align,merge,deduplicate'
+reference_type: 'filtered_graph'
+input         : 'tests/data/ovis-samplesheet.csv'
+reference     : 'tests/data/graph/example-filtered.d2.gbz'
+tracing       : true

@@ -8,14 +8,38 @@
 
 ## [2.3.0] - Unreleased
 
-### GPU accelerated Giraffe
+### GPU accelerated Giraffe (requires NVIDIA GPUs)
 
-- Implementing parabricks giraffe
-- New switch to control this (`--gpu_giraffe`)
-- Flag for apptainer support (nv & nvccli)
+#### Limitations (parabricks 4.7.0)
+
+- does not support GAM output
+- does not support custom alignment scoring
+
+#### Implementation details
+
+- Implemented parabricks giraffe for a limited set of modes
+    - currently supporting filtered, single-reference graphs, BAM output
+    - See #45 for planned additions
+    - Tested locally (WSL2) via Docker & Apptainer
+    - TODO: tested on HPC
+
+- New params:
 
 ```
-# To test your local system can support it:
+GPU acceleration
+  --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe
+  --apptainer_gpu_flag         [string]  Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI  (accepted: nv, nvccli) [default: nv]
+  --gpu_partition              [string]  GPU SLURM partition name, defaults to 'gpu'
+  --gpu_resources              [string]  GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)
+  --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB), sets streams = 1, batch_size = 5000, computes some tasks on CPU. When false, uses '--nstreams' and '--batch_size'
+  --nstreams                   [string]  Number of streams per GPU: applied when gpu_low_memory is false; 'auto' to set from GPU and host memory, else INT to set manually [default: auto]
+  --batch_size                 [integer] Alignment batch size: applied when gpu_low_memory is false [default: 10000]
+```
+
+- New local tests via pixi (note for WSL2, set `apptainer_gpu_flag` to `nvccli` )
+
+```
+# To test if a local system can support it:
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey |   sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 sudo apt update
@@ -24,7 +48,7 @@ sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
 docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi -L
 
-# If the final command returns your GPU, e.g. `GPU 0: NVIDIA...` - parabricks should run locally via Docker
+# If the final command returns your GPU, e.g. `GPU 0: NVIDIA...` - parabricks should run locally
 ```
 
 - TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu

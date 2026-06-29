@@ -137,17 +137,31 @@
         },
         "apptainer_gpu_flag": {
           "type": "string",
-          "description": "Apptainer/Singularity GPU support: 'nv' for NVIDIA, 'nvccli' for NVIDIA container CLI, 'rocm' for AMD",
+          "description": "Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI",
           "default": "nv",
-          "enum": ["nv", "nvccli", "rocm"]
+          "enum": ["nv", "nvccli"]
         },
         "gpu_partition": {
           "type": "string",
-          "description": "GPU partition name, defaults to 'gpu'"
+          "description": "GPU SLURM partition name, defaults to 'gpu'"
         },
         "gpu_resources": {
           "type": "string",
           "description": "GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)"
+        },
+        "gpu_low_memory": {
+          "type": "boolean",
+          "description": "For low memory GPUs (i.e., 16GB), sets streams = 1, batch_size = 5000, computes some tasks on CPU. When false, uses '--nstreams' and '--batch_size'"
+        },
+        "nstreams": {
+          "type": "string",
+          "default": "auto",
+          "description": "Number of streams per GPU: applied when gpu_low_memory is false; 'auto' to set from GPU and host memory, else INT to set manually"
+        },
+        "batch_size": {
+          "type": "integer",
+          "default": 10000,
+          "description": "Alignment batch size: applied when gpu_low_memory is false"
         }
       }
     },

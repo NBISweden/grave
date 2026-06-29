@@ -1,4 +1,5 @@
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
+//include { GPU_PREPROCESS           } from '../../../modules/local/vg/gpu_preprocess/main'
 include { GPU_GIRAFFE              } from '../../../modules/local/parabricks/vg_giraffe/main'
 include { GAM_TO_TAGGED_SORTED_BAM } from '../../../modules/local/vg/surject/main'
 include { BWA_ALN_SAMSE            } from '../../../modules/nf-core/bwa/aln/main'
@@ -23,12 +24,25 @@ workflow ALIGN_READS {
 
     // Run alignment to pangenome graph
     if ( reference_type == "unfiltered_graph" || reference_type == "filtered_graph" ) {
+        // Check if running with GPU acceleration
         if ( gpu_giraffe ) {
-            // Run GPU accelerated Giraffe
-            GPU_GIRAFFE (
-                fastp_reads,
-                indexed_reference
-            )
+            // Unfiltered graphs require preprocessing
+            if ( reference_type == "unfiltered_graph" ) {
+                // // Create unfiltered graph indexes
+                // GPU_PREPROCESS (
+                //     fastp_reads,
+                //     indexed_reference
+                // )
+                // GPU_GIRAFFE (
+                //     // Inputs
+                // )
+            } else {
+                // Run GPU accelerated Giraffe
+                GPU_GIRAFFE (
+                    fastp_reads,
+                    indexed_reference
+                )
+            }
         } //else {
             // Run CPU Giraffe
             GIRAFFE (

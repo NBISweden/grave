@@ -166,9 +166,26 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 \*\*The bwa linear reference was the same used as the graph backbone (GCF_016772045.2).
 
-![Run times](assets/runtimes.png)
+##### GPU accelerated graph alignment with parabricks
 
-Timings refer to the entire alignment modules, not just the aligners themselves.<br>Note that within `grave,` `bwa` defaults to use 6 cpus, while `vg giraffe` uses 64.
+- [NVIDIA Parabricks](https://docs.nvidia.com/clara/parabricks/latest/index.html) offers GPU-accelerated versions of a number of popular genomics tools, including `vg giraffe`
+- This has been implemented in `grave`, and can be selected with `--gpu_giraffe`
+- Run times for the default (CPU) implementation versus the GPU version are shown below, alongside `bwa aln`
+
+> [!IMPORTANT]
+> **Limitations**:<br>
+> - Only NVIDIA GPUs are supported.<br>
+> - `Parabricks` updates less frequently than `vg`, thus outputs between the two are unlikely to be identical.<br>
+> - Some graph indexes are not compatible between the two tools and must be recomputed, due to underlying `vg` version differences.<br>
+> - `Parabricks 4.7.0` does not output GAM, surjecting directly to BAM. This prevents genotyping with `vg call`.<br>
+> - It also does not support custom alignment scoring, such as for mismatches or gap opens/extensions.<br>
+
+
+TODO UPDATE    ![Run times](assets/runtimes.png)
+
+TODO: fix this : Timings refer to the entire alignment modules, not just the aligners themselves.<br>
+TODO: fix this - what size readset was used. Use a single large real sample. All tests were run with the same readsets.<br>
+TODO check and fix - Note that while the figure shows performance with 64 cpus for `bwa` and `vg giraffe`, within `grave` `bwa` defaults to 6 cpus.
 
 #### Was your graph built with more than one reference sample?
 

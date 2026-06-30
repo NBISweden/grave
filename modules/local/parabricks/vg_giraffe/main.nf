@@ -14,7 +14,8 @@ process GPU_GIRAFFE {
     tuple val(task.process), val('gpu_giraffe'), eval("pbrun giraffe --version | grep VG-giraffe | sed 's/.*\t//'"), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
+    def args  = task.ext.args  ?: ''
+    def args2 = task.ext.args2 ?: ''
 
     if (meta.type == "ancient" && params.reference_type == "unfiltered_graph") // Ancient samples merged
         """
@@ -25,6 +26,7 @@ process GPU_GIRAFFE {
         """
         pbrun giraffe \\
             ${args} \\
+            ${args2} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -48,6 +50,7 @@ process GPU_GIRAFFE {
         """
         pbrun giraffe \\
             ${args} \\
+            ${args2} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -71,6 +74,7 @@ process GPU_GIRAFFE {
         """
         pbrun giraffe \\
             ${args} \\
+            ${args2} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\

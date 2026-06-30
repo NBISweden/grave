@@ -149,7 +149,7 @@
         },
         "gpu_partition": {
           "type": "string",
-          "description": "GPU SLURM partition name, defaults to 'gpu'"
+          "description": "NVIDIA GPU SLURM partition name, defaults to 'gpu'"
         },
         "gpu_resources": {
           "type": "string",
@@ -162,12 +162,16 @@
         "nstreams": {
           "type": "string",
           "default": "auto",
-          "description": "Number of streams per GPU: applied when gpu_low_memory is false; 'auto' to set from GPU and host memory, else INT to set manually"
+          "description": "Number of streams per GPU: applied when gpu_low_memory is false; 'auto' overrides several settings based on GPU and host memory, else INT to set manually"
         },
         "batch_size": {
           "type": "integer",
           "default": 10000,
           "description": "Alignment batch size: applied when gpu_low_memory is false"
+        },
+        "minimizers_gpu": {
+          "type": "boolean",
+          "description": "Use GPU for minimizers and seeds (requires high VRAM). N.B. can be overridden by --nstreams auto"
         }
       }
     },

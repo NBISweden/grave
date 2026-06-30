@@ -1,4 +1,4 @@
-//include { GPU_PREPROCESS           } from '../../../modules/local/vg/gpu_preprocess/main'
+include { GPU_PREPROCESS           } from '../../../modules/local/vg/gpu_preprocess/main'
 include { GPU_GIRAFFE              } from '../../../modules/local/parabricks/vg_giraffe/main'
 include { SAMTOOLS_FILTER_GPU      } from '../../../modules/local/samtools/filter_gpu/main'
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
@@ -29,15 +29,28 @@ workflow ALIGN_READS {
         if ( gpu_giraffe ) {
             // Unfiltered graphs require preprocessing with the same vg version used in parabricks
             if ( reference_type == "unfiltered_graph" ) {
-                // // Create unfiltered graph indexes
-                // GPU_PREPROCESS (
-                //     fastp_reads,
-                //     indexed_reference
-                // )
-                // // Run giraffe
-                // GPU_GIRAFFE (
-                //     // Inputs
-                // )
+                // Create unfiltered graph indexes
+                GPU_PREPROCESS (
+                    fastp_reads,
+                    indexed_reference
+                )
+                // Join reads to their personalised pangenome
+                fastp_reads
+                    .join(GPU_PREPROCESS.out.ch_sample_indexes)
+                    .multiMap { element ->
+                        def meta    = element[0]
+                        def reads   = element[1]
+                        def ref     = element[2]
+                        def indexes = element[3..-1]
+                        joined_reads: [ meta, reads ]
+                        joined_subgraph: [ ref, indexes ]
+                    }
+                    .set { giraffe_input }
+                // Run giraffe
+                GPU_GIRAFFE (
+                    giraffe_input.joined_reads,
+                    giraffe_input.joined_subgraph
+                )
             // Filtered graph indexes are already computed
             } else if ( reference_type == "filtered_graph" ) {
                 // Run giraffe
@@ -45,26 +58,27 @@ workflow ALIGN_READS {
                     fastp_reads,
                     indexed_reference
                 )
-                // Apply alignment filters to BAM output
-                SAMTOOLS_FILTER_GPU (
-                    GPU_GIRAFFE.out.ch_bams
-                )
-                // Branch passed/failed libraries
-                SAMTOOLS_FILTER_GPU.out.ch_surjected_bam_counts
-                    .branch { meta, bam, alignment_count ->
-                        passed: alignment_count.toInteger() > 0
-                            return [ meta, bam ]
-                        failed: alignment_count.toInteger() == 0
-                            return [ meta, bam ]
-                    }
-                    .set { branched_bam }
-                mapped_bam       = branched_bam.passed
-                failed_libraries = branched_bam.failed
-                alignment_stats  = SAMTOOLS_FILTER_GPU.out.ch_surjected_bam_stats
             }
-        // Running base giraffe (default, uses CPUs)
+            // For either graph type
+            // Apply alignment filters to BAM output
+            SAMTOOLS_FILTER_GPU (
+                GPU_GIRAFFE.out.ch_bams
+            )
+            // Branch passed/failed libraries
+            SAMTOOLS_FILTER_GPU.out.ch_surjected_bam_counts
+                .branch { meta, bam, alignment_count ->
+                    passed: alignment_count.toInteger() > 0
+                        return [ meta, bam ]
+                    failed: alignment_count.toInteger() == 0
+                        return [ meta, bam ]
+                }
+                .set { branched_bam }
+            mapped_bam       = branched_bam.passed
+            failed_libraries = branched_bam.failed
+            alignment_stats  = SAMTOOLS_FILTER_GPU.out.ch_surjected_bam_stats
+        // No GPU acceleration requested
         } else {
-            // Run giraffe
+            // Run giraffe in CPU mode
             GIRAFFE (
                 fastp_reads,
                 indexed_reference

@@ -237,12 +237,9 @@ def validateInputParameters() {
     if ( !params.multiple_references && params.paths_dir ) {
         error "ERROR: A paths directory was provided with '--paths_dir' but '--multiple_references' = ${params.multiple_references}'."
     }
-    // Temporary limitations: disallow GPU Giraffe with multiple reference samples and/or unfiltered graphs
+    // Temporary limitations: disallow GPU Giraffe with multiple reference samples
     if ( params.multiple_references && params.gpu_giraffe ) {
         error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
-    }
-    if ( params.reference_type == 'unfiltered_graph' && params.gpu_giraffe ) {
-        error "ERROR: grave does not currently support GPU Giraffe with unfiltered graph references. If this is a feature you need, please submit a GitHub issue."
     }
 
 }

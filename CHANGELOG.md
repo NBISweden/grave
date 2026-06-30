@@ -18,11 +18,13 @@
 
 #### Implementation details
 
-- Implemented parabricks giraffe for a limited set of modes
-    - currently supporting filtered, single-reference graphs, BAM output
+- Implemented parabricks giraffe for single-reference graph modes
     - See #45 for planned additions
-    - Tested locally (WSL2) via Docker & Apptainer
-    - TODO: tested on HPC
+    - Tested locally (WSL2) via Docker & Apptainer, and on HPC
+- New local tests via pixi (note for WSL2, set `apptainer_gpu_flag` to `nvccli` )
+
+- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
+
 
 - New params:
 
@@ -30,14 +32,14 @@
 GPU acceleration
   --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe
   --apptainer_gpu_flag         [string]  Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI  (accepted: nv, nvccli) [default: nv]
-  --gpu_partition              [string]  GPU SLURM partition name, defaults to 'gpu'
+  --gpu_partition              [string]  NVIDIA GPU SLURM partition name, defaults to 'gpu'
   --gpu_resources              [string]  GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)
   --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB), sets streams = 1, batch_size = 5000, computes some tasks on CPU. When false, uses '--nstreams' and '--batch_size'
-  --nstreams                   [string]  Number of streams per GPU: applied when gpu_low_memory is false; 'auto' to set from GPU and host memory, else INT to set manually [default: auto]
+  --nstreams                   [string]  Number of streams per GPU: applied when gpu_low_memory is false; 'auto' overrides several settings based on GPU and host memory, else INT to set manually [default: auto]
   --batch_size                 [integer] Alignment batch size: applied when gpu_low_memory is false [default: 10000]
+  --minimizers_gpu             [boolean] Use GPU for minimizers and seeds (requires high VRAM). N.B. can be overridden by --nstreams auto
 ```
 
-- New local tests via pixi (note for WSL2, set `apptainer_gpu_flag` to `nvccli` )
 
 ```
 # To test if a local system can support it:
@@ -51,8 +53,6 @@ docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi -L
 
 # If the final command returns your GPU, e.g. `GPU 0: NVIDIA...` - parabricks should run locally
 ```
-
-- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
 
 ### Schema
 

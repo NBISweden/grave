@@ -122,6 +122,12 @@
         "project": {
           "type": "string",
           "description": "SLURM account (project code to log compute hours in)"
+        },
+        "align_stage_in_mode": {
+          "type": "string",
+          "default": "symlink",
+          "description": "Controls input staging mode to aligners; on network-mounted filesystems, copy + node-local scratch usage may improve I/O performance",
+          "enum": ["symlink", "copy"]
         }
       }
     },

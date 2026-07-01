@@ -175,16 +175,15 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 > [!IMPORTANT]
 > **Limitations**:<br>
 > - Only NVIDIA GPUs are supported. Specify the NVIDIA SLURM partition with `--gpu_partition` (default: gpu).<br>
-> - `Parabricks` updates less frequently than `vg`, thus outputs between the two are unlikely to be identical.<br>
+> - `Parabricks` updates less frequently than `vg`, thus outputs between the implemented versions may not be identical.<br>
 > - Some graph indexes are not compatible between the two tools and must be recomputed, due to underlying `vg` version differences.<br>
-> - `Parabricks 4.7.0` does not output GAM, surjecting directly to BAM. This prevents genotyping with `vg call`.<br>
-> - It also does not support custom alignment scoring, such as for mismatches or gap opens/extensions.<br>
+> - `Parabricks 4.7.0` surjects directly to BAM, disabling genotyping with `vg call`, which uses GAM.<br>
+> - `Parabricks 4.7.0` does not support custom alignment scoring, such as mismatches/gap opens/gap extensions.<br>
+> - `grave` does not support GPU-accelerated `giraffe` for multi-reference graphs. Please request it if you need it.<br>
 
 TODO UPDATE    ![Run times](assets/runtimes.png)
-
-TODO: fix this : Timings refer to the entire alignment modules, not just the aligners themselves.<br>
-TODO: fix this - what size readset was used. Use a single large real sample. All tests were run with the same readsets.<br>
-TODO check and fix - Note that while the figure shows performance with 64 cpus for `bwa` and `vg giraffe`, within `grave` `bwa` defaults to 6 cpus.
+TODO: Time the aligners themselves, not the module.
+TODO CPU tools were run with 64 cpus. All tests were run on a SIZE/coverage sample.
 
 #### Was your graph built with more than one reference sample?
 

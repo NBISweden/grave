@@ -161,13 +161,18 @@
         },
         "nstreams": {
           "type": "string",
-          "default": "auto",
+          "default": 3,
           "description": "Number of streams per GPU: applied when gpu_low_memory is false; 'auto' overrides several settings based on GPU and host memory, else INT to set manually"
         },
         "batch_size": {
           "type": "integer",
           "default": 10000,
           "description": "Alignment batch size: applied when gpu_low_memory is false"
+        },
+        "work_queue_capacity": {
+          "type": "integer",
+          "default": 40,
+          "description": "Soft limit for the capacity of the work queues in between stages"
         },
         "minimizers_gpu": {
           "type": "boolean",

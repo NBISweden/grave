@@ -15,6 +15,7 @@
 - does not support GAM output
 - does not support custom alignment scoring
 - requires use of an older version of vg for index construction
+- Noted that on more powerful GPUs `--nstreams auto` can lead to OOM on VRAM, pbrun sets `gpu-minimizers true` and then runs out of mem. Better to manually configure performance (now default).
 
 #### Implementation details
 
@@ -24,7 +25,6 @@
 - New local tests via pixi (note for WSL2, set `apptainer_gpu_flag` to `nvccli` )
 
 - TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
-
 
 - New params:
 
@@ -39,7 +39,6 @@ GPU acceleration
   --batch_size                 [integer] Alignment batch size: applied when gpu_low_memory is false [default: 10000]
   --minimizers_gpu             [boolean] Use GPU for minimizers and seeds (requires high VRAM). N.B. can be overridden by --nstreams auto
 ```
-
 
 ```
 # To test if a local system can support it:

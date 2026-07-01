@@ -174,12 +174,11 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 > [!IMPORTANT]
 > **Limitations**:<br>
-> - Only NVIDIA GPUs are supported.<br>
+> - Only NVIDIA GPUs are supported. Specify the NVIDIA SLURM partition with `--gpu_partition` (default: gpu).<br>
 > - `Parabricks` updates less frequently than `vg`, thus outputs between the two are unlikely to be identical.<br>
 > - Some graph indexes are not compatible between the two tools and must be recomputed, due to underlying `vg` version differences.<br>
 > - `Parabricks 4.7.0` does not output GAM, surjecting directly to BAM. This prevents genotyping with `vg call`.<br>
 > - It also does not support custom alignment scoring, such as for mismatches or gap opens/extensions.<br>
-
 
 TODO UPDATE    ![Run times](assets/runtimes.png)
 

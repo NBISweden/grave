@@ -30,14 +30,16 @@
 
 ```
 GPU acceleration
-  --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe
-  --apptainer_gpu_flag         [string]  Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI  (accepted: nv, nvccli) [default: nv]
-  --gpu_partition              [string]  NVIDIA GPU SLURM partition name, defaults to 'gpu'
-  --gpu_resources              [string]  GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)
-  --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB), sets streams = 1, batch_size = 5000, computes some tasks on CPU. When false, uses '--nstreams' and '--batch_size'
-  --nstreams                   [string]  Number of streams per GPU: applied when gpu_low_memory is false; 'auto' overrides several settings based on GPU and host memory, else INT to set manually [default: auto]
-  --batch_size                 [integer] Alignment batch size: applied when gpu_low_memory is false [default: 10000]
-  --minimizers_gpu             [boolean] Use GPU for minimizers and seeds (requires high VRAM). N.B. can be overridden by --nstreams auto
+  --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe 
+  --apptainer_gpu_flag         [string]  Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI  (accepted: nv, nvccli) [default: nv] 
+  --gpu_partition              [string]  NVIDIA GPU SLURM partition name [default: gpu] 
+  --gpu_resources              [string]  GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs) 
+  --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU) 
+  --performance_auto           [boolean] For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory 
+  --nstreams                   [integer] Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 3] 
+  --batch_size                 [integer] Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 10000] 
+  --work_queue_capacity        [integer] Soft capacity limit of work queues between stages, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 40] 
+  --minimizers_gpu             [boolean] Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors 
 ```
 
 ```

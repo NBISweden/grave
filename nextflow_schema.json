@@ -149,7 +149,8 @@
         },
         "gpu_partition": {
           "type": "string",
-          "description": "NVIDIA GPU SLURM partition name, defaults to 'gpu'"
+          "description": "NVIDIA GPU SLURM partition name",
+          "default": "gpu"
         },
         "gpu_resources": {
           "type": "string",
@@ -157,26 +158,30 @@
         },
         "gpu_low_memory": {
           "type": "boolean",
-          "description": "For low memory GPUs (i.e., 16GB), sets streams = 1, batch_size = 5000, computes some tasks on CPU. When false, uses '--nstreams' and '--batch_size'"
+          "description": "For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU)"
+        },
+        "performance_auto": {
+          "type": "boolean",
+          "description": "For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory"
         },
         "nstreams": {
-          "type": "string",
+          "type": "integer",
           "default": 3,
-          "description": "Number of streams per GPU: applied when gpu_low_memory is false; 'auto' overrides several settings based on GPU and host memory, else INT to set manually"
+          "description": "Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false"
         },
         "batch_size": {
           "type": "integer",
           "default": 10000,
-          "description": "Alignment batch size: applied when gpu_low_memory is false"
+          "description": "Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false"
         },
         "work_queue_capacity": {
           "type": "integer",
           "default": 40,
-          "description": "Soft limit for the capacity of the work queues in between stages"
+          "description": "Soft capacity limit of work queues between stages, applied when '--gpu_low_memory' & '--performance_auto' are false"
         },
         "minimizers_gpu": {
           "type": "boolean",
-          "description": "Use GPU for minimizers and seeds (requires high VRAM). N.B. can be overridden by --nstreams auto"
+          "description": "Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors"
         }
       }
     },

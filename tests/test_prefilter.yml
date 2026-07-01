@@ -1,0 +1,7 @@
+# Graph test params yml
+
+steps         : 'preprocess,prefilter,index,align'
+reference_type: 'filtered_graph'
+input         : 'tests/data/prefilter_samplesheet.csv'
+reference     : 'tests/data/graph/example-filtered.d2.gbz'
+tracing       : true

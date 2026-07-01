@@ -23,6 +23,7 @@ apptainer              = ["apptainer"]
 [tasks]
 test-docker            = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml"
 test-apptainer         = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml"
+test-prefilter         = "nextflow main.nf -profile apptainer,test -params-file tests/test_prefilter.yml"
 test-singularity       = "nextflow main.nf -profile singularity,test -params-file tests/test_graph.yml"
 test-conda             = "nextflow main.nf -profile conda,test -params-file tests/test_graph.yml"
 test-docker-linear     = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml"

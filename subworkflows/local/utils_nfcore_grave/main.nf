@@ -138,6 +138,7 @@ def validateInputParameters() {
     // Define valid workflow steps
     def permitted_steps = [
         'preprocess',     // read preprocessing
+        'prefilter',      // taxonomy filtering of reads
         'index',          // reference indexing
         'align',          // alignment to the reference
         'merge',          // merging of library-level BAMs to sample-level BAMs
@@ -158,6 +159,7 @@ def validateInputParameters() {
     // Define step dependencies
     def step_dependencies = [
         'preprocess'    : [], // no dependencies
+        'prefilter'     : ['preprocess'],
         'index'         : [],
         'align'         : ['preprocess', 'index'],
         'merge'         : ['align'],

@@ -63,18 +63,21 @@ workflow {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Prepare reads (quality filtering + QC reports)
-    fastp_reads         = channel.empty()
-    fastp_report        = channel.empty()
-    raw_fastqc_report   = channel.empty()
-    fastp_fastqc_report = channel.empty()
+    processed_reads        = channel.empty()
+    fastp_report           = channel.empty()
+    raw_fastqc_report      = channel.empty()
+    fastp_fastqc_report    = channel.empty()
+    filtered_fastqc_report = channel.empty()
     if ( 'preprocess' in workflow_steps) {
         PREPROCESS_READS (
-            samplesheet
+            samplesheet,
+            workflow_steps
         )
-        fastp_reads         = PREPROCESS_READS.out.fastp_reads
-        fastp_report        = PREPROCESS_READS.out.fastp_report
-        raw_fastqc_report   = PREPROCESS_READS.out.raw_fastqc_report
-        fastp_fastqc_report = PREPROCESS_READS.out.fastp_fastqc_report
+        processed_reads        = PREPROCESS_READS.out.processed_reads
+        fastp_report           = PREPROCESS_READS.out.fastp_report
+        raw_fastqc_report      = PREPROCESS_READS.out.raw_fastqc_report
+        fastp_fastqc_report    = PREPROCESS_READS.out.fastp_fastqc_report
+        filtered_fastqc_report = PREPROCESS_READS.out.filtered_fastqc_report
     }
 
     // Align reads (GAM + BAM produced in graph mode, & BAM in linear). Also adds read groups and sorts BAMs
@@ -88,7 +91,7 @@ workflow {
             params.gpu_giraffe,
             params.reference_type,
             paths,
-            fastp_reads,
+            processed_reads,
             reference,
             indexed_reference
         )
@@ -202,6 +205,7 @@ workflow {
     fastp_report               = fastp_report
     raw_fastqc_report          = raw_fastqc_report
     fastp_fastqc_report        = fastp_fastqc_report
+    filtered_fastqc_report     = filtered_fastqc_report
     // ALIGN_READS
     mapped_gam                 = mapped_gam
     failed_libraries           = failed_libraries
@@ -245,14 +249,17 @@ output {
         path '02_reference/extracted_linear_reference'
     }
     // PREPROCESS_READS
-    fastp_report {
-        path '03_read_qc/fastp_reports'
-    }
     raw_fastqc_report {
-        path '03_read_qc/raw_data_fastq_reports'
+        path '03_read_qc/01_raw_FASTQ'
     }
     fastp_fastqc_report {
-        path '03_read_qc/qced_data_fastq_reports'
+        path '03_read_qc/02_fastp_FASTQ/fastqc'
+    }
+    fastp_report {
+        path '03_read_qc/02_fastp_FASTQ/fastp_report'
+    }
+    filtered_fastqc_report {
+        path '03_read_qc/03_taxonomy_filtered_FASTQ'
     }
     // ALIGN_READS
     mapped_gam {

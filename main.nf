@@ -71,7 +71,11 @@ workflow {
     if ( 'preprocess' in workflow_steps) {
         PREPROCESS_READS (
             samplesheet,
-            workflow_steps
+            workflow_steps,
+            params.prefiltering_tool,
+            params.build_db,
+            params.remote_database,
+            params.local_database
         )
         processed_reads        = PREPROCESS_READS.out.processed_reads
         fastp_report           = PREPROCESS_READS.out.fastp_report

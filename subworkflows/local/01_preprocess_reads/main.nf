@@ -8,6 +8,10 @@ workflow PREPROCESS_READS {
     take:
     samplesheet
     workflow_steps
+    prefiltering_tool
+    build_db
+    remote_database
+    local_database
 
     main:
     // Run quality filtering on input reads
@@ -17,9 +21,13 @@ workflow PREPROCESS_READS {
     // Run the prefiltering subworkflow if requested
     if ( 'prefilter' in workflow_steps) {
         PREFILTER_READS (
-            processed_reads
+            processed_reads,
+            prefiltering_tool,
+            build_db,
+            remote_database,
+            local_database
         )
-        processed_reads = PREFILTER_READS.out.ch_filtered_reads
+        //TODO override: processed_reads = PREFILTER_READS.out.ch_filtered_reads
     }
 
     // For raw FASTQ inputs, make links with the same naming style as FASTP output: FASTQC results more easily cross-referenced

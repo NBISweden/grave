@@ -186,6 +186,16 @@ def validateInputParameters() {
     if ( 'preprocess' in requested_steps && !params.input ) {
         error "ERROR: Read preprocessing was requested but no input samplesheet was provided with '--input'"
     }
+    // Prefiltering: enforce a single database source
+    if ( 'prefilter' in requested_steps ) {
+        def dbOptions = [params.local_database, params.remote_database, params.build_db].findAll { it != null }
+        if (dbOptions.size() > 1) {
+            error("Prefiltering: only one database option may be specified. Please provide at most one of: --local_database, --remote_database, --build_db")
+        }
+        if (dbOptions.size() == 0) {
+            error("Read prefiltering was requested, but no database source was provided. Please specify one of: --local_database, --remote_database, --build_db")
+        }
+    }
     // Enforce reference for index if requested
     if ( 'index' in requested_steps && !params.reference ) {
         error "ERROR: Reference indexing was requested but no reference file was provided with '--reference'"
@@ -239,9 +249,16 @@ def validateInputParameters() {
     if ( !params.multiple_references && params.paths_dir ) {
         error "ERROR: A paths directory was provided with '--paths_dir' but '--multiple_references' = ${params.multiple_references}'."
     }
-    // Temporary limitations: disallow GPU Giraffe with multiple reference samples
+
+    // Temporary limitations
+
+    // Disallow GPU Giraffe with multiple reference samples
     if ( params.multiple_references && params.gpu_giraffe ) {
         error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
+    }
+    // Disallow centrifuge
+    if ( params.prefiltering_tool == 'centrifuge' ) {
+        error "Centrifuge prefiltering is not yet implemented. Please use Kraken2 for now, and make a GitHub issue if you need centrifuge support."
     }
 
 }

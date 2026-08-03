@@ -2,7 +2,7 @@ process GPU_GIRAFFE {
 
     tag "${meta.read_group}"
     // NOTE: all resources handled in conf/tool_resources.config
-    container 'nvcr.io/nvidia/clara/clara-parabricks:4.7.0-1'
+    container 'nvcr.io/nvidia/clara/clara-parabricks:4.7.1-1'
 
     input:
     tuple val(meta), path(reads)

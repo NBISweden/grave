@@ -16,12 +16,14 @@ process GPU_GIRAFFE {
     script:
     def args  = task.ext.args  ?: ''
     def args2 = task.ext.args2 ?: ''
+    def args3 = task.ext.args3 ?: ''
 
     if (meta.type == "ancient" && params.reference_type == "unfiltered_graph") // Ancient samples merged
         """
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -41,6 +43,7 @@ process GPU_GIRAFFE {
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -60,6 +63,7 @@ process GPU_GIRAFFE {
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -79,6 +83,7 @@ process GPU_GIRAFFE {
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -98,6 +103,7 @@ process GPU_GIRAFFE {
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\
@@ -117,6 +123,7 @@ process GPU_GIRAFFE {
         pbrun giraffe \\
             ${args} \\
             ${args2} \\
+            ${args3} \\
             --num-gpus ${task.accelerator.request} \\
             --align-only \\
             --no-markdups \\

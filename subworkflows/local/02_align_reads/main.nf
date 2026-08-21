@@ -12,7 +12,7 @@ workflow ALIGN_READS {
     gpu_giraffe
     reference_type
     paths
-    fastp_reads
+    processed_reads
     reference
     indexed_reference
 
@@ -31,11 +31,11 @@ workflow ALIGN_READS {
             if ( reference_type == "unfiltered_graph" ) {
                 // Create unfiltered graph indexes
                 GPU_PREPROCESS (
-                    fastp_reads,
+                    processed_reads,
                     indexed_reference
                 )
                 // Join reads to their personalised pangenome
-                fastp_reads
+                processed_reads
                     .join(GPU_PREPROCESS.out.ch_sample_indexes)
                     .multiMap { element ->
                         def meta    = element[0]
@@ -55,7 +55,7 @@ workflow ALIGN_READS {
             } else if ( reference_type == "filtered_graph" ) {
                 // Run giraffe
                 GPU_GIRAFFE (
-                    fastp_reads,
+                    processed_reads,
                     indexed_reference
                 )
             }
@@ -80,7 +80,7 @@ workflow ALIGN_READS {
         } else {
             // Run giraffe in CPU mode
             GIRAFFE (
-                fastp_reads,
+                processed_reads,
                 indexed_reference
             )
             // Branch passed/failed libraries to separate channels
@@ -108,7 +108,7 @@ workflow ALIGN_READS {
     // Input reference is a linear assembly
     } else if ( reference_type == "linear" ) {
         // Split libraries by type
-        fastp_reads
+        processed_reads
             .branch { meta, reads ->
                 ancient: meta.type == "ancient"
                 modern:  meta.type == "modern"

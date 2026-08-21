@@ -138,6 +138,7 @@ def validateInputParameters() {
     // Define valid workflow steps
     def permitted_steps = [
         'preprocess',     // read preprocessing
+        'prefilter',      // taxonomy filtering of reads
         'index',          // reference indexing
         'align',          // alignment to the reference
         'merge',          // merging of library-level BAMs to sample-level BAMs
@@ -158,6 +159,7 @@ def validateInputParameters() {
     // Define step dependencies
     def step_dependencies = [
         'preprocess'    : [], // no dependencies
+        'prefilter'     : ['preprocess'],
         'index'         : [],
         'align'         : ['preprocess', 'index'],
         'merge'         : ['align'],
@@ -183,6 +185,16 @@ def validateInputParameters() {
     // Enforce input for preprocess step if requested
     if ( 'preprocess' in requested_steps && !params.input ) {
         error "ERROR: Read preprocessing was requested but no input samplesheet was provided with '--input'"
+    }
+    // Prefiltering: enforce a single database source
+    if ( 'prefilter' in requested_steps ) {
+        def dbOptions = [params.local_database, params.remote_database, params.build_db].findAll { it != null }
+        if (dbOptions.size() > 1) {
+            error("Prefiltering: only one database option may be specified. Please provide at most one of: --local_database, --remote_database, --build_db")
+        }
+        if (dbOptions.size() == 0) {
+            error("Read prefiltering was requested, but no database source was provided. Please specify one of: --local_database, --remote_database, --build_db")
+        }
     }
     // Enforce reference for index if requested
     if ( 'index' in requested_steps && !params.reference ) {
@@ -237,9 +249,16 @@ def validateInputParameters() {
     if ( !params.multiple_references && params.paths_dir ) {
         error "ERROR: A paths directory was provided with '--paths_dir' but '--multiple_references' = ${params.multiple_references}'."
     }
-    // Temporary limitations: disallow GPU Giraffe with multiple reference samples
+
+    // Temporary limitations
+
+    // Disallow GPU Giraffe with multiple reference samples
     if ( params.multiple_references && params.gpu_giraffe ) {
         error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
+    }
+    // Disallow centrifuge
+    if ( params.prefiltering_tool == 'centrifuge' ) {
+        error "Centrifuge prefiltering is not yet implemented. Please use Kraken2 for now, and make a GitHub issue if you need centrifuge support."
     }
 
 }

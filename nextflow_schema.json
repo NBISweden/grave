@@ -159,11 +159,6 @@
           "default": 10000,
           "description": "Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false"
         },
-        "gpu_write": {
-          "type": "boolean",
-          "default": true,
-          "description": "Use one GPU to accelerate writing final BAM/CRAM"
-        },
         "work_queue_capacity": {
           "type": "integer",
           "default": 40,
@@ -172,6 +167,11 @@
         "minimizers_gpu": {
           "type": "boolean",
           "description": "Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors"
+        },
+        "gpu_write": {
+           "type": "boolean",
+           "default": true,
+           "description": "Use one GPU to accelerate writing final BAM"
         }
       }
     },
@@ -238,6 +238,36 @@
           "type": "integer",
           "default": 11,
           "description": "Minimum required overlap for FASTP merging of paired-end reads"
+        }
+      }
+    },
+    "taxon_based_read_removal": {
+      "title": "Taxon-based read removal",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "prefiltering_tool": {
+          "type": "string",
+          "default": "kraken2",
+          "description": "Tool for taxon-based read removal",
+          "enum": ["kraken2", "centrifuge"]
+        },
+        "database_store": {
+          "type": "string",
+          "default": "filtering_database",
+          "description": "Directory name for storage of database files (applies for '--remote_database' and '--build_db')"
+        },
+        "local_database": {
+          "type": "string",
+          "description": "Path to folder containing local database"
+        },
+        "remote_database": {
+          "type": "string",
+          "description": "URL to remote database"
+        },
+        "build_db": {
+          "type": "string"
         }
       }
     },
@@ -477,19 +507,22 @@
       "$ref": "#/$defs/slurm_hpc_specific_parameters"
     },
     {
-      "$ref": "#/$defs/gpu_acceleration"
-    },
-    {
       "$ref": "#/$defs/optional_processes_outputs"
     },
     {
       "$ref": "#/$defs/read_qc_parameters"
     },
     {
+      "$ref": "#/$defs/taxon_based_read_removal"
+    },
+    {
       "$ref": "#/$defs/graph_indexing_parameters"
     },
     {
       "$ref": "#/$defs/alignment_parameters"
+    },
+    {
+      "$ref": "#/$defs/gpu_acceleration"
     },
     {
       "$ref": "#/$defs/bam_deduplication_parameters"

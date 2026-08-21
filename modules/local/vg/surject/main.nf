@@ -4,7 +4,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
 
     tag "${meta.read_group}"
     label 'process_medium'
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
         'oras://community.wave.seqera.io/library/samtools_vg:a6632ebd35c760c0' :
         'community.wave.seqera.io/library/samtools_vg:519b6ec44480b658' }"
 

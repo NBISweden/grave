@@ -67,7 +67,7 @@
       "properties": {
         "steps": {
           "type": "string",
-          "description": "The workflow steps to execute, provided as a csv string",
+          "description": "The workflow steps to execute (comma-separated string)",
           "default": "preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call"
         }
       },
@@ -83,17 +83,17 @@
           "type": "string",
           "format": "file-path",
           "mimetype": "csv",
-          "description": "Path to input csv samplesheet"
+          "description": "Path to samplesheet in '.csv' format"
         },
         "reference": {
           "type": "string",
           "format": "file-path",
-          "description": "Path to reference .gbz graph (modes: unfiltered_graph, filtered_graph), or .fasta (mode: linear)"
+          "description": "Path to reference file, see also --reference_type"
         },
         "reference_type": {
           "type": "string",
           "enum": ["unfiltered_graph", "filtered_graph", "linear"],
-          "description": "The type of reference file provided, changes the run mode accordingly"
+          "description": "The type of reference provided. Graphs: '.gbz' format, linear references: '.fasta' format"
         }
       }
     },
@@ -105,7 +105,7 @@
       "properties": {
         "multiple_references": {
           "type": "boolean",
-          "description": "Run graph analyses assuming multiple reference assemblies"
+          "description": "Run grave assuming the graph contains multiple reference samples, see also --paths_dir"
         },
         "paths_dir": {
           "type": "string",
@@ -121,7 +121,57 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Provide this when using a SLURM system (project allocation code for hours logging)"
+          "description": "SLURM account (project code to log compute hours in)"
+        },
+        "align_stage_in_mode": {
+          "type": "string",
+          "default": "symlink",
+          "description": "Controls input staging mode to aligners; on network-mounted filesystems, copy + node-local scratch usage may improve I/O performance",
+          "enum": ["symlink", "copy"]
+        }
+      }
+    },
+    "gpu_acceleration": {
+      "title": "GPU acceleration",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "gpu_giraffe": {
+          "type": "boolean",
+          "description": "Use a GPU accelerated version of giraffe"
+        },
+        "gpu_low_memory": {
+          "type": "boolean",
+          "description": "For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU)"
+        },
+        "performance_auto": {
+          "type": "boolean",
+          "description": "For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory"
+        },
+        "nstreams": {
+          "type": "integer",
+          "default": 3,
+          "description": "Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false"
+        },
+        "batch_size": {
+          "type": "integer",
+          "default": 10000,
+          "description": "Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false"
+        },
+        "gpu_write": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use one GPU to accelerate writing final BAM/CRAM"
+        },
+        "work_queue_capacity": {
+          "type": "integer",
+          "default": 40,
+          "description": "Soft capacity limit of work queues between stages, applied when '--gpu_low_memory' & '--performance_auto' are false"
+        },
+        "minimizers_gpu": {
+          "type": "boolean",
+          "description": "Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors"
         }
       }
     },
@@ -134,16 +184,16 @@
         "freebayes": {
           "type": "boolean",
           "default": true,
-          "description": "Turn on (true) or off (false) the Freebayes variant caller"
+          "description": "Run Freebayes"
         },
         "deepvariant": {
           "type": "boolean",
-          "description": "Turn on (true) or off (false) the DeepVariant variant caller"
+          "description": "Run DeepVariant"
         },
         "reference_stats": {
           "type": "boolean",
           "default": true,
-          "description": "Report reference statistics (FAI index for linear, text summaries for graphs)"
+          "description": "Report reference file statistics"
         },
         "keepRawGam": {
           "type": "boolean",
@@ -151,7 +201,7 @@
         },
         "rawMapStats": {
           "type": "boolean",
-          "description": "Publish stats on the raw GAM (will include unmapped)"
+          "description": "Publish stats on the raw GAM (includes unmapped)"
         },
         "keepRawVcf": {
           "type": "boolean",
@@ -167,27 +217,27 @@
       "properties": {
         "discardUnmerged": {
           "type": "boolean",
-          "description": "When merging aDNA reads, discard unmerged. If false, unmerged reads are combined with merged in a single FASTQ"
+          "description": "When merging aDNA reads, discard unmerged. Otherwise, unmerged are combined with merged and treated as single-end reads"
         },
         "fastpDedup": {
           "type": "boolean",
-          "description": "Remove duplicate reads detected by exact hash matching algorithm"
+          "description": "Remove duplicate reads detected by exact hash match"
         },
         "dupCalcAccuracy": {
           "type": "integer",
           "default": 1,
-          "description": "Accuracy of the duplication rate calculation. Higher accuracy uses more memory to avoid hash collision (1: 1G, 2: 2G, 3: 4G, 4: 8G, 5: 16G, 6: 24G). If --fastpDedup = true, 3+ recommended. If false, 1 recommended",
+          "description": "Accuracy of duplication rate estimation: if setting --fastpDedup, use 3+, else use 1",
           "enum": [1, 2, 3, 4, 5, 6]
         },
         "readDiscardLength": {
           "type": "integer",
           "default": 20,
-          "description": "Discard reads shorter than this value"
+          "description": "Discard fragments less than INT bases"
         },
         "minFastpOverlapLength": {
           "type": "integer",
           "default": 11,
-          "description": "Minimum overlap required for FASTP to merge paired-end data"
+          "description": "Minimum required overlap for FASTP merging of paired-end reads"
         }
       }
     },
@@ -200,26 +250,26 @@
         "aDNAkmerLength": {
           "type": "integer",
           "default": 15,
-          "description": "K value when K-mer profiling ancient DNA samples and constructing graph indexes"
+          "description": "aDNA samples: K-mer length for minimizer computation (+ read K-mer profiling in unfiltered_graph mode)"
         },
         "aDNAwindowLength": {
           "type": "integer",
           "default": 3,
-          "description": "Window size when constructing graph indexes for ancient DNA samples"
+          "description": "aDNA samples: Window length for minimizer computation"
         },
         "modernKmerLength": {
           "type": "integer",
           "default": 29,
-          "description": "K value when K-mer profiling modern samples and constructing graph indexes"
+          "description": "Modern samples: K-mer length for minimizer computation (+ read K-mer profiling in unfiltered_graph mode)"
         },
         "modernWindowLength": {
           "type": "integer",
           "default": 11,
-          "description": "Window size when constructing graph indexes for modern samples"
+          "description": "Modern samples: Window length for minimizer computation"
         },
         "noNestedDistance": {
           "type": "boolean",
-          "description": "For complex graphs 'dist' index may use excessive memory. Set 'true' to debug (produces a limited version of the index and reduces memory imprint)"
+          "description": "Developers: produce limited version of the distance index (lower memory imprint)"
         }
       }
     },
@@ -232,22 +282,22 @@
         "aDNA_mismatch_penalty": {
           "type": "integer",
           "default": 3,
-          "description": "Giraffe alignment (aDNA reads only): mismatch penalty"
+          "description": "Giraffe alignment (aDNA reads): mismatch penalty"
         },
         "aDNA_gap_open_penalty": {
           "type": "integer",
           "default": 11,
-          "description": "Giraffe alignment (aDNA reads only): gap open penalty"
+          "description": "Giraffe alignment (aDNA reads): gap open penalty"
         },
         "aDNA_gap_extend_penalty": {
           "type": "integer",
           "default": 4,
-          "description": "Giraffe alignment (aDNA reads only): gap extend penalty"
+          "description": "Giraffe alignment (aDNA reads): gap extend penalty"
         },
         "kffKmerMinimum": {
           "type": "integer",
           "default": 5,
-          "description": "FASTQ: Minimum required occurences of a read K-mer for it to be counted prior to haplotype subsampling"
+          "description": "Haplotype subsampling: minimum frequency of read K-mer for consideration"
         },
         "gamDiscardUnmapped": {
           "type": "boolean",
@@ -282,7 +332,7 @@
         "defrayEndsLength": {
           "type": "integer",
           "default": 999,
-          "description": "GAM: When clipping, sets max number of bases to clip from read ends, requires --gamDefrayEnds"
+          "description": "GAM: maximum bases to clip from read ends, requires --gamDefrayEnds"
         },
         "bwaFilterMapQ": {
           "type": "boolean",
@@ -305,18 +355,18 @@
         "dedupConsiderBothEnds": {
           "type": "boolean",
           "default": true,
-          "description": "For aDNA, consider both the 5' and 3' ends of the read when identifying duplicates. When false, the 5' end is used"
+          "description": "aDNA: consider 5' and 3' alignment positions when identifying duplicate reads. If false, consider the 5' position"
         },
         "removeDuplicates": {
           "type": "boolean",
           "default": true,
-          "description": "Remove duplicate reads with Picard MarkDuplicates. If false, they are written with duplicate flags and the tagging policy is applied"
+          "description": "Remove duplicate reads. If false, duplicates are marked and the tagging policy is applied"
         },
         "duplicateTaggingPolicy": {
           "type": "string",
           "default": "DontTag",
           "enum": ["DontTag", "OpticalOnly", "All"],
-          "description": "Policy for tagging duplicates in the DT optional SAM/BAM field"
+          "description": "Policy for tagging duplicates in the DT SAM tag"
         }
       }
     },
@@ -329,7 +379,7 @@
         "samplePloidy": {
           "type": "integer",
           "default": 2,
-          "description": "General: Ploidy of the study organism"
+          "description": "Ploidy of the target organism"
         },
         "minimumAlleleSupport": {
           "type": "integer",
@@ -425,6 +475,9 @@
     },
     {
       "$ref": "#/$defs/slurm_hpc_specific_parameters"
+    },
+    {
+      "$ref": "#/$defs/gpu_acceleration"
     },
     {
       "$ref": "#/$defs/optional_processes_outputs"

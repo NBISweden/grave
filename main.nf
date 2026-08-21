@@ -46,6 +46,7 @@ workflow {
     // Run any required utility processes on the reference file
     REFERENCE_UTILITIES (
         workflow_steps,
+        params.gpu_giraffe,
         params.reference_type,
         params.reference_stats,
         reference,
@@ -84,6 +85,7 @@ workflow {
     mapped_bam       = channel.empty()
     if ( 'align' in workflow_steps ) {
         ALIGN_READS (
+            params.gpu_giraffe,
             params.reference_type,
             paths,
             fastp_reads,

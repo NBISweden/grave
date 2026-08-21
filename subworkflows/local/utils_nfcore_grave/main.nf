@@ -204,7 +204,6 @@ def validateInputParameters() {
     if ( !params.reference && params.reference_type ) {
         error "ERROR: A reference type has been provided, but no reference file."
     }
-
     // Check reference type matches the provided mode
     if ( params.reference && params.reference_type ) {
         def reference_file = new File(params.reference as String)
@@ -237,6 +236,10 @@ def validateInputParameters() {
     }
     if ( !params.multiple_references && params.paths_dir ) {
         error "ERROR: A paths directory was provided with '--paths_dir' but '--multiple_references' = ${params.multiple_references}'."
+    }
+    // Temporary limitations: disallow GPU Giraffe with multiple reference samples
+    if ( params.multiple_references && params.gpu_giraffe ) {
+        error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
     }
 
 }

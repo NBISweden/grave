@@ -1,15 +1,18 @@
-include { INDEX_UNFILTERED_GRAPH } from '../../../modules/local/vg/index_unfiltered/main'
-include { INDEX_FILTERED_GRAPH   } from '../../../modules/local/vg/index_filtered/main'
-include { BWA_INDEX              } from '../../../modules/nf-core/bwa/index/main'
-include { GRAPH_STATISTICS       } from '../../../modules/local/vg/stats/main'
-include { SAMTOOLS_FAIDX         } from '../../../modules/nf-core/samtools/faidx/main'
-include { GRAPH_EXTRACT          } from '../../../modules/local/vg/paths/main'
-include { COMPUTE_SNARLS         } from '../../../modules/local/vg/snarls/main'
+include { INDEX_UNFILTERED_GRAPH     } from '../../../modules/local/vg/index_unfiltered/main'
+include { INDEX_UNFILTERED_GRAPH_GPU } from '../../../modules/local/vg/index_unfiltered/gpu'
+include { INDEX_FILTERED_GRAPH       } from '../../../modules/local/vg/index_filtered/main'
+include { INDEX_FILTERED_GRAPH_GPU   } from '../../../modules/local/vg/index_filtered/gpu'
+include { BWA_INDEX                  } from '../../../modules/nf-core/bwa/index/main'
+include { GRAPH_STATISTICS           } from '../../../modules/local/vg/stats/main'
+include { SAMTOOLS_FAIDX             } from '../../../modules/nf-core/samtools/faidx/main'
+include { GRAPH_EXTRACT              } from '../../../modules/local/vg/paths/main'
+include { COMPUTE_SNARLS             } from '../../../modules/local/vg/snarls/main'
 
 workflow REFERENCE_UTILITIES {
 
     take:
     workflow_steps
+    gpu_giraffe
     reference_type
     reference_stats
     reference
@@ -25,29 +28,59 @@ workflow REFERENCE_UTILITIES {
     // If indexing is requested, index appropriately based on the reference type
     if ( 'index' in workflow_steps) {
         if ( reference_type == "unfiltered_graph" ) {
-            INDEX_UNFILTERED_GRAPH (
-                reference,
-                sample_types
-            )
-            reference
-                .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
-                .collect()
-                .map { element ->
-                    [ref: element[0], indexes: element[1..-1]]
-                }
-                .set { indexed_reference }
+            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
+            if ( gpu_giraffe ) {
+                INDEX_UNFILTERED_GRAPH_GPU (
+                    reference,
+                    sample_types
+                )
+                reference
+                    .combine(INDEX_UNFILTERED_GRAPH_GPU.out.ch_hapl_indexes)
+                    .collect()
+                    .map { element ->
+                        [ref: element[0], indexes: element[1..-1]]
+                    }
+                    .set { indexed_reference }
+            } else {
+                INDEX_UNFILTERED_GRAPH (
+                    reference,
+                    sample_types
+                )
+                reference
+                    .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
+                    .collect()
+                    .map { element ->
+                        [ref: element[0], indexes: element[1..-1]]
+                    }
+                    .set { indexed_reference }
+            }
         } else if ( reference_type == "filtered_graph" ) {
-            INDEX_FILTERED_GRAPH (
-                reference,
-                sample_types
-            )
-            reference
-                .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
-                .collect()
-                .map { element ->
-                    [ref: element[0], indexes: element[1..-1]]
-                }
-                .set { indexed_reference }
+            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
+            if ( gpu_giraffe ) {
+                INDEX_FILTERED_GRAPH_GPU (
+                    reference,
+                    sample_types
+                )
+                reference
+                    .combine(INDEX_FILTERED_GRAPH_GPU.out.ch_filter_indexes)
+                    .collect()
+                    .map { element ->
+                        [ref: element[0], indexes: element[1..-1]]
+                    }
+                    .set { indexed_reference }
+            } else {
+                INDEX_FILTERED_GRAPH (
+                    reference,
+                    sample_types
+                )
+                reference
+                    .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
+                    .collect()
+                    .map { element ->
+                        [ref: element[0], indexes: element[1..-1]]
+                    }
+                    .set { indexed_reference }
+            }
         } else if ( reference_type == "linear" ) {
             // Index the reference
             BWA_INDEX (

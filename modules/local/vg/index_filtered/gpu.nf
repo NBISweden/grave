@@ -1,12 +1,12 @@
-process INDEX_FILTERED_GRAPH {
+process INDEX_FILTERED_GRAPH_GPU {
 
     tag "${graph.baseName}_graph"
     label 'process_high_memory'
     // NOTE: update version string manually (due to use of storedir)
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/vg:1.73.0--645b5a4f32c11ace' :
-        'community.wave.seqera.io/library/vg:1.73.0--e9dad0f50dfcdf46' }"
-    storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_indexes_${params.aDNAkmerLength}-${params.aDNAwindowLength}/min_dist") }
+        'oras://community.wave.seqera.io/library/vg:1.70.0--e551f543615b3bad' :
+        'community.wave.seqera.io/library/vg:1.70.0--f0e005bd33f23d2f' }"
+    storeDir { graph.toRealPath().parent.resolve("${graph.baseName}_gpu_indexes_${params.aDNAkmerLength}-${params.aDNAwindowLength}/min_dist") }
 
     input:
     path (graph)
@@ -15,7 +15,7 @@ process INDEX_FILTERED_GRAPH {
     output:
     path ("${graph.baseName}.????*"), emit: ch_filter_indexes
     // NOTE: update version string manually (due to use of storedir)
-    tuple val(task.process), val('vg'), val('1.73.0'), topic: versions
+    tuple val(task.process), val('vg'), val('1.70.0'), topic: versions
 
     script:
     def args = task.ext.args ?: ''

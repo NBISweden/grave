@@ -132,18 +132,22 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 #### Customise run parameters
 
-- Custom parameters should be set by editing a `params.yml` file, and providing it on the command line when you execute the workflow (`-params-file params.yml`).
-
-- An important parameter is `--steps`, a string specifying which pipeline subworkflows to run, e.g., (`--steps 'index,preprocess'`). Each requested step has further dependencies which the user will be prompted to provide. The default is to run all steps for a graph reference input.
+- While in many cases defaults are sufficient, custom parameters can be set by editing a `params.yml` file, and providing it on the command line when you execute the workflow (`-params-file params.yml`).
 
 - Use `pixi run help` to see available parameters and their descriptions.
 
+- An important parameter is `--steps`, a string specifying which pipeline stages to run, e.g., (`--steps 'index,preprocess'` only indexes the input and preprocesses the reads). Some steps have their own dependencies, but `grave` will notify the user immediately when an invalid combination is provided. The default is to run all possible steps for a typical graph reference.
+
+- A selection of key parameters are expanded on below.
+
+##### Graph indexing
+
 > [!IMPORTANT]
-> The graph aligner `vg giraffe` uses a seed, cluster, chain, and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`). During graph indexing, minimisers are calculated from the graph, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value. The seeding stage of alignment involves computing exact matches between these minimisers and reads. Nearby seeds are clustered and chained together via ungapped alignment, with high-scoring chains serving as the starting point for extension.<br><br>
-> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too short for minimiser computation. Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many potential secondary alignments for a read.<br><br>
+> The graph aligner `vg giraffe` uses a seed, cluster, chain, and extend strategy, with two important parameters: *K*-mer length (`k`) and window length (`w`). During graph indexing, minimisers are calculated from haplotype paths, by sliding across length `w` and taking the sequence (minimiser) of length `k` with the smallest hash value. The seeding stage of alignment involves computing exact matches between these minimisers and reads. Proximate seeds in the graph are clustered, clusters are chained together, and high-scoring chains serve as the starting point for extension.<br><br>
+> Users should keep in mind that reads shorter than `k+w-1` cannot be aligned, as they are too short for minimiser computation. Furthermore, with very short reads (~30 bp) users may notice fewer high quality alignments (MAPQ 30+) - this is expected if there are many comparably scoring chains entering extension, thus many comparably scoring mapping positions for a read.<br><br>
 > To address these issues, `grave` uses different `k` and `w` defaults for modern and ancient reads:<br><br>
 > Modern samples are run with `giraffe` defaults, emphasising higher specificity (`k` = 29, `w` = 11).<br><br>
-> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones. The `grave` aDNA defaults (`k` = 15, `w` = 3) have acceptable performance at `30 bp` and good performance at `40+ bp`, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants. Users may find that adjusting these parameters for their particular dataset can improve performance.<br><br>
+> For aDNA reads, a reduced `k` and `w` results in a low-specificity, high-density index - relying on chaining to discriminate good matches from spurious ones. The `grave` aDNA defaults (`k` = 15, `w` = 3) balance performance across 30-70 bp reads, though a MAPQ filter of `30` is recommended to filter out alignments from contaminants. Users may find that adjusting these parameters for their particular dataset can improve performance, see the table below for general guidance.<br><br>
 > Suggested further reading: [Rubin et al., 2025, NAR Genomics and Bioinformatics](https://academic.oup.com/nargab/article/7/4/lqaf170/8376687). As the authors note, there is no single best setting for `k` and `w` in the aDNA context, as it depends on several factors related to the graph and reads.
 
 **Comparison of alignment parameters**<br>
@@ -162,9 +166,40 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 \*\*The bwa linear reference was the same used as the graph backbone (GCF_016772045.2).
 
+**Comparison of alignment run time**<br>
+
 ![Run times](assets/runtimes.png)
 
-Timings refer to the entire alignment modules, not just the aligners themselves.<br>Note that within `grave,` `bwa` defaults to use 6 cpus, while `vg giraffe` uses 64.
+- 5 million reads per length were aligned using 48 CPUs
+- `bwa aln` targeted the sheep linear reference genome
+- `giraffe` targeted a sheep pangenome graph, and used the `grave` default indexing settings (`k` = 15, `w` = 3)
+
+##### GPU accelerated graph alignment with parabricks
+
+- [NVIDIA Parabricks](https://docs.nvidia.com/clara/parabricks/latest/index.html) offers GPU-accelerated versions of a number of popular genomics tools, including `vg giraffe`
+- This is an experimental feature in `grave` selected with `--gpu_giraffe`
+- The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
+
+```
+nextflow main.nf -profile <institution> -params-file params.yml -c gpu_configuration.config
+```
+
+```{gpu_configuration.config}
+process {
+    withName: 'GPU_GIRAFFE' {
+        accelerator = [ type: 'h100', request: 2 ] // 2x h100 GPUs
+    }
+}
+```
+
+> [!IMPORTANT]
+> **Limitations**:<br>
+> - Only NVIDIA GPUs are supported, and the institutional config must be configured for GPU requests.<br>
+> - `Parabricks` updates less frequently than `vg`, thus outputs between the implemented versions may not be identical.<br>
+> - Some graph indexes are not compatible between the two tools and must be recomputed, due to underlying `vg` version differences.<br>
+> - `Parabricks 4.7.1` surjects directly to BAM, disabling genotyping with `vg call`, which uses GAM.<br>
+> - `Parabricks 4.7.1` does not support custom alignment scoring, such as mismatches/gap opens/gap extensions.<br>
+> - `grave` does not support GPU-accelerated `giraffe` for multi-reference graphs. Please request it if you need it.<br>
 
 #### Was your graph built with more than one reference sample?
 

@@ -1,10 +1,67 @@
 # Changelog
 
-## [2.3.0] - Unreleased
+## [2.4.0] - Unreleased
 
 ### Prefiltering, and any effects on default MAPQ
 
 - TODO: kraken2
+
+## [2.3.0] - Unreleased
+
+### GPU accelerated Giraffe (requires NVIDIA GPUs)
+
+#### Limitations (parabricks 4.7.1)
+
+- does not support GAM output
+- does not support custom alignment scoring
+- requires use of an older version of vg for index construction
+- Noted that on more powerful GPUs `--nstreams auto` can lead to OOM on VRAM, pbrun sets `gpu-minimizers true` and then runs out of mem. Better to manually configure performance (now default).
+- For aDNA samples, reverts to CPU frequently (presumably due to dense index). Currently treat as experimental.
+
+#### Implementation details
+
+- Implemented parabricks giraffe for single-reference graph modes
+    - See #45 for planned additions
+    - Tested locally and on HPC
+    - New local test
+
+- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
+
+- New params:
+
+```
+GPU acceleration
+  --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe 
+  --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU) 
+  --performance_auto           [boolean] For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory 
+  --nstreams                   [integer] Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 3] 
+  --batch_size                 [integer] Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 10000] 
+  --work_queue_capacity        [integer] Soft capacity limit of work queues between stages, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 40] 
+  --minimizers_gpu             [boolean] Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors 
+```
+
+```
+# To test if a local system can support it:
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey |   sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt update
+sudo apt install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+docker run --rm --gpus all nvidia/cuda:12.3.2-base-ubuntu22.04 nvidia-smi -L
+
+# If the final command returns your GPU, e.g. `GPU 0: NVIDIA...` - parabricks should run locally
+```
+
+### Schema
+
+- Simplified help messages in most cases
+
+### General
+
+- README fixes, added 13/3 performance to table
+- Fixed last occurences of Apptainer defaulting to pull + convert Docker image vs using sif
+- Locally executing modules now also use a container
 
 ## [2.2.1] - 20260624
 

@@ -159,11 +159,6 @@
           "default": 10000,
           "description": "Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false"
         },
-        "gpu_write": {
-          "type": "boolean",
-          "default": true,
-          "description": "Use one GPU to accelerate writing final BAM/CRAM"
-        },
         "work_queue_capacity": {
           "type": "integer",
           "default": 40,
@@ -172,6 +167,11 @@
         "minimizers_gpu": {
           "type": "boolean",
           "description": "Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors"
+        },
+        "gpu_write": {
+           "type": "boolean",
+           "default": true,
+           "description": "Use one GPU to accelerate writing final BAM"
         }
       }
     },
@@ -373,60 +373,6 @@
           "type": "integer",
           "default": 20,
           "description": "BAM (linear mode only): MAPQ threshold applied when filtering, requires --bwaFilterMapQ"
-        }
-      }
-    },
-    "gpu_acceleration": {
-      "title": "GPU acceleration",
-      "type": "object",
-      "description": "",
-      "default": "",
-      "properties": {
-        "gpu_giraffe": {
-          "type": "boolean",
-          "description": "Use a GPU accelerated version of giraffe"
-        },
-        "apptainer_gpu_flag": {
-          "type": "string",
-          "description": "Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI",
-          "default": "nv",
-          "enum": ["nv", "nvccli"]
-        },
-        "gpu_partition": {
-          "type": "string",
-          "description": "NVIDIA GPU SLURM partition name",
-          "default": "gpu"
-        },
-        "gpu_resources": {
-          "type": "string",
-          "description": "GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)"
-        },
-        "gpu_low_memory": {
-          "type": "boolean",
-          "description": "For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU)"
-        },
-        "performance_auto": {
-          "type": "boolean",
-          "description": "For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory"
-        },
-        "nstreams": {
-          "type": "integer",
-          "default": 3,
-          "description": "Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false"
-        },
-        "batch_size": {
-          "type": "integer",
-          "default": 10000,
-          "description": "Alignment batch size, applied when '--gpu_low_memory' & '--performance_auto' are false"
-        },
-        "work_queue_capacity": {
-          "type": "integer",
-          "default": 40,
-          "description": "Soft capacity limit of work queues between stages, applied when '--gpu_low_memory' & '--performance_auto' are false"
-        },
-        "minimizers_gpu": {
-          "type": "boolean",
-          "description": "Use GPU for minimizers and seeds (requires high VRAM). WARNING: may be overridden by `--performance_auto`, causing OOM errors"
         }
       }
     },

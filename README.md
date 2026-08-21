@@ -166,24 +166,40 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 \*\*The bwa linear reference was the same used as the graph backbone (GCF_016772045.2).
 
+**Comparison of alignment run time**<br>
+
+![Run times](assets/runtimes.png)
+
+- 5 million reads per length were aligned using 48 CPUs
+- `bwa aln` targeted the sheep linear reference genome
+- `giraffe` targeted a sheep pangenome graph, and used the `grave` default indexing settings (`k` = 15, `w` = 3)
+
 ##### GPU accelerated graph alignment with parabricks
 
 - [NVIDIA Parabricks](https://docs.nvidia.com/clara/parabricks/latest/index.html) offers GPU-accelerated versions of a number of popular genomics tools, including `vg giraffe`
-- This has been implemented in `grave`, and can be selected with `--gpu_giraffe`
-- Run times for the default (CPU) implementation versus the GPU version are shown below, alongside `bwa aln`
+- This is an experimental feature in `grave` selected with `--gpu_giraffe`
+- The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
+
+```
+nextflow main.nf -profile <institution> -params-file params.yml -c gpu_configuration.config
+```
+
+```{gpu_configuration.config}
+process {
+    withName: 'GPU_GIRAFFE' {
+        accelerator = [ type: 'h100', request: 2 ] // 2x h100 GPUs
+    }
+}
+```
 
 > [!IMPORTANT]
 > **Limitations**:<br>
-> - Only NVIDIA GPUs are supported. Specify the NVIDIA SLURM partition with `--gpu_partition` (default: gpu).<br>
+> - Only NVIDIA GPUs are supported, and the institutional config must be configured for GPU requests.<br>
 > - `Parabricks` updates less frequently than `vg`, thus outputs between the implemented versions may not be identical.<br>
 > - Some graph indexes are not compatible between the two tools and must be recomputed, due to underlying `vg` version differences.<br>
-> - `Parabricks 4.7.0` surjects directly to BAM, disabling genotyping with `vg call`, which uses GAM.<br>
-> - `Parabricks 4.7.0` does not support custom alignment scoring, such as mismatches/gap opens/gap extensions.<br>
+> - `Parabricks 4.7.1` surjects directly to BAM, disabling genotyping with `vg call`, which uses GAM.<br>
+> - `Parabricks 4.7.1` does not support custom alignment scoring, such as mismatches/gap opens/gap extensions.<br>
 > - `grave` does not support GPU-accelerated `giraffe` for multi-reference graphs. Please request it if you need it.<br>
-
-TODO UPDATE    ![Run times](assets/runtimes.png)
-TODO: Time the aligners themselves, not the module.
-TODO CPU tools were run with 64 cpus. All tests were run on a SIZE/coverage sample.
 
 #### Was your graph built with more than one reference sample?
 

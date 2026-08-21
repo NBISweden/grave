@@ -10,19 +10,20 @@
 
 ### GPU accelerated Giraffe (requires NVIDIA GPUs)
 
-#### Limitations (parabricks 4.7.0)
+#### Limitations (parabricks 4.7.1)
 
 - does not support GAM output
 - does not support custom alignment scoring
 - requires use of an older version of vg for index construction
 - Noted that on more powerful GPUs `--nstreams auto` can lead to OOM on VRAM, pbrun sets `gpu-minimizers true` and then runs out of mem. Better to manually configure performance (now default).
+- For aDNA samples, reverts to CPU frequently (presumably due to dense index). Currently treat as experimental.
 
 #### Implementation details
 
 - Implemented parabricks giraffe for single-reference graph modes
     - See #45 for planned additions
-    - Tested locally (WSL2) via Docker & Apptainer, and on HPC
-- New local tests via pixi (note for WSL2, set `apptainer_gpu_flag` to `nvccli` )
+    - Tested locally and on HPC
+    - New local test
 
 - TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
 
@@ -31,9 +32,6 @@
 ```
 GPU acceleration
   --gpu_giraffe                [boolean] Use a GPU accelerated version of giraffe 
-  --apptainer_gpu_flag         [string]  Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI  (accepted: nv, nvccli) [default: nv] 
-  --gpu_partition              [string]  NVIDIA GPU SLURM partition name [default: gpu] 
-  --gpu_resources              [string]  GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs) 
   --gpu_low_memory             [boolean] For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU) 
   --performance_auto           [boolean] For HPC: overrides '--nstreams', '--batch_size', '--work_queue_capacity', and '--minimizers_gpu' based on GPU and host memory 
   --nstreams                   [integer] Number of streams per GPU, applied when '--gpu_low_memory' & '--performance_auto' are false [default: 3] 

@@ -141,21 +141,6 @@
           "type": "boolean",
           "description": "Use a GPU accelerated version of giraffe"
         },
-        "apptainer_gpu_flag": {
-          "type": "string",
-          "description": "Apptainer/Singularity GPU passthrough mode: 'nv' for standard NVIDIA support, 'nvccli' for NVIDIA container CLI",
-          "default": "nv",
-          "enum": ["nv", "nvccli"]
-        },
-        "gpu_partition": {
-          "type": "string",
-          "description": "NVIDIA GPU SLURM partition name",
-          "default": "gpu"
-        },
-        "gpu_resources": {
-          "type": "string",
-          "description": "GPU resources per task, defaults to '1'. Examples: '2' (2 GPUs), 'l40s:1' (1 L40 GPU), 'h100:2' (2 H100 GPUs)"
-        },
         "gpu_low_memory": {
           "type": "boolean",
           "description": "For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU)"

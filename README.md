@@ -168,9 +168,11 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 **Comparison of alignment run time**<br>
 
-TODO UPDATE    ![Run times](assets/runtimes.png)
-TODO CPU tools were run with 48 cpus. All tests were run on a SIZE/coverage sample.
-- The dense index generated for `giraffe` does not result in an increased run-time versus `bwa aln` on 48 CPUs
+![Run times](assets/runtimes.png)
+
+- 5 million reads per length were aligned using 48 CPUs
+- `bwa aln` targeted the sheep linear reference genome
+- `giraffe` targeted a sheep pangenome graph, and used the `grave` default indexes settings (`k` = 15, `w` = 3)
 
 ##### GPU accelerated graph alignment with parabricks
 

@@ -49,7 +49,7 @@ p = (
     + geom_col(position=position_dodge(width=0.8), width=0.7)
     + scale_fill_manual(values=grey_shades)
     + labs(
-        title='Aligner run times by read length (100k reads)',
+        title='Aligner run times by read length (5 million reads/length)',
         x='Aligner',
         y='Wall-clock time (seconds)',
         fill='Read length (bp)',

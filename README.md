@@ -172,13 +172,13 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 
 - 5 million reads per length were aligned using 48 CPUs
 - `bwa aln` targeted the sheep linear reference genome
-- `giraffe` targeted a sheep pangenome graph, and used the `grave` default indexes settings (`k` = 15, `w` = 3)
+- `giraffe` targeted a sheep pangenome graph, and used the `grave` default indexing settings (`k` = 15, `w` = 3)
 
 ##### GPU accelerated graph alignment with parabricks
 
 - [NVIDIA Parabricks](https://docs.nvidia.com/clara/parabricks/latest/index.html) offers GPU-accelerated versions of a number of popular genomics tools, including `vg giraffe`
-- This is an experimental feature in `grave`, and can be selected with `--gpu_giraffe`
-- A config can be provided on the command line to specify specific GPU resources beyond the default, which is 1 GPU of the default type:
+- This is an experimental feature in `grave` selected with `--gpu_giraffe`
+- The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
 
 ```
 nextflow main.nf -profile <institution> -params-file params.yml -c gpu_configuration.config

@@ -177,11 +177,11 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 ##### GPU accelerated graph alignment with parabricks
 
 - [NVIDIA Parabricks](https://docs.nvidia.com/clara/parabricks/latest/index.html) offers GPU-accelerated versions of a number of popular genomics tools, including `vg giraffe`
-- This is an experimental feature in `grave` selected with `--gpu_giraffe`
+- This is an experimental feature in `grave` selected with `--gpu_giraffe` and using the `gpu` profile
 - The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
 
 ```
-nextflow main.nf -profile <institution> -params-file params.yml -c gpu_configuration.config
+nextflow main.nf -profile gpu,<institution> -params-file params.yml -c gpu_configuration.config
 ```
 
 ```{gpu_configuration.config}

@@ -8,10 +8,19 @@
 
 ## [2.3.0] - Unreleased
 
-### Updates
+### Tooling updates
 
-- Update nf-schema to 2.8.0, nextflow to 26.04.6, nf-core to 4.1.0, nf-test to 0.9.5
-- Enforce strict syntax. Use typed params.
+- nf-schema -> 2.8.0
+- nextflow  -> 26.04.6
+- nf-core   -> 4.1.0
+- nf-test   -> 0.9.5
+- nft-utils -> 1.1.0
+
+### Typing migration in line with Nextflow strict syntax
+
+- Strict syntax is now default
+- Therefore, the `pixi.toml` now enforces it for tests
+- Migrated to statically typed params to maintain user expected behaviour on CLI input
 
 ### GPU accelerated Giraffe (requires NVIDIA GPUs)
 

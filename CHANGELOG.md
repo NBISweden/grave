@@ -6,7 +6,7 @@
 
 - TODO: kraken2
 
-## [2.3.0] - Unreleased
+## [2.3.0] - 20260902
 
 ### Tooling updates
 

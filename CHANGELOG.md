@@ -8,6 +8,20 @@
 
 ## [2.3.0] - Unreleased
 
+### Tooling updates
+
+- nf-schema -> 2.8.0
+- nextflow  -> 26.04.6
+- nf-core   -> 4.1.0
+- nf-test   -> 0.9.5
+- nft-utils -> 1.1.0
+
+### Typing migration in line with Nextflow strict syntax
+
+- Strict syntax is now default
+- Therefore, the `pixi.toml` now enforces it for tests
+- Migrated to statically typed params to maintain user expected behaviour on CLI input
+
 ### GPU accelerated Giraffe (requires NVIDIA GPUs)
 
 #### Limitations (parabricks 4.7.1)
@@ -24,8 +38,6 @@
     - See #45 for planned additions
     - Tested locally and on HPC
     - New local test
-
-- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
 
 - New params:
 

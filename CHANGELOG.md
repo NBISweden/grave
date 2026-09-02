@@ -8,6 +8,11 @@
 
 ## [2.3.0] - Unreleased
 
+### Updates
+
+- Update nf-schema to 2.8.0, nextflow to 26.04.6, nf-core to 4.1.0, nf-test to 0.9.5
+- Enforce strict syntax. Use typed params.
+
 ### GPU accelerated Giraffe (requires NVIDIA GPUs)
 
 #### Limitations (parabricks 4.7.1)
@@ -24,8 +29,6 @@
     - See #45 for planned additions
     - Tested locally and on HPC
     - New local test
-
-- TODO: README - update timings. bwa vs cpu giraffe with same cpu count + add gpu
 
 - New params:
 

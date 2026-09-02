@@ -10,6 +10,115 @@ include { PROFILE_PMD             } from './subworkflows/local/05_profile_pmd/ma
 include { GENOTYPE                } from './subworkflows/local/06_genotype/main'
 include { VARIANT_CALL            } from './subworkflows/local/07_variant_call/main'
 
+// Param types (defaults in nextflow.config)
+params {
+
+    // General
+    project                    : String
+    align_stage_in_mode        : String
+
+    // Input options
+    steps                      : String
+    input                      : String
+    reference                  : String
+    reference_type             : String
+    multiple_references        : String
+    paths_dir                  : String
+
+    // GPU acceleration
+    gpu_giraffe                : Boolean
+    gpu_low_memory             : Boolean
+    performance_auto           : Boolean
+    nstreams                   : Integer
+    batch_size                 : Integer
+    work_queue_capacity        : Integer
+    minimizers_gpu             : Boolean
+    gpu_write                  : Boolean
+
+    // Optional processes
+    reference_stats            : Boolean
+    freebayes                  : Boolean
+    freebayes_mode             : String
+    deepvariant                : Boolean
+
+    // Debug memory issues on graph distance indexing
+    noNestedDistance           : Boolean
+
+    // Graph indexing options
+    aDNAkmerLength             : Integer
+    aDNAwindowLength           : Integer
+    modernKmerLength           : Integer
+    modernWindowLength         : Integer
+
+    // FASTP
+    discardUnmerged            : Boolean
+    fastpDedup                 : Boolean
+    dupCalcAccuracy            : Integer
+    readDiscardLength          : Integer
+    minFastpOverlapLength      : Integer
+
+    // GIRAFFE
+    aDNA_mismatch_penalty      : Integer
+    aDNA_gap_open_penalty      : Integer
+    aDNA_gap_extend_penalty    : Integer
+    kffKmerMinimum             : Integer
+    gamDiscardUnmapped         : Boolean
+    gamFilterMapQ              : Boolean
+    minimumMapQFilter          : Integer
+    alignIdentityFilter        : Boolean
+    minimumScorePrimaryAlign   : Float
+    gamDefrayEnds              : Boolean
+    defrayEndsLength           : Integer
+    rawMapStats                : Boolean
+    keepRawGam                 : Boolean
+
+    // BWA (linear mode)
+    bwaFilterMapQ              : Boolean
+    bwaMinimumMapQFilter       : Integer
+
+    // DEDUPLICATE_BAM
+    duplicateTaggingPolicy     : String
+    dedupConsiderBothEnds      : Boolean
+    removeDuplicates           : Boolean
+
+    // Variant calling general
+    maxNestLevel               : Integer
+    maxRefLength               : Integer
+    samplePloidy               : Integer
+    minimumAlleleSupport       : Integer
+    keepRawVcf                 : Boolean
+
+    // GENOTYPE_READS
+    minimumSiteSupport         : Integer
+    baselineErrorSmallVariants : Float
+    baselineErrorLargeVariants : Float
+
+    // FREEBAYES
+    maxComplexGap              : Integer
+    minFraction                : Float
+
+    // DEEPVARIANT
+    deepVariantModelType       : String
+
+    // Internal
+    outdir                     : String
+    monochrome_logs            : Boolean
+    help                       : Boolean
+    help_full                  : Boolean
+    show_hidden                : Boolean
+    version                    : Boolean
+    trace_timestamp            : String
+    tracing                    : Boolean
+    validate_params            : Boolean
+    config_profile_name        : String
+    config_profile_description : String
+    config_profile_contact     : String
+    config_profile_url         : String
+    custom_config_version      : String
+    custom_config_base         : String
+
+}
+
 // Entry workflow
 workflow {
 

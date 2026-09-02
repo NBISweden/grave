@@ -24,9 +24,9 @@ environments:
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/bioconda/linux-64/vg-1.73.0-h9ee0642_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -244,9 +244,9 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/yacman-0.9.3-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-3.23.0-pyhcf101f3_1.conda
       osx-64:
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -416,9 +416,9 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zlib-ng-2.3.2-h53ec75d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
       osx-arm64:
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -593,9 +593,9 @@ environments:
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/bioconda/linux-64/vg-1.73.0-h9ee0642_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -797,9 +797,9 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/yacman-0.9.3-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-3.23.0-pyhcf101f3_1.conda
       osx-64:
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -969,9 +969,9 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zlib-ng-2.3.2-h53ec75d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
       osx-arm64:
-      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+      - conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyfaidx-0.9.0.3-pyhdfd78af_0.conda
       - conda: https://conda.anaconda.org/bioconda/noarch/pyvcf3-1.0.3-pyhdfd78af_0.tar.bz2
@@ -1147,19 +1147,19 @@ packages:
   license_family: MIT
   size: 15613819
   timestamp: 1776781335957
-- conda: https://conda.anaconda.org/bioconda/noarch/nextflow-25.10.2-h2a3209d_0.conda
-  sha256: 31164f531b9ec17cdc766458dbff18bea9409bf65a7dce08cde369d390dc7df3
-  md5: d5637b16b8df941e9a6cb3109346283d
+- conda: https://conda.anaconda.org/bioconda/noarch/nextflow-26.04.6-h2a3209d_1.conda
+  sha256: 452805a6a3cc3f4e28417d855c7c03001dce1b2557a7e8ae46971d3a8778f9af
+  md5: 4fea597e1977b0221de342a3bfb2d971
   depends:
   - coreutils
   - curl
-  - openjdk >=17,<=24
+  - openjdk >=17,<26
   license: Apache-2.0
-  size: 34828352
-  timestamp: 1764361506696
-- conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.0.2-pyhdfd78af_1.conda
-  sha256: a62019fbb74ba3bcb39ef037fb47b2e00a5bc1293b577468f1102137175e44cc
-  md5: 4ab387e9266b5d792bfa86e28ef4dda8
+  size: 37863659
+  timestamp: 1784828644646
+- conda: https://conda.anaconda.org/bioconda/noarch/nf-core-4.1.0-pyhdfd78af_0.conda
+  sha256: b90513a5036ff2084d8654913cb76611f374813900df48b394bd05077b6e391b
+  md5: 0bb17a17f070f2689ea0e9bbf59de9c1
   depends:
   - click
   - filetype
@@ -1194,18 +1194,18 @@ packages:
   - trogon
   license: MIT
   license_family: MIT
-  size: 476065
-  timestamp: 1777930150340
-- conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.3-h2a3209d_0.conda
-  sha256: 8248f23527f3829bd5f3bf7cbfed1c1938a0caa1b2a4d640ad04a18a3f8a485c
-  md5: be0dd632423c5d548cc03897279198b9
+  size: 509814
+  timestamp: 1785339005547
+- conda: https://conda.anaconda.org/bioconda/noarch/nf-test-0.9.5-h2a3209d_0.conda
+  sha256: a99f62b01c74b01854c01bdebe765110f4754e2245ec536df10a521ad96befd5
+  md5: 394b91381c88e5c7df30b7e34fefd6e5
   depends:
   - coreutils
   - curl
-  - openjdk >=11,<=18
+  - openjdk >=17,<26
   license: MIT
-  size: 25224738
-  timestamp: 1759228333585
+  size: 16542781
+  timestamp: 1773937784890
 - conda: https://conda.anaconda.org/bioconda/noarch/piper-0.14.5-pyhdfd78af_0.conda
   sha256: 62d4d52a2aa380520d5bfae5a1f7ba229adeb1aa55947d0342b9848789fd344d
   md5: 6ba12f0caaab10681762fc53428627c8

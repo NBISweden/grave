@@ -1,15 +1,15 @@
 [workspace]
 name                   = "grave pixi workspace"
-version                = "2.0.0"
+version                = "2.3.0"
 description            = "A workflow for mapping and variant calling aDNA against pangenome graphs"
 authors                = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
 channels               = ["conda-forge", "bioconda"]
 platforms              = ["linux-64", "osx-64", "osx-arm64"]
 
 [dependencies]
-nextflow               = "==25.10.2"
-nf-core                = ">=4.0.2,<5"
-nf-test                = ">=0.9.3"
+nextflow               = "==26.04.6"
+nf-core                = ">=4.1.0,<5"
+nf-test                = ">=0.9.5"
 
 [target.linux-64.dependencies]
 vg                     = "==1.73.0"
@@ -21,22 +21,19 @@ apptainer              = "==1.4.5"
 apptainer              = ["apptainer"]
 
 [tasks]
-test-docker            = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml"
-test-apptainer         = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml"
-test-singularity       = "nextflow main.nf -profile singularity,test -params-file tests/test_graph.yml"
-test-conda             = "nextflow main.nf -profile conda,test -params-file tests/test_graph.yml"
-test-docker-linear     = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml"
-test-apptainer-linear  = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml"
-test-apptainer-lengths = "nextflow main.nf -profile apptainer,test -params-file tests/test_lengths.yml"
-test-ovis-unfiltered   = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-unfiltered-params.yml"
-test-ovis-filtered     = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-filtered-params.yml"
-test-ovis-linear       = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-linear-params.yml"
-test-gpu               = "nextflow main.nf -profile gpu,docker,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory"
-nftest-docker          = "nf-test test tests/main.nf.test --verbose"
-nftest-apptainer       = "nf-test test tests/main.nf.test --verbose --profile apptainer"
-nftest-singularity     = "nf-test test tests/main.nf.test --verbose --profile singularity"
+test-docker            = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml -output-format none"
+test-apptainer         = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml -output-format none"
+test-singularity       = "nextflow main.nf -profile singularity,test -params-file tests/test_graph.yml -output-format none"
+test-docker-linear     = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml -output-format none"
+test-apptainer-linear  = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml -output-format none"
+test-apptainer-lengths = "nextflow main.nf -profile apptainer,test -params-file tests/test_lengths.yml -output-format none"
+test-ovis-unfiltered   = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-unfiltered-params.yml -output-format none"
+test-ovis-filtered     = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-filtered-params.yml -output-format none"
+test-ovis-linear       = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-linear-params.yml -output-format none"
+test-gpu               = "nextflow main.nf -profile gpu,docker,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
+default-nf-test        = "nf-test test tests/main.nf.test --verbose"
 debug                  = "nextflow main.nf -profile apptainer,test,debug -params-file tests/test_graph.yml"
 help                   = "nextflow main.nf --help"
 
 [activation.env]
-NXF_SYNTAX_PARSER      = "v1"
+NXF_SYNTAX_PARSER      = "v2"

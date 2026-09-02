@@ -1,5 +1,5 @@
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
-![Nextflow](https://img.shields.io/badge/Nextflow-v25.10.2-brightgreen)
+![Nextflow](https://img.shields.io/badge/Nextflow-v26.04.6-brightgreen)
 
 <p align="center">
   <img src="assets/grave.svg" alt="grave" width="500">

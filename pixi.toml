@@ -1,6 +1,6 @@
 [workspace]
 name                   = "grave pixi workspace"
-version                = "2.3.0"
+version                = "2.4.0"
 description            = "A workflow for mapping and variant calling aDNA against pangenome graphs"
 authors                = ["CormacKinsella <27350062+CormacKinsella@users.noreply.github.com>"]
 channels               = ["conda-forge", "bioconda"]
@@ -20,20 +20,61 @@ apptainer              = "==1.4.5"
 [environments]
 apptainer              = ["apptainer"]
 
-[tasks]
-test-docker            = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml -output-format none"
-test-apptainer         = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml -output-format none"
-test-singularity       = "nextflow main.nf -profile singularity,test -params-file tests/test_graph.yml -output-format none"
-test-docker-linear     = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml -output-format none"
-test-apptainer-linear  = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml -output-format none"
-test-apptainer-lengths = "nextflow main.nf -profile apptainer,test -params-file tests/test_lengths.yml -output-format none"
-test-ovis-unfiltered   = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-unfiltered-params.yml -output-format none"
-test-ovis-filtered     = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-filtered-params.yml -output-format none"
-test-ovis-linear       = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-linear-params.yml -output-format none"
-test-gpu               = "nextflow main.nf -profile gpu,docker,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
-default-nf-test        = "nf-test test tests/main.nf.test --verbose"
-debug                  = "nextflow main.nf -profile apptainer,test,debug -params-file tests/test_graph.yml"
-help                   = "nextflow main.nf --help"
+[tasks.test-docker]
+cmd          = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml -output-format none"
+description  = "Run the pipeline test profile with Docker"
+
+[target.osx-arm64.tasks.test-docker]
+cmd          = "nextflow main.nf -profile docker,arm64,test -params-file tests/test_graph.yml -output-format none"
+description  = "Run the pipeline test profile with Docker (arm64)"
+
+[tasks.test-apptainer]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/test_graph.yml -output-format none"
+description = "Run the pipeline test profile with Apptainer"
+
+[tasks.test-docker-linear]
+cmd         = "nextflow main.nf -profile docker,test -params-file tests/test_linear.yml -output-format none"
+description = "Run the linear reference test with Docker"
+
+[tasks.test-apptainer-linear]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/test_linear.yml -output-format none"
+description = "Run the linear reference test with Apptainer"
+
+[tasks.test-apptainer-lengths]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/test_lengths.yml -output-format none"
+description = "Run the read lengths test with Apptainer"
+
+[tasks.test-ovis-unfiltered]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-unfiltered-params.yml -output-format none"
+description = "Run the Ovis unfiltered test with Apptainer"
+
+[tasks.test-ovis-filtered]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-filtered-params.yml -output-format none"
+description = "Run the Ovis filtered test with Apptainer"
+
+[tasks.test-ovis-linear]
+cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-linear-params.yml -output-format none"
+description = "Run the Ovis linear test with Apptainer"
+
+[tasks.test-gpu]
+cmd         = "nextflow main.nf -profile gpu,docker,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
+description = "Run the GPU test with Docker"
+
+[tasks.default-nf-test]
+cmd         = "nf-test test tests/main.nf.test --verbose"
+description = "Run the nf-test suite"
+
+[tasks.debug]
+cmd         = "nextflow main.nf -profile apptainer,test,debug -params-file tests/test_graph.yml"
+description = "Run the test profile with debug enabled"
+
+[tasks.help]
+cmd         = "nextflow main.nf --help"
+description = "Show the pipeline help message"
+
+[tasks.schema-build]
+cmd         = "nf-core pipelines schema build"
+description = "Build or update the nextflow_schema.json"
 
 [activation.env]
 NXF_SYNTAX_PARSER      = "v2"

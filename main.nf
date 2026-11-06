@@ -34,6 +34,7 @@ params {
     work_queue_capacity        : Integer
     minimizers_gpu             : Boolean
     gpu_write                  : Boolean
+    gpu_bwa_aln                : Boolean
 
     // Optional processes
     reference_stats            : Boolean

@@ -141,6 +141,10 @@
           "type": "boolean",
           "description": "Use a GPU accelerated version of giraffe"
         },
+        "gpu_bwa_aln": {
+          "type": "boolean",
+          "description": "Use a GPU accelerated implementation of BWA aln"
+        },
         "gpu_low_memory": {
           "type": "boolean",
           "description": "For low memory GPUs (i.e., 16GB): overrides performance options (e.g., '--nstreams 1', '--batch_size 5000', moves some tasks to CPU)"

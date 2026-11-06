@@ -36,9 +36,10 @@ LABEL org.opencontainers.image.source="https://github.com/bilalbioinfo/galn" \
       org.opencontainers.image.description="G-ALN: GPU implementation of bwa aln and bwa index" \
       org.opencontainers.image.licenses="GPL-3.0"
 
-# libgomp is needed for OpenMP; zlib is statically linked (zlib-ng)
+# libgomp is needed for OpenMP; zlib is statically linked (zlib-ng); samtools is used by the pipeline for filtering/sorting
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libgomp1 \
+        samtools \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /opt/galn/build/galn /usr/local/bin/galn

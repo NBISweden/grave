@@ -4,6 +4,7 @@ include { SAMTOOLS_FILTER_GPU      } from '../../../modules/local/samtools/filte
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
 include { GAM_TO_TAGGED_SORTED_BAM } from '../../../modules/local/vg/surject/main'
 include { BWA_ALN_SAMSE            } from '../../../modules/nf-core/bwa/aln/main'
+include { GALN_ALN_SAMSE           } from '../../../modules/local/galn/aln/main.nf'
 include { BWAMEM3_MEM              } from '../../../modules/nf-core/bwamem3/mem/main'
 
 workflow ALIGN_READS {
@@ -119,10 +120,13 @@ workflow ALIGN_READS {
             .set { reads }
         // User requested GPU accelerated BWA aln (libraries always pre-merged)
         if ( gpu_bwa_aln ) {
-            // GALN (
-            //     reads.ancient,
-            //     indexed_reference
-            // )
+            // Run GALN and samse for ancient libraries (always pre-merged)
+            GALN_ALN_SAMSE (
+                reads.ancient,
+                indexed_reference
+            )
+            aln_bam      = GALN_ALN_SAMSE.out.ch_bam
+            aln_flagstat = GALN_ALN_SAMSE.out.ch_flagstat
         // No GPU acceleration requested
         } else {
             // Run BWA aln and samse for ancient libraries (always pre-merged)
@@ -130,6 +134,8 @@ workflow ALIGN_READS {
                 reads.ancient,
                 indexed_reference
             )
+            aln_bam      = BWA_ALN_SAMSE.out.ch_bam
+            aln_flagstat = BWA_ALN_SAMSE.out.ch_flagstat
         }
         // Run BWA-MEM3 for modern libraries
         BWAMEM3_MEM (
@@ -137,8 +143,8 @@ workflow ALIGN_READS {
             indexed_reference_mem3
         )
         // Mix outputs
-        mapped_bam      = BWA_ALN_SAMSE.out.ch_bam.mix(BWAMEM3_MEM.out.ch_bam)
-        alignment_stats = BWA_ALN_SAMSE.out.ch_flagstat.mix(BWAMEM3_MEM.out.ch_flagstat)
+        mapped_bam      = aln_bam.mix(BWAMEM3_MEM.out.ch_bam)
+        alignment_stats = aln_flagstat.mix(BWAMEM3_MEM.out.ch_flagstat)
     }
 
     emit:

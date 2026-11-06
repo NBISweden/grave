@@ -4,17 +4,19 @@ include { SAMTOOLS_FILTER_GPU      } from '../../../modules/local/samtools/filte
 include { GIRAFFE                  } from '../../../modules/local/vg/giraffe/main'
 include { GAM_TO_TAGGED_SORTED_BAM } from '../../../modules/local/vg/surject/main'
 include { BWA_ALN_SAMSE            } from '../../../modules/nf-core/bwa/aln/main'
-include { BWA_MEM                  } from '../../../modules/nf-core/bwa/mem/main'
+include { BWAMEM3_MEM              } from '../../../modules/nf-core/bwamem3/mem/main'
 
 workflow ALIGN_READS {
 
     take:
     gpu_giraffe
+    gpu_bwa_aln
     reference_type
     paths
     fastp_reads
     reference
     indexed_reference
+    indexed_reference_mem3
 
     main:
     mapped_gam       = channel.empty()
@@ -115,19 +117,28 @@ workflow ALIGN_READS {
                 return tuple( meta, reads )
             }
             .set { reads }
-        // Run BWA aln and samse for ancient libraries (always pre-merged)
-        BWA_ALN_SAMSE (
-            reads.ancient,
-            indexed_reference
-        )
-        // Run BWA mem for modern libraries
-        BWA_MEM (
+        // User requested GPU accelerated BWA aln (libraries always pre-merged)
+        if ( gpu_bwa_aln ) {
+            // GALN (
+            //     reads.ancient,
+            //     indexed_reference
+            // )
+        // No GPU acceleration requested
+        } else {
+            // Run BWA aln and samse for ancient libraries (always pre-merged)
+            BWA_ALN_SAMSE (
+                reads.ancient,
+                indexed_reference
+            )
+        }
+        // Run BWA-MEM3 for modern libraries
+        BWAMEM3_MEM (
             reads.modern,
-            indexed_reference,
+            indexed_reference_mem3
         )
         // Mix outputs
-        mapped_bam      = BWA_ALN_SAMSE.out.ch_bam.mix(BWA_MEM.out.ch_bam)
-        alignment_stats = BWA_ALN_SAMSE.out.ch_flagstat.mix(BWA_MEM.out.ch_flagstat)
+        mapped_bam      = BWA_ALN_SAMSE.out.ch_bam.mix(BWAMEM3_MEM.out.ch_bam)
+        alignment_stats = BWA_ALN_SAMSE.out.ch_flagstat.mix(BWAMEM3_MEM.out.ch_flagstat)
     }
 
     emit:

@@ -154,10 +154,11 @@ workflow {
         sample_types,
         paths
     )
-    indexed_reference = REFERENCE_UTILITIES.out.indexed_reference   // Stored output
-    stats             = REFERENCE_UTILITIES.out.stats
-    reference_fastas  = REFERENCE_UTILITIES.out.reference_fastas
-    snarls            = REFERENCE_UTILITIES.out.snarls              // Stored output
+    indexed_reference      = REFERENCE_UTILITIES.out.indexed_reference   // Stored output
+    indexed_reference_mem3 = REFERENCE_UTILITIES.out.indexed_reference_mem3 // Stored output
+    stats                  = REFERENCE_UTILITIES.out.stats
+    reference_fastas       = REFERENCE_UTILITIES.out.reference_fastas
+    snarls                 = REFERENCE_UTILITIES.out.snarls              // Stored output
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~ Main grave workflow ~~~~~~
@@ -187,11 +188,13 @@ workflow {
     if ( 'align' in workflow_steps ) {
         ALIGN_READS (
             params.gpu_giraffe,
+            params.gpu_bwa_aln,
             params.reference_type,
             paths,
             fastp_reads,
             reference,
-            indexed_reference
+            indexed_reference,
+            indexed_reference_mem3
         )
         mapped_gam       = ALIGN_READS.out.mapped_gam
         failed_libraries = ALIGN_READS.out.failed_libraries

@@ -3,6 +3,7 @@ include { INDEX_UNFILTERED_GRAPH_GPU } from '../../../modules/local/vg/index_unf
 include { INDEX_FILTERED_GRAPH       } from '../../../modules/local/vg/index_filtered/main'
 include { INDEX_FILTERED_GRAPH_GPU   } from '../../../modules/local/vg/index_filtered/gpu'
 include { BWA_INDEX                  } from '../../../modules/nf-core/bwa/index/main'
+include { BWAMEM3_INDEX              } from '../../../modules/nf-core/bwamem3/index/main'
 include { GRAPH_STATISTICS           } from '../../../modules/local/vg/stats/main'
 include { SAMTOOLS_FAIDX             } from '../../../modules/nf-core/samtools/faidx/main'
 include { GRAPH_EXTRACT              } from '../../../modules/local/vg/paths/main'
@@ -20,10 +21,11 @@ workflow REFERENCE_UTILITIES {
     paths
 
     main:
-    indexed_reference = channel.empty()
-    stats             = channel.empty()
-    reference_fastas  = channel.empty()
-    snarls            = channel.empty()
+    indexed_reference      = channel.empty()
+    indexed_reference_mem3 = channel.empty()
+    stats                  = channel.empty()
+    reference_fastas       = channel.empty()
+    snarls                 = channel.empty()
 
     // If indexing is requested, index appropriately based on the reference type
     if ( 'index' in workflow_steps) {
@@ -82,9 +84,14 @@ workflow REFERENCE_UTILITIES {
                     .set { indexed_reference }
             }
         } else if ( reference_type == "linear" ) {
-            // Index the reference
+            // Index for BWA aln only when ancient libraries are present
+            reference
+                .combine(sample_types)
+                .filter { _ref, types -> types in ['ancient', 'both'] }
+                .map { ref, _types -> ref }
+                .set { aln_reference }
             BWA_INDEX (
-                reference
+                aln_reference
             )
             reference
                 .combine(BWA_INDEX.out.ch_bwa_index)
@@ -93,6 +100,22 @@ workflow REFERENCE_UTILITIES {
                     [ref: element[0], indexes: element[1..-1]]
                 }
                 .set { indexed_reference }
+            // Index for BWA-MEM3 only when modern libraries are present
+            reference
+                .combine(sample_types)
+                .filter { _ref, types -> types in ['modern', 'both'] }
+                .map { ref, _types -> ref }
+                .set { mem_reference }
+            BWAMEM3_INDEX (
+                mem_reference
+            )
+            reference
+                .combine(BWAMEM3_INDEX.out.ch_bwamem3_index)
+                .collect()
+                .map { element ->
+                    [ref: element[0], indexes: element[1..-1]]
+                }
+                .set { indexed_reference_mem3 }
         }
     }
 
@@ -143,6 +166,7 @@ workflow REFERENCE_UTILITIES {
 
     emit:
     indexed_reference
+    indexed_reference_mem3
     stats
     reference_fastas
     snarls

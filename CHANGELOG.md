@@ -1,10 +1,23 @@
 # Changelog
 
-## [2.4.0] - Unreleased
+## [2.?.0]
 
 ### Prefiltering, and any effects on default MAPQ
 
 - TODO: kraken2
+
+## [2.4.0] - Unreleased
+
+- Pixi toml tasks atomised & trimmed, osx support for basic docker test, schema build task added
+
+- Linear path:
+    - Removed the `nf-core/bwa/mem` module used for modern samples
+    - Replaced with the rust reimplementation, BWA-MEM3 (0.16.0)
+    - Patched the nf-core modules to otherwise replicate all prior behaviour
+    - Cost: additional indexing path to support, though it only runs if a modern sample is present (aln now also only indexes if an aDNA sample is present)
+
+- GPU aln implementation, `galn` (optional). Controlled via `gpu_bwa_aln` param
+    - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
 
 ## [2.3.0] - 20260902
 

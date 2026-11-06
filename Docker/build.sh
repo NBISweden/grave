@@ -16,15 +16,15 @@ IMAGE_NAME="ghcr.io/nbisweden/galn"
 
 # Push images
 
-        docker push $IMAGE_NAME:$IMAGE_TAG || {
-                echo "Error pushing image, exited script"
-                exit 1
-        }
+        # docker push $IMAGE_NAME:$IMAGE_TAG || {
+        #         echo "Error pushing image, exited script"
+        #         exit 1
+        # }
 
-        docker push $IMAGE_NAME:latest || {
-                echo "Error pushing image, exited script"
-                exit 1
-        }
+        # docker push $IMAGE_NAME:latest || {
+        #         echo "Error pushing image, exited script"
+        #         exit 1
+        # }
 
 ######################
 

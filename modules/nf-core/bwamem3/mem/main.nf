@@ -1,11 +1,14 @@
-process BWA_MEM {
+// Copyright (c) the nf-core community under an open-source MIT license.
+// See https://github.com/nf-core/modules for full license, file patching instructions and upstream contributing.
+
+process BWAMEM3_MEM {
 
     tag "${meta.read_group}"
     label 'process_high'
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
-        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/d7/d7e24dc1e4d93ca4d3a76a78d4c834a7be3985b0e1e56fddd61662e047863a8a/data' :
-        'community.wave.seqera.io/library/bwa_htslib_samtools:83b50ff84ead50d0' }"
+    container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/ff/ffd9362ddd396e0eb431def1812e02a274552b162355b242d974af65fcf83167/data'
+        : 'community.wave.seqera.io/library/bwa-mem3_htslib_samtools_findutils:f271e572b6aa004b'}"
 
     input:
     tuple val(meta)     , path(reads)
@@ -14,7 +17,7 @@ process BWA_MEM {
     output:
     tuple val(meta), path("*.bam"), emit: ch_bam
     tuple val(meta), path("*_flagstat.txt"), emit: ch_flagstat
-    tuple val(task.process), val('bwa'), eval('bwa 2>&1 | head -n 3 | tail -n 1 | sed "s/Version: //"'), topic: versions
+    tuple val(task.process), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), topic: versions
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
@@ -25,7 +28,7 @@ process BWA_MEM {
     """
     INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
 
-    bwa mem \\
+    bwa-mem3 mem \\
         ${read_group} \\
         -t ${task.cpus} \\
         \$INDEX_PREFIX \\

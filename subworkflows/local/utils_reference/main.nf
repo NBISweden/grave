@@ -3,6 +3,7 @@ include { INDEX_UNFILTERED_GRAPH_GPU } from '../../../modules/local/vg/index_unf
 include { INDEX_FILTERED_GRAPH       } from '../../../modules/local/vg/index_filtered/main'
 include { INDEX_FILTERED_GRAPH_GPU   } from '../../../modules/local/vg/index_filtered/gpu'
 include { BWA_INDEX                  } from '../../../modules/nf-core/bwa/index/main'
+include { GALN_INDEX                 } from '../../../modules/local/galn/index/main'
 include { BWAMEM3_INDEX              } from '../../../modules/nf-core/bwamem3/index/main'
 include { GRAPH_STATISTICS           } from '../../../modules/local/vg/stats/main'
 include { SAMTOOLS_FAIDX             } from '../../../modules/nf-core/samtools/faidx/main'
@@ -14,6 +15,7 @@ workflow REFERENCE_UTILITIES {
     take:
     workflow_steps
     gpu_giraffe
+    gpu_bwa_aln
     reference_type
     reference_stats
     reference
@@ -90,11 +92,19 @@ workflow REFERENCE_UTILITIES {
                 .filter { _ref, types -> types in ['ancient', 'both'] }
                 .map { ref, _types -> ref }
                 .set { aln_reference }
-            BWA_INDEX (
-                aln_reference
-            )
+            if ( gpu_bwa_aln ) {
+                GALN_INDEX (
+                    aln_reference
+                )
+                bwa_index = GALN_INDEX.out.ch_bwa_index
+            } else {
+                BWA_INDEX (
+                    aln_reference
+                )
+                bwa_index = BWA_INDEX.out.ch_bwa_index
+            }
             reference
-                .combine(BWA_INDEX.out.ch_bwa_index)
+                .combine(bwa_index)
                 .collect()
                 .map { element ->
                     [ref: element[0], indexes: element[1..-1]]

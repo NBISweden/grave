@@ -143,7 +143,7 @@
         },
         "gpu_bwa_aln": {
           "type": "boolean",
-          "description": "Use a GPU accelerated implementation of BWA aln"
+          "description": "Use a GPU accelerated implementation of BWA aln (linear mode only)"
         },
         "gpu_low_memory": {
           "type": "boolean",

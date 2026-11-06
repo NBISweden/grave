@@ -148,6 +148,7 @@ workflow {
     REFERENCE_UTILITIES (
         workflow_steps,
         params.gpu_giraffe,
+        params.gpu_bwa_aln,
         params.reference_type,
         params.reference_stats,
         reference,

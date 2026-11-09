@@ -18,6 +18,7 @@
 
 - GPU aln implementation, `galn` (optional). Controlled via `gpu_bwa_aln` param
     - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
+    - Indexing sheep genome took ~30 seconds, therefore time request shortened to 1 hr for faster queueing
 
 ### Bug fixes
 

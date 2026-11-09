@@ -57,7 +57,7 @@ cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-
 description = "Run the Ovis linear test with Apptainer"
 
 [tasks.test-gpu]
-cmd         = "nextflow main.nf -profile gpu,docker,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
+cmd         = "nextflow main.nf -profile docker,gpu,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
 description = "Run the GPU test with Docker"
 
 [tasks.default-nf-test]

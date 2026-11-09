@@ -181,7 +181,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 - The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
 
 ```
-nextflow main.nf -profile gpu,<institution> -params-file params.yml -c gpu_configuration.config
+nextflow main.nf -profile <institution>,gpu -params-file params.yml -c gpu_configuration.config
 ```
 
 ```{gpu_configuration.config}

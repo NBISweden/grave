@@ -19,6 +19,10 @@
 - GPU aln implementation, `galn` (optional). Controlled via `gpu_bwa_aln` param
     - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
 
+### Bug fixes
+
+- `gpu` test profile order fixed: `docker,gpu,test` so that gpu overwrites docker
+
 ## [2.3.0] - 20260902
 
 ### Tooling updates

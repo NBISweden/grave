@@ -294,7 +294,7 @@ unknownSimian.1.gorilla.bam
 
 - Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) or [G-ALN](https://github.com/bilalbioinfo/galn) if GPU acceleration is requested via the `gpu_bwa_aln` parameter.
 
-- Modern DNA will be run with `BWA-MEM3`, a rust reimplemention of BWA-MEM2 (default settings).
+- Modern DNA will be run with `BWA-MEM3`, a rust reimplementation of BWA-MEM2 (default settings).
 
 - To configure linear mode, set the parameter `reference_type` to `linear`, and provide a FASTA reference with the `reference` parameter.
 

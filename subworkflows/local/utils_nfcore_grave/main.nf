@@ -121,8 +121,9 @@ workflow PIPELINE_INITIALISATION {
         .map { meta, _fastqs -> meta.type }
         .unique()
         .collect()
+        .ifEmpty([]) // No samplesheet (index-only run): collect() emits nothing on an empty channel
         .map { uniqueTypes ->
-            uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign that type to "ch_types". Else assign "both".
+            uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign that type to "ch_types". Else (several types, or no samplesheet) assign "both".
         }
 
     emit:

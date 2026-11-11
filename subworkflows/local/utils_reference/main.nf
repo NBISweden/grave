@@ -1,7 +1,7 @@
-include { INDEX_UNFILTERED_GRAPH     } from '../../../modules/local/vg/index_unfiltered/main'
-include { INDEX_UNFILTERED_GRAPH_GPU } from '../../../modules/local/vg/index_unfiltered/gpu'
-include { INDEX_FILTERED_GRAPH       } from '../../../modules/local/vg/index_filtered/main'
-include { INDEX_FILTERED_GRAPH_GPU   } from '../../../modules/local/vg/index_filtered/gpu'
+include { INDEX_DIST                 } from '../../../modules/local/vg/index_dist/main'
+include { INDEX_RINDEX               } from '../../../modules/local/vg/index_ri/main'
+include { INDEX_MINIMIZER            } from '../../../modules/local/vg/minimizer/main'
+include { INDEX_HAPLOTYPES           } from '../../../modules/local/vg/haplotypes/main'
 include { BWA_INDEX                  } from '../../../modules/nf-core/bwa/index/main'
 include { GALN_INDEX                 } from '../../../modules/local/galn/index/main'
 include { BWAMEM3_INDEX              } from '../../../modules/nf-core/bwamem3/index/main'
@@ -31,60 +31,40 @@ workflow REFERENCE_UTILITIES {
 
     // If indexing is requested, index appropriately based on the reference type
     if ( 'index' in workflow_steps) {
+        // One index per sample type present (keyed on that type's parameters in the store)
+        index_types = sample_types.flatMap { types -> types == 'both' ? ['ancient', 'modern'] : [types] }
         if ( reference_type == "unfiltered_graph" ) {
-            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
-            if ( gpu_giraffe ) {
-                INDEX_UNFILTERED_GRAPH_GPU (
-                    reference,
-                    sample_types
-                )
+            INDEX_DIST (
                 reference
-                    .combine(INDEX_UNFILTERED_GRAPH_GPU.out.ch_hapl_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            } else {
-                INDEX_UNFILTERED_GRAPH (
-                    reference,
-                    sample_types
-                )
+            )
+            INDEX_RINDEX (
                 reference
-                    .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            }
+            )
+            INDEX_HAPLOTYPES (
+                reference
+                    .combine(INDEX_DIST.out.ch_dist)
+                    .combine(INDEX_RINDEX.out.ch_ri)
+                    .combine(index_types)
+            )
+            reference
+                .combine(INDEX_HAPLOTYPES.out.ch_hapl.collect())
+                .collect() // value channel so every library can reuse it
+                .map { element -> [ref: element[0], indexes: element[1..-1]] }
+                .set { indexed_reference }
         } else if ( reference_type == "filtered_graph" ) {
-            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
-            if ( gpu_giraffe ) {
-                INDEX_FILTERED_GRAPH_GPU (
-                    reference,
-                    sample_types
-                )
+            INDEX_DIST (
                 reference
-                    .combine(INDEX_FILTERED_GRAPH_GPU.out.ch_filter_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            } else {
-                INDEX_FILTERED_GRAPH (
-                    reference,
-                    sample_types
-                )
+            )
+            INDEX_MINIMIZER (
                 reference
-                    .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            }
+                    .combine(INDEX_DIST.out.ch_dist)
+                    .combine(index_types)
+            )
+            reference
+                .combine(INDEX_DIST.out.ch_dist.mix(INDEX_MINIMIZER.out.ch_minimizer).collect())
+                .collect() // value channel so every library can reuse it
+                .map { element -> [ref: element[0], indexes: element[1..-1]] }
+                .set { indexed_reference }
         } else if ( reference_type == "linear" ) {
             // Index for BWA aln only when ancient libraries are present
             reference

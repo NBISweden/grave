@@ -23,6 +23,10 @@
 ### Bug fixes
 
 - `gpu` test profile order fixed: `docker,gpu,test` so that gpu overwrites docker
+- Addressed an issue with how indexes were generated and stored by name
+    - There were still existing caching issues not fully addressed by the addition of k and w params to the storedir
+    - The storedir name only depended on aDNA params, even when modern params were those being changed
+    - refactored indexing to split shared jobs into individual modules, and fix storedir naming
 
 ## [2.3.0] - 20260902
 

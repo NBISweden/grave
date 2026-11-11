@@ -24,6 +24,10 @@ apptainer              = ["apptainer"]
 cmd          = "nextflow main.nf -profile docker,test -params-file tests/test_graph.yml -output-format none"
 description  = "Run the pipeline test profile with Docker"
 
+[tasks.test-docker-unfiltered]
+cmd          = "nextflow main.nf -profile docker,test -params-file tests/test_graph_unfiltered.yml -output-format none"
+description  = "Run the pipeline test profile with Docker"
+
 [target.osx-arm64.tasks.test-docker]
 cmd          = "nextflow main.nf -profile docker,arm64,test -params-file tests/test_graph.yml -output-format none"
 description  = "Run the pipeline test profile with Docker (arm64)"

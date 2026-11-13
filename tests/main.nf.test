@@ -10,7 +10,7 @@ nextflow_pipeline {
                 steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
                 reference_type = 'unfiltered_graph'
                 input          = "$projectDir/tests/data/samplesheet.csv"
-                reference      = "$projectDir/tests/data/graph/example-unfiltered.gbz"
+                reference      = "$projectDir/tests/data/graph/additional_graphs/example-unfiltered.gbz"
                 deepvariant    = true
                 kffKmerMinimum = 2
                 outdir         = "$launchDir/results"
@@ -64,7 +64,7 @@ nextflow_pipeline {
                 steps          = 'preprocess,index,align,merge,deduplicate,profile_pmd,graph_genotype,reads_genotype,variant_call'
                 reference_type = 'filtered_graph'
                 input          = "$projectDir/tests/data/samplesheet.csv"
-                reference      = "$projectDir/tests/data/graph/additional_graphs/example-filtered.d2.gbz"
+                reference      = "$projectDir/tests/data/graph/example-filtered.d2.gbz"
                 deepvariant    = true
                 kffKmerMinimum = 2
                 outdir         = "$launchDir/results"

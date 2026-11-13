@@ -90,7 +90,7 @@ workflow PIPELINE_INITIALISATION {
                 // Initial checks passed, add FASTQ paths
                 if (meta.merged) {
                     if (row.fastq_1 && !row.fastq_2) {
-                        return [meta, [file(row.fastq_1)]]
+                        return [meta, [resolveFastq(row.fastq_1)]]
                     } else if (!row.fastq_1) {
                         error ("Error caused by sample: '${meta.read_group}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
                     } else {
@@ -98,7 +98,7 @@ workflow PIPELINE_INITIALISATION {
                     }
                 } else if (!meta.merged) {
                     if (row.fastq_1 && row.fastq_2) {
-                        return [meta, [file(row.fastq_1), file(row.fastq_2)]]
+                        return [meta, [resolveFastq(row.fastq_1), resolveFastq(row.fastq_2)]]
                     } else {
                         error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting two FASTQ files, received one or none.")
                     }
@@ -243,4 +243,10 @@ def validateInputParameters() {
         error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
     }
 
+}
+
+// Resolve a samplesheet path: relative to the launch directory, falling back to the project directory
+def resolveFastq(String path) {
+    def f = file(path)
+    return f.exists() ? f : file("${projectDir}/${path}")
 }

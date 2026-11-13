@@ -22,7 +22,7 @@ params {
     input                      : String
     reference                  : String
     reference_type             : String
-    multiple_references        : String
+    multiple_references        : Boolean
     paths_dir                  : String
 
     // GPU acceleration

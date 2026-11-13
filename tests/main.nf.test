@@ -20,7 +20,7 @@ nextflow_pipeline {
             assert workflow.success
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
-                workflow.trace.tasks().size(),
+                workflow.trace.tasks().collect { task -> task.name.replaceAll(/ \(.*\)$/, '') }.unique().sort(), // distinct process names, robust to retries
                 getAllFilesFromDir("$launchDir/results",
                     relative: true,
                     ignore: ["01_pipeline_info/**/**"]
@@ -48,7 +48,7 @@ nextflow_pipeline {
             assert workflow.success
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
-                workflow.trace.tasks().size(),
+                workflow.trace.tasks().collect { task -> task.name.replaceAll(/ \(.*\)$/, '') }.unique().sort(), // distinct process names, robust to retries
                 getAllFilesFromDir("$launchDir/results",
                     relative: true,
                     ignore: ["01_pipeline_info/**/**"]
@@ -75,7 +75,7 @@ nextflow_pipeline {
             assert workflow.success
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
-                workflow.trace.tasks().size(),
+                workflow.trace.tasks().collect { task -> task.name.replaceAll(/ \(.*\)$/, '') }.unique().sort(), // distinct process names, robust to retries
                 getAllFilesFromDir("$launchDir/results",
                     relative: true,
                     ignore: ["01_pipeline_info/**/**"]
@@ -100,7 +100,7 @@ nextflow_pipeline {
             assert workflow.success
             assert workflow.trace.tasks().size() > 0
             assert snapshot(
-                workflow.trace.tasks().size(),
+                workflow.trace.tasks().collect { task -> task.name.replaceAll(/ \(.*\)$/, '') }.unique().sort(), // distinct process names, robust to retries
                 getAllFilesFromDir("$launchDir/results",
                     relative: true,
                     ignore: ["01_pipeline_info/**/**"]

@@ -36,6 +36,7 @@
     - refactored indexing to split shared jobs into individual modules, and fix storedir naming
 
 - `nf-test` had drifted from current defaults and outputs. Updated & fixed bug with resolving input location.
+    - Additionally changed from raw process count to unique process names (count can be unstable if something is repeated)
 
 - Fixed bug with `multiple_reference` param type (string -> boolean)
 

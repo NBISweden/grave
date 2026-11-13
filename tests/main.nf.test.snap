@@ -1,7 +1,24 @@
 {
     "Unfiltered graph, multiple reference samples, all steps": {
         "content": [
-            66,
+            [
+                "ALIGN_READS:GAM_TO_TAGGED_SORTED_BAM",
+                "ALIGN_READS:GIRAFFE",
+                "DEDUPLICATE_BAM:DEDUPLICATE",
+                "GENOTYPE:GENOTYPE_GRAPH",
+                "GENOTYPE:GENOTYPE_READS",
+                "MERGE_BAMS:MERGE",
+                "PREPROCESS_READS:FASTP",
+                "PREPROCESS_READS:QC_FASTP",
+                "PREPROCESS_READS:QC_RAW",
+                "PREPROCESS_READS:RENAME_SAMPLES",
+                "PROFILE_PMD:DAMAGE_PROFILER",
+                "REFERENCE_UTILITIES:GRAPH_EXTRACT",
+                "REFERENCE_UTILITIES:GRAPH_STATISTICS",
+                "VARIANT_CALL:FREEBAYES",
+                "VARIANT_CALL:GRAPH_DEEPVARIANT",
+                "VARIANT_CALL:PROCESS_DEEPVARIANT"
+            ],
             [
                 "02_reference/extracted_linear_reference/simChimp.fasta",
                 "02_reference/extracted_linear_reference/simChimp.fasta.fai",
@@ -275,7 +292,7 @@
                 "07_variant_calling/freebayes/modernHuman.simGorilla.norm.vcf.gz"
             ]
         ],
-        "timestamp": "2026-11-11T16:18:35.890149956",
+        "timestamp": "2026-11-13T15:51:01.302023132",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
@@ -283,7 +300,24 @@
     },
     "Filtered graph, single reference sample, all steps": {
         "content": [
-            66,
+            [
+                "ALIGN_READS:GAM_TO_TAGGED_SORTED_BAM",
+                "ALIGN_READS:GIRAFFE",
+                "DEDUPLICATE_BAM:DEDUPLICATE",
+                "GENOTYPE:GENOTYPE_GRAPH",
+                "GENOTYPE:GENOTYPE_READS",
+                "MERGE_BAMS:MERGE",
+                "PREPROCESS_READS:FASTP",
+                "PREPROCESS_READS:QC_FASTP",
+                "PREPROCESS_READS:QC_RAW",
+                "PREPROCESS_READS:RENAME_SAMPLES",
+                "PROFILE_PMD:DAMAGE_PROFILER",
+                "REFERENCE_UTILITIES:GRAPH_EXTRACT",
+                "REFERENCE_UTILITIES:GRAPH_STATISTICS",
+                "VARIANT_CALL:FREEBAYES",
+                "VARIANT_CALL:GRAPH_DEEPVARIANT",
+                "VARIANT_CALL:PROCESS_DEEPVARIANT"
+            ],
             [
                 "02_reference/extracted_linear_reference/reference.fasta",
                 "02_reference/extracted_linear_reference/reference.fasta.fai",
@@ -453,7 +487,7 @@
                 "07_variant_calling/freebayes/modernHuman.norm.vcf.gz"
             ]
         ],
-        "timestamp": "2026-11-11T16:21:18.219079554",
+        "timestamp": "2026-11-13T15:53:52.475313712",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
@@ -461,7 +495,24 @@
     },
     "Unfiltered graph, single reference sample, all steps": {
         "content": [
-            71,
+            [
+                "ALIGN_READS:GAM_TO_TAGGED_SORTED_BAM",
+                "ALIGN_READS:GIRAFFE",
+                "DEDUPLICATE_BAM:DEDUPLICATE",
+                "GENOTYPE:GENOTYPE_GRAPH",
+                "GENOTYPE:GENOTYPE_READS",
+                "MERGE_BAMS:MERGE",
+                "PREPROCESS_READS:FASTP",
+                "PREPROCESS_READS:QC_FASTP",
+                "PREPROCESS_READS:QC_RAW",
+                "PREPROCESS_READS:RENAME_SAMPLES",
+                "PROFILE_PMD:DAMAGE_PROFILER",
+                "REFERENCE_UTILITIES:GRAPH_EXTRACT",
+                "REFERENCE_UTILITIES:GRAPH_STATISTICS",
+                "VARIANT_CALL:FREEBAYES",
+                "VARIANT_CALL:GRAPH_DEEPVARIANT",
+                "VARIANT_CALL:PROCESS_DEEPVARIANT"
+            ],
             [
                 "02_reference/extracted_linear_reference/reference.fasta",
                 "02_reference/extracted_linear_reference/reference.fasta.fai",
@@ -631,7 +682,7 @@
                 "07_variant_calling/freebayes/modernHuman.norm.vcf.gz"
             ]
         ],
-        "timestamp": "2026-11-11T16:13:30.586052639",
+        "timestamp": "2026-11-13T15:45:50.035403826",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"
@@ -639,7 +690,22 @@
     },
     "Linear reference, single reference sample, all steps": {
         "content": [
-            55,
+            [
+                "ALIGN_READS:BWAMEM3_MEM",
+                "ALIGN_READS:BWA_ALN_SAMSE",
+                "DEDUPLICATE_BAM:DEDUPLICATE",
+                "MERGE_BAMS:MERGE",
+                "PIPELINE_INITIALISATION:STANDARDISE_FASTA",
+                "PREPROCESS_READS:FASTP",
+                "PREPROCESS_READS:QC_FASTP",
+                "PREPROCESS_READS:QC_RAW",
+                "PREPROCESS_READS:RENAME_SAMPLES",
+                "PROFILE_PMD:DAMAGE_PROFILER",
+                "REFERENCE_UTILITIES:SAMTOOLS_FAIDX",
+                "VARIANT_CALL:FREEBAYES",
+                "VARIANT_CALL:LINEAR_DEEPVARIANT",
+                "VARIANT_CALL:PROCESS_DEEPVARIANT"
+            ],
             [
                 "02_reference/extracted_linear_reference/example.fasta",
                 "02_reference/extracted_linear_reference/example.fasta.fai",
@@ -791,7 +857,7 @@
                 "07_variant_calling/freebayes/modernHuman.norm.vcf.gz"
             ]
         ],
-        "timestamp": "2026-11-11T16:23:35.146003039",
+        "timestamp": "2026-11-13T15:56:16.855739229",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.6"

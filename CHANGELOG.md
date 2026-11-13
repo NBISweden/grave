@@ -59,6 +59,9 @@
     - issue is that `sample_types` is a channel compared to a string
     - we now filter out modern samples from the channel input
 
+- Duplicate library detection lacked a separator:
+    - `sample1,2,11` could clash with `sample1,21,1`
+    - added separator
 
 
 ## [2.3.0] - 20260902

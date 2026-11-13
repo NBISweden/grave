@@ -73,7 +73,7 @@ workflow PIPELINE_INITIALISATION {
                     merged: row.merged.toLowerCase()
                 ]
                 // Check no duplicate "read group" combinations
-                def key = "${meta.id}${meta.library}${meta.repeat}"
+                def key = "${meta.id}.${meta.library}.${meta.repeat}"
                 if (!uniqueReadGroups.add(key)) {
                     error ("Error: found a duplicate for sample '${meta.id}' in the samplesheet. Each row should have a unique combination of 'sample_id', 'library_id' and 'repeat_number'.")
                 }

@@ -231,14 +231,13 @@ workflow {
     // Damage profile ancient samples if they are present
     damage_profiler = channel.empty()
     if ( 'profile_pmd' in workflow_steps ) {
-        if ( sample_types != "modern" ) {
-            PROFILE_PMD (
-                paths,
-                reference_fastas,
-                deduplicated_bams
-            )
-            damage_profiler = PROFILE_PMD.out.damage_profiler
-        }
+        ancient_bams = deduplicated_bams.filter { meta, _bams, _indexes -> meta.type == 'ancient' }
+        PROFILE_PMD (
+            paths,
+            reference_fastas,
+            ancient_bams
+        )
+        damage_profiler = PROFILE_PMD.out.damage_profiler
     }
 
     // Genotyping

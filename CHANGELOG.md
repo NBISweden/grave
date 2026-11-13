@@ -45,6 +45,22 @@
     - Fixed one affected test file
     - Fixed the steps string parsing so that it will strip out whitespace
 
+- Hidden bug in the gating for profile PMD:
+    - Gating appeared to be due to this section in `main.nf`:
+        ```
+            if ( 'profile_pmd' in workflow_steps ) {
+                if ( sample_types != "modern" ) {
+        ```
+    - Gating was actually applied by `when` in the process:
+        ```
+            when:
+        meta.type == 'ancient'
+        ```
+    - issue is that `sample_types` is a channel compared to a string
+    - we now filter out modern samples from the channel input
+
+
+
 ## [2.3.0] - 20260902
 
 ### Tooling updates

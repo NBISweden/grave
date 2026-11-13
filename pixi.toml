@@ -49,16 +49,16 @@ cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/test_
 description = "Run the read lengths test with Apptainer"
 
 [tasks.test-ovis-unfiltered]
-cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-unfiltered-params.yml -output-format none"
-description = "Run the Ovis unfiltered test with Apptainer"
+cmd         = "nextflow main.nf -profile docker,test -params-file tests/ovis-unfiltered-params.yml -output-format none"
+description = "Run the Ovis unfiltered test with Docker"
 
 [tasks.test-ovis-filtered]
-cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-filtered-params.yml -output-format none"
-description = "Run the Ovis filtered test with Apptainer"
+cmd         = "nextflow main.nf -profile docker,test -params-file tests/ovis-filtered-params.yml -output-format none"
+description = "Run the Ovis filtered test with Docker"
 
 [tasks.test-ovis-linear]
-cmd         = "nextflow main.nf -profile apptainer,test -params-file tests/ovis-linear-params.yml -output-format none"
-description = "Run the Ovis linear test with Apptainer"
+cmd         = "nextflow main.nf -profile docker,test -params-file tests/ovis-linear-params.yml -output-format none"
+description = "Run the Ovis linear test with Docker"
 
 [tasks.test-gpu]
 cmd         = "nextflow main.nf -profile docker,gpu,test -params-file tests/gpu_test.yml --gpu_giraffe --gpu_low_memory -output-format none"
@@ -69,7 +69,7 @@ cmd         = "nf-test test tests/main.nf.test --verbose"
 description = "Run the nf-test suite"
 
 [tasks.debug]
-cmd         = "nextflow main.nf -profile apptainer,test,debug -params-file tests/test_graph.yml"
+cmd         = "nextflow main.nf -profile docker,test,debug -params-file tests/test_graph.yml"
 description = "Run the test profile with debug enabled"
 
 [tasks.help]

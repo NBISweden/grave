@@ -155,7 +155,7 @@ def validateInputParameters() {
         'profile_pmd'     // post-mortem damage profiling (ancient samples only)
     ]
     // Parse requested steps
-    def requested_steps = params.steps.tokenize(",")
+    def requested_steps = parseSteps()
     // Check requested steps are valid
     def invalid_steps = requested_steps.findAll { step -> !(step in permitted_steps) }
     // Report invalid steps
@@ -255,4 +255,9 @@ def validateInputParameters() {
 def resolveFastq(String path) {
     def f = file(path)
     return f.exists() ? f : file("${projectDir}/${path}")
+}
+
+// Parse the comma-separated 'steps' parameter, ignoring surrounding whitespace
+def parseSteps() {
+    return params.steps.tokenize(',')*.trim().findAll { step -> step }
 }

@@ -41,6 +41,10 @@
     - They would have ended up clobbering each other after the MERGE step
     - Added a guard to prevent this
 
+- Trailing whitespace in the steps string caused a failure, but the issue was hard to spot (e.g., `align` versus `align `)
+    - Fixed one affected test file
+    - Fixed the steps string parsing so that it will strip out whitespace
+
 ## [2.3.0] - 20260902
 
 ### Tooling updates

@@ -1,14 +1,14 @@
 #!/usr/bin/env nextflow
 
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_grave/main'
-include { REFERENCE_UTILITIES     } from './subworkflows/local/utils_reference/main'
-include { PREPROCESS_READS        } from './subworkflows/local/01_preprocess_reads/main'
-include { ALIGN_READS             } from './subworkflows/local/02_align_reads/main'
-include { MERGE_BAMS              } from './subworkflows/local/03_merge_bams/main'
-include { DEDUPLICATE_BAM         } from './subworkflows/local/04_deduplicate_bam/main'
-include { PROFILE_PMD             } from './subworkflows/local/05_profile_pmd/main'
-include { GENOTYPE                } from './subworkflows/local/06_genotype/main'
-include { VARIANT_CALL            } from './subworkflows/local/07_variant_call/main'
+include { PIPELINE_INITIALISATION; parseSteps } from './subworkflows/local/utils_nfcore_grave/main'
+include { REFERENCE_UTILITIES                 } from './subworkflows/local/utils_reference/main'
+include { PREPROCESS_READS                    } from './subworkflows/local/01_preprocess_reads/main'
+include { ALIGN_READS                         } from './subworkflows/local/02_align_reads/main'
+include { MERGE_BAMS                          } from './subworkflows/local/03_merge_bams/main'
+include { DEDUPLICATE_BAM                     } from './subworkflows/local/04_deduplicate_bam/main'
+include { PROFILE_PMD                         } from './subworkflows/local/05_profile_pmd/main'
+include { GENOTYPE                            } from './subworkflows/local/06_genotype/main'
+include { VARIANT_CALL                        } from './subworkflows/local/07_variant_call/main'
 
 // Param types (defaults in nextflow.config)
 params {
@@ -142,7 +142,7 @@ workflow {
     paths        = params.multiple_references ? channel.fromPath("${params.paths_dir}/*.paths").collect() : [] // Set up paths channel if multi-reference mode
 
     // Parse requested workflow steps
-    workflow_steps = params.steps.tokenize(",")
+    workflow_steps = parseSteps()
 
     // Run any required utility processes on the reference file
     REFERENCE_UTILITIES (

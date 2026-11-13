@@ -24,6 +24,8 @@
     - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
     - Indexing sheep genome took ~30 seconds, therefore time request shortened to 1 hr for faster queueing
 
+- Cleaned up `conf` file placeholders & added realistic dynamic resource adjustment for `giraffe` module
+
 ### Bug fixes
 
 - `gpu` test profile order fixed: `docker,gpu,test` so that gpu overwrites docker

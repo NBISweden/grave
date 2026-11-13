@@ -60,6 +60,7 @@ workflow PIPELINE_INITIALISATION {
     ch_samplesheet = channel.empty()
     if ( params.input ) {
         def uniqueReadGroups = new HashSet<String>() // Initialise empty set for detecting duplicate read groups
+        def sampleTypes = [:] // Track the sample type seen for each sample_id
         ch_samplesheet = channel.fromPath(params.input, checkIfExists: true)
             .splitCsv(header: true, skip: 0)
             .map { row ->
@@ -86,6 +87,11 @@ workflow PIPELINE_INITIALISATION {
                 // Check sample types are correctly stated
                 if (!['ancient', 'modern'].contains(meta.type)) {
                     error ("Error: for '${meta.read_group}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
+                }
+                // Check each sample_id has a single sample type (otherwise merged/deduplicated BAMs overwrite each other)
+                def firstType = sampleTypes.putIfAbsent(meta.id, meta.type)
+                if (firstType && firstType != meta.type) {
+                    error ("Error: sample '${meta.id}' has both '${firstType}' and '${meta.type}' libraries in the samplesheet. Each 'sample_id' must have a single 'sample_type', use different 'sample_id's.")
                 }
                 // Initial checks passed, add FASTQ paths
                 if (meta.merged) {

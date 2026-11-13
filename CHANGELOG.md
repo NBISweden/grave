@@ -37,8 +37,9 @@
 
 - Fixed bug with `multiple_reference` param type (string -> boolean)
 
-
-
+- A sample that passes the library uniqueness check was still allowed to progress even when it carried two types across libraries: `ancient` & `modern`
+    - They would have ended up clobbering each other after the MERGE step
+    - Added a guard to prevent this
 
 ## [2.3.0] - 20260902
 

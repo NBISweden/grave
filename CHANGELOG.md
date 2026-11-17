@@ -66,6 +66,8 @@
     - `sample1,2,11` could clash with `sample1,21,1`
     - added separator
 
+- Nitpick: removed unused args declarations, these might imply to a user that args was available to edit in `conf`, but in fact they weren't wired up to the process commands.
+
 
 ## [2.3.0] - 20260902
 

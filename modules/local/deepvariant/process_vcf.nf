@@ -18,8 +18,6 @@ process PROCESS_DEEPVARIANT {
     tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
     if (!params.multiple_references)	// Assume single reference sample
         """
         # Normalise and sort (no bubbles to pop in DeepVariant VC)

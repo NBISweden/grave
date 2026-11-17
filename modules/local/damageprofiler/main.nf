@@ -18,8 +18,6 @@ process DAMAGE_PROFILER {
     tuple val(task.process), val('damageprofiler'), eval('damageprofiler -version | sed "s/.* v//"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
     if (!params.multiple_references)	// Assume single reference sample
         """
         # Find system Java max heap size & convert to GB

@@ -15,7 +15,6 @@ process MERGE {
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
     def readgroupList = readgroups.collect{ it.repeat }.join(' ')
     def readgroupCount = readgroups.size()
 

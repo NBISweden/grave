@@ -18,7 +18,6 @@ process COMPUTE_SNARLS {
     tuple val(task.process), val('vg'), val('1.73.0'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
     """
     # Compute graph snarls for genotyping tasks
     vg snarls -t ${task.cpus} --include-trivial ${graph} > ${graph}.snarls

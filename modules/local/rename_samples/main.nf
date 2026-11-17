@@ -12,8 +12,6 @@ process RENAME_SAMPLES {
     tuple val(meta), path("*.fq.gz"), emit: ch_renamed_reads
 
     script:
-    def args = task.ext.args ?: ''
-
     if (meta.merged == false)
         """
         ln -s ${reads[0]} ${meta.read_group}_R1.fq.gz

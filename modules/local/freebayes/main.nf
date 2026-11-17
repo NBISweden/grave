@@ -21,8 +21,6 @@ process FREEBAYES_PARALLEL {
     tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
     if (!params.multiple_references) // Assume single reference sample (this setting forced in 'linear' mode).
         """
         # Generate equal coverage regions for parallelization

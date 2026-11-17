@@ -199,9 +199,9 @@ def validateInputParameters() {
     if ( 'graph_genotype' in requested_steps && !params.reference ) {
         error "ERROR: Graph genotyping was requested but no reference file was provided with '--reference'"
     }
-    // Error if incompatible step requested
+    // Warn requested step will be ignored
     if ( requested_steps.any { step -> step in ['graph_genotype', 'reads_genotype'] } && params.reference_type == 'linear' ) {
-        println "WARN: Graph-based genotyping was requested but grave is running in linear mode."
+        log.warn("WARN: Graph-based genotyping was requested but grave is running in linear mode.")
     }
     // If reference is provided, enforce reference type also
     if ( params.reference && !params.reference_type ) {

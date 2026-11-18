@@ -20,7 +20,7 @@
     - Patched the nf-core modules to otherwise replicate all prior behaviour
     - Cost: additional indexing path to support, though it only runs if a modern sample is present (aln now also only indexes if an aDNA sample is present)
 
-- GPU aln implementation, `galn` (optional). Controlled via `gpu_bwa_aln` param
+- Added optional GPU aln implementation, `galn`. Controlled via `gpu_bwa_aln` param
     - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
     - Indexing sheep genome took ~30 seconds, therefore time request shortened to 1 hr for faster queueing
 
@@ -67,6 +67,8 @@
     - added separator
 
 - Nitpick: removed unused args declarations, these might imply to a user that args was available to edit in `conf`, but in fact they weren't wired up to the process commands.
+
+- Fixed a number of other small nitpicks.
 
 
 ## [2.3.0] - 20260902

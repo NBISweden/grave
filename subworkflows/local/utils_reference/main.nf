@@ -110,25 +110,22 @@ workflow REFERENCE_UTILITIES {
     }
 
     // When reference is a graph, produce statistics
-    if ( reference_type != "linear" && reference_stats == true ) {
+    if ( reference_type != "linear" && reference_stats ) {
         GRAPH_STATISTICS (
             reference
         )
         stats = GRAPH_STATISTICS.out.ch_graph_stats
     }
 
-    // When reference is linear, produce fai index & statistics
-    if ( reference_type == "linear" && reference_stats == true ) {
-        SAMTOOLS_FAIDX (
-            reference
-        )
-        stats   = SAMTOOLS_FAIDX.out.ch_fai
-        ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
-    } else if ( reference_type == "linear" && reference_stats == false ) {
+    // When reference is linear, produce fai index & statistics on request
+    if ( reference_type == "linear" ) {
         SAMTOOLS_FAIDX (
             reference
         )
         ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
+        if ( reference_stats ) {
+            stats = SAMTOOLS_FAIDX.out.ch_fai
+        }
     }
 
     // Get and assign reference fasta channel if it's required

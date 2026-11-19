@@ -22,7 +22,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
     script:
     def args = task.ext.args ?: ''
 
-    if (!params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// Default reference paths, GAM not interleaved
+    if (!params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged)))	// Default reference paths, GAM not interleaved
         """
         # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
         vg surject \\
@@ -51,7 +51,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
         samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
         """
 
-    else if (!params.multiple_references && meta.type == "modern" && meta.merged == false)	// Default reference paths, GAM interleaved
+    else if (!params.multiple_references && meta.type == "modern" && !meta.merged)	// Default reference paths, GAM interleaved
         """
         # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
         vg surject \\
@@ -81,7 +81,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
         samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
         """
 
-    else if (params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged == true)))	// User provided reference paths, GAM not interleaved
+    else if (params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged)))	// User provided reference paths, GAM not interleaved
         """
         # Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths)
         for i in *.paths
@@ -115,7 +115,7 @@ process GAM_TO_TAGGED_SORTED_BAM {
             done
         """
 
-    else if  (params.multiple_references && meta.type == "modern" && meta.merged == false)	// User provided reference paths, GAM interleaved
+    else if  (params.multiple_references && meta.type == "modern" && !meta.merged)	// User provided reference paths, GAM interleaved
         """
         # Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths, interleaved)
         for i in *.paths

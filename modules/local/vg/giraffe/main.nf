@@ -90,7 +90,7 @@ process GIRAFFE {
         ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
         """
 
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == false) // Arrives paired, output interleaved
+    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && !meta.merged) // Arrives paired, output interleaved
         """
         # Generate list of input read files
         echo -e "./${reads[0]}\n./${reads[1]}" > readfiles
@@ -131,7 +131,7 @@ process GIRAFFE {
         rm *.${meta.read_group}.* *.kff readfiles
         """
 
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == false) // Arrives paired, output interleaved
+    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && !meta.merged) // Arrives paired, output interleaved
         """
         # Map paired-end reads (default settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
@@ -158,7 +158,7 @@ process GIRAFFE {
         ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
         """
 
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged, output not interleaved
+    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged) // Arrives merged, output not interleaved
         """
         # Generate kff index of the reads
         kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
@@ -196,7 +196,7 @@ process GIRAFFE {
         rm *.${meta.read_group}.* *.kff
         """
 
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == true) // Arrives merged, output not interleaved
+    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged) // Arrives merged, output not interleaved
         """
         # Map merged reads (default settings are equivalent to BWA mem)
         vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam

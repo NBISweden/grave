@@ -34,7 +34,7 @@ process GPU_PREPROCESS {
         rm *.kff
         """
 
-    else if (meta.type == "modern" && meta.merged == false) // Paired
+    else if (meta.type == "modern" && !meta.merged) // Paired
         """
         # Generate list of input read files
         echo -e "./${reads[0]}\n./${reads[1]}" > readfiles
@@ -51,7 +51,7 @@ process GPU_PREPROCESS {
         rm *.kff
         """
 
-    else if (meta.type == "modern" && meta.merged == true) // Merged
+    else if (meta.type == "modern" && meta.merged) // Merged
         """
         # Generate kff index of the reads
         kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .

@@ -27,99 +27,60 @@ process GENOTYPE_READS {
     def gamFiles = gams instanceof Collection ? gams : [gams]
     def gamCount = gamFiles.size()
 
-    if (!params.multiple_references)  // Default reference paths
+    def run_genotype = params.multiple_references ?
         """
-        # Concatenate GAMs if multiple libraries per sample
-        if (( ${gamCount} == 1 )); then
-            echo "Only one GAM file for sample ${meta.id}, skipping merge"
-            mv ${gams} ${meta.id}.merged.gam
-        else
-            echo "Merging ${gamCount} GAM files for sample ${meta.id}"
-            cat ${gams} > ${meta.id}.merged.gam
-        fi
-
-        # Compute read support
-        vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.merged.gam -o ${meta.id}.filtered.pack -Q 5
-
-        # Remove merged GAM for disk economy (unless symlink, i.e., only one input GAM)
-        if [ -f ${meta.id}.merged.gam ] && [ ! -L ${meta.id}.merged.gam ]; then
-            rm ${meta.id}.merged.gam
-        fi
-
-        # Reference will have PanSN format, raw VCF produced by vg call won't. Convert reference to align with VCF naming & reindex
-        sed -i 's/.*#/>/g' ${reference_fasta}
-        rm *.fai && samtools faidx reference.fasta
-
-        # Genotype against all reference paths in the graph
-        vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.raw.vcf.gz
-
-        # Index raw VCF
-        tabix -p vcf ${meta.id}.raw.vcf.gz
-
-        # Pop bubbles
-        vcfbub --input ${meta.id}.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f reference.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.filtered.vcf.gz
-
-        # Clean up
-        if [ "${params.keepRawVcf}" != "true" ]
-            then
-                rm ${meta.id}.raw.vcf.gz ${meta.id}.raw.vcf.gz.tbi
-            else
-                rm ${meta.id}.raw.vcf.gz.tbi
-        fi
-        rm reference.fasta* *.filtered.pack
-        """
-
-    else if (params.multiple_references)  // User reference paths
-        """
-        # Concatenate GAMs if multiple libraries per sample
-        if (( ${gamCount} == 1 )); then
-            echo "Only one GAM file for sample ${meta.id}, skipping merge"
-            mv ${gams} ${meta.id}.merged.gam
-        else
-            echo "Merging ${gamCount} GAM files for sample ${meta.id}"
-            cat ${gams} > ${meta.id}.merged.gam
-        fi
-
-        # Compute read support
-        vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.merged.gam -o ${meta.id}.filtered.pack -Q 5
-
-        # Remove merged GAM for disk economy (unless symlink, i.e., only one input GAM)
-        if [ -f ${meta.id}.merged.gam ] && [ ! -L ${meta.id}.merged.gam ]; then
-            rm ${meta.id}.merged.gam
-        fi
-
         # Loop through each reference sample
         for i in *.paths
             do
                 PREFIX=`echo \$i | sed 's/\\.paths//'`
-
-                # References will have PanSN format, raw VCFs produced by vg call won't. Convert references to align with VCF naming & reindex
-                sed -i 's/.*#/>/g' \$PREFIX.fasta
-                rm \$PREFIX.fasta.fai && samtools faidx \$PREFIX.fasta
-
-                # Genotype against a specific reference sample in the graph
-                vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack --ref-sample \$PREFIX --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.raw.vcf.gz
-
-                # Index raw VCF
-                tabix -p vcf ${meta.id}.\$PREFIX.raw.vcf.gz
-
-                # Pop bubbles
-                vcfbub --input ${meta.id}.\$PREFIX.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$PREFIX.fasta | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.filtered.vcf.gz
-
-                # Clean up
-                if [ "${params.keepRawVcf}" != "true" ]
-                    then
-                        rm ${meta.id}.\$PREFIX.raw.vcf.gz ${meta.id}.\$PREFIX.raw.vcf.gz.tbi
-                    else
-                        rm ${meta.id}.\$PREFIX.raw.vcf.gz.tbi
-                fi
-                rm \$PREFIX.fasta*
-
+                genotype \$PREFIX.fasta ${meta.id}.\$PREFIX "--ref-sample \$PREFIX"
             done
+        """ :
+        "genotype ${reference_fasta} ${meta.id} ''" // Default: genotype against all reference paths in the graph
+    """
+    genotype() {
+        # References will have PanSN format, raw VCFs produced by vg call won't. Convert references to align with VCF naming & reindex
+        sed -i 's/.*#/>/g' \$1
+        rm \$1.fai && samtools faidx \$1
 
-        # Clean up outside of loop
-        rm *.filtered.pack
+        # Genotype against the reference paths in the graph (a specific reference sample, if requested)
+        vg call -t ${task.cpus} ${graph} --pack ${meta.id}.filtered.pack \$3 --min-support ${params.minimumAlleleSupport},${params.minimumSiteSupport} --baseline-error ${params.baselineErrorSmallVariants},${params.baselineErrorLargeVariants} --snarls ${snarls} --sample ${meta.id} --genotype-snarls --all-snarls --gbz-translation --gbz --ploidy ${params.samplePloidy} | bgzip --threads ${task.cpus} > \$2.raw.vcf.gz
 
-        """
+        # Index raw VCF
+        tabix -p vcf \$2.raw.vcf.gz
 
+        # Pop bubbles
+        vcfbub --input \$2.raw.vcf.gz --max-level ${params.maxNestLevel} --max-ref-length ${params.maxRefLength} | bcftools norm -f \$1 | bcftools sort | bgzip --threads ${task.cpus} > \$2.filtered.vcf.gz
+
+        # Clean up
+        if [ "${params.keepRawVcf}" != "true" ]
+            then
+                rm \$2.raw.vcf.gz \$2.raw.vcf.gz.tbi
+            else
+                rm \$2.raw.vcf.gz.tbi
+        fi
+        rm \$1*
+    }
+
+    # Concatenate GAMs if multiple libraries per sample
+    if (( ${gamCount} == 1 )); then
+        echo "Only one GAM file for sample ${meta.id}, skipping merge"
+        mv ${gams} ${meta.id}.merged.gam
+    else
+        echo "Merging ${gamCount} GAM files for sample ${meta.id}"
+        cat ${gams} > ${meta.id}.merged.gam
+    fi
+
+    # Compute read support
+    vg pack -t ${task.cpus} -x ${graph} -g ${meta.id}.merged.gam -o ${meta.id}.filtered.pack -Q 5
+
+    # Remove merged GAM for disk economy (unless symlink, i.e., only one input GAM)
+    if [ -f ${meta.id}.merged.gam ] && [ ! -L ${meta.id}.merged.gam ]; then
+        rm ${meta.id}.merged.gam
+    fi
+
+    ${run_genotype}
+
+    rm *.filtered.pack
+    """
 }

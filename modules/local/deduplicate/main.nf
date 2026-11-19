@@ -18,101 +18,42 @@ process DEDUPLICATE {
 
     script:
     def args = task.ext.args ?: ''
-
-    if (!params.multiple_references && meta.type == "ancient") // By default, assume all reads have known 5' and 3' endings and use both for deduplication
+    // By default, assume all reads have known 5' and 3' endings and use both for deduplication (ancient); modern uses only 5' mapping positions
+    def flow_args = meta.type == 'ancient' ? args : ''
+    def run_dedup = params.multiple_references ?
         """
-        # Find system Java max heap size & convert to GB
-        MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
-        MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
+        # Loop over reference samples
+        for i in *.paths
+            do
+                PREFIX=`echo \$i | sed 's/\\.paths//'`
+                dedup ${meta.id}.\$PREFIX
+            done
+        """ :
+        "dedup ${meta.id}"
+    """
+    # Find system Java max heap size & convert to GB
+    MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
+    MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
 
+    dedup() {
         # Mark duplicates
         picard -Xms2g -Xmx\${MAX_HEAP_GB}g MarkDuplicates \
-            --INPUT ${meta.id}.merge.bam \
-            --OUTPUT ${meta.id}.dedup.bam \
-            --METRICS_FILE ${meta.id}.dedup_metrics.txt \
+            --INPUT \$1.merge.bam \
+            --OUTPUT \$1.dedup.bam \
+            --METRICS_FILE \$1.dedup_metrics.txt \
             --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
             --REMOVE_DUPLICATES ${params.removeDuplicates} \
             --VALIDATION_STRINGENCY STRICT \
             --ASSUME_SORT_ORDER coordinate \
-            ${args}
+            ${flow_args}
 
         # Index BAM
-        samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
+        samtools index --threads ${task.cpus} \$1.dedup.bam
 
         # Stats
-        samtools flagstat ${meta.id}.dedup.bam > ${meta.id}.dedup.bam.flagstats
-        """
+        samtools flagstat \$1.dedup.bam > \$1.dedup.bam.flagstats
+    }
 
-    else if (!params.multiple_references && meta.type == "modern") // Use only 5' mapping positions
-        """
-        # Find system Java max heap size & convert to GB
-        MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
-        MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
-
-        # Mark duplicates
-        picard -Xms2g -Xmx\${MAX_HEAP_GB}g MarkDuplicates \
-            --INPUT ${meta.id}.merge.bam \
-            --OUTPUT ${meta.id}.dedup.bam \
-            --METRICS_FILE ${meta.id}.dedup_metrics.txt \
-            --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
-            --REMOVE_DUPLICATES ${params.removeDuplicates} \
-            --VALIDATION_STRINGENCY STRICT \
-            --ASSUME_SORT_ORDER coordinate
-
-        # Index BAM
-        samtools index --threads ${task.cpus} ${meta.id}.dedup.bam
-
-        # Stats
-        samtools flagstat ${meta.id}.dedup.bam > ${meta.id}.dedup.bam.flagstats
-        """
-
-    else if (params.multiple_references && meta.type == "ancient")
-        """
-        # Find system Java max heap size & convert to GB
-        MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
-        MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
-
-        # Loop over reference samples
-        for i in *.paths
-            do
-                PREFIX=`echo \$i | sed 's/\\.paths//'`
-                picard -Xms2g -Xmx\${MAX_HEAP_GB}g MarkDuplicates \
-                    --INPUT ${meta.id}.\$PREFIX.merge.bam \
-                    --OUTPUT ${meta.id}.\$PREFIX.dedup.bam \
-                    --METRICS_FILE ${meta.id}.\$PREFIX.dedup_metrics.txt \
-                    --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
-                    --REMOVE_DUPLICATES ${params.removeDuplicates} \
-                    --VALIDATION_STRINGENCY STRICT \
-                    --ASSUME_SORT_ORDER coordinate \
-                    ${args}
-
-                samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
-                samtools flagstat ${meta.id}.\$PREFIX.dedup.bam > ${meta.id}.\$PREFIX.dedup.bam.flagstats
-            done
-        """
-
-    else if (params.multiple_references && meta.type == "modern")
-        """
-        # Find system Java max heap size & convert to GB
-        MAX_HEAP_BYTES=\$(java -XX:+PrintFlagsFinal 2>/dev/null | grep MaxHeapSize | grep -v Soft | awk '{print \$4}') || true
-        MAX_HEAP_GB=\$(expr \$MAX_HEAP_BYTES / 1024 / 1024 / 1024)
-
-        # Loop over reference samples
-        for i in *.paths
-            do
-                PREFIX=`echo \$i | sed 's/\\.paths//'`
-                picard -Xms2g -Xmx\${MAX_HEAP_GB}g MarkDuplicates \
-                    --INPUT ${meta.id}.\$PREFIX.merge.bam \
-                    --OUTPUT ${meta.id}.\$PREFIX.dedup.bam \
-                    --METRICS_FILE ${meta.id}.\$PREFIX.dedup_metrics.txt \
-                    --TAGGING_POLICY ${params.duplicateTaggingPolicy} \
-                    --REMOVE_DUPLICATES ${params.removeDuplicates} \
-                    --VALIDATION_STRINGENCY STRICT \
-                    --ASSUME_SORT_ORDER coordinate
-
-                samtools index --threads ${task.cpus} ${meta.id}.\$PREFIX.dedup.bam
-                samtools flagstat ${meta.id}.\$PREFIX.dedup.bam > ${meta.id}.\$PREFIX.dedup.bam.flagstats
-            done
-        """
-
+    ${run_dedup}
+    """
 }

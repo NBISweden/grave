@@ -21,14 +21,29 @@ process GAM_TO_TAGGED_SORTED_BAM {
 
     script:
     def args = task.ext.args ?: ''
-
-    if (!params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged)))	// Default reference paths, GAM not interleaved
+    def interleaved = meta.type == 'modern' && !meta.merged ? '--interleaved' : '' // Modern unmerged GAMs are interleaved
+    def run_surject = params.multiple_references ?
         """
+        # Surject to each user provided list of reference paths
+        for i in *.paths
+            do
+                PREFIX=`echo \$i | sed 's/\\.paths//'`
+                surject ${meta.read_group}.\$PREFIX --into-paths \$i
+            done
+        """ :
+        "surject ${meta.read_group}"
+    """
+    surject() {
+        OUT=\$1
+        shift
+
         # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
         vg surject \\
             -t ${task.cpus} \\
             -x ${graph} \\
+            ${interleaved} \\
             --bam-output \\
+            "\$@" \\
             ${mapped_gam} | \\
         samtools addreplacerg \\
             --threads ${task.cpus} \\
@@ -45,109 +60,12 @@ process GAM_TO_TAGGED_SORTED_BAM {
             --threads ${task.cpus} \\
             --output-fmt BAM \\
             - > \\
-        ${meta.read_group}.bam
+        \$OUT.bam
 
         # Get stats on what survived surjection
-        samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
-        """
+        samtools flagstat \$OUT.bam > \$OUT.bam.flagstats
+    }
 
-    else if (!params.multiple_references && meta.type == "modern" && !meta.merged)	// Default reference paths, GAM interleaved
-        """
-        # Surject GAM, add read group tags, remove unsurjected (if requested), coordinate sort
-        vg surject \\
-            -t ${task.cpus} \\
-            -x ${graph} \\
-            --interleaved \\
-            --bam-output \\
-            ${mapped_gam} | \\
-        samtools addreplacerg \\
-            --threads ${task.cpus} \\
-            -u \\
-            --output-fmt BAM \\
-            -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
-            - | \\
-        samtools view \\
-            ${args} \\
-            --with-header \\
-            --uncompressed \\
-            - | \\
-        samtools sort \\
-            --threads ${task.cpus} \\
-            --output-fmt BAM \\
-            - > \\
-        ${meta.read_group}.bam
-
-        # Get stats on what survived surjection
-        samtools flagstat ${meta.read_group}.bam > ${meta.read_group}.bam.flagstats
-        """
-
-    else if (params.multiple_references && (meta.type == "ancient" || (meta.type == "modern" && meta.merged)))	// User provided reference paths, GAM not interleaved
-        """
-        # Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths)
-        for i in *.paths
-            do
-                PREFIX=`echo \$i | sed 's/\\.paths//'`
-                vg surject \\
-                    -t ${task.cpus} \\
-                    -x ${graph} \\
-                    --into-paths \$i \\
-                    --bam-output \\
-                    ${mapped_gam} | \\
-                samtools addreplacerg \\
-                    --threads ${task.cpus} \\
-                    -u \\
-                    --output-fmt BAM \\
-                    -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
-                    - | \\
-                samtools view \\
-                    ${args} \\
-                    --with-header \\
-                    --uncompressed \\
-                    - | \\
-                samtools sort \\
-                    --threads ${task.cpus} \\
-                    --output-fmt BAM \\
-                    - > \\
-                ${meta.read_group}.\$PREFIX.bam
-
-                # Get stats on what survived surjection
-                samtools flagstat ${meta.read_group}.\$PREFIX.bam > ${meta.read_group}.\$PREFIX.bam.flagstats
-            done
-        """
-
-    else if  (params.multiple_references && meta.type == "modern" && !meta.merged)	// User provided reference paths, GAM interleaved
-        """
-        # Surject GAM, add read group tags, coordinate sort (to each user provided list of reference paths, interleaved)
-        for i in *.paths
-            do
-                PREFIX=`echo \$i | sed 's/\\.paths//'`
-                vg surject \\
-                    -t ${task.cpus} \\
-                    -x ${graph} \\
-                    --into-paths \$i \\
-                    --interleaved \\
-                    --bam-output \\
-                    ${mapped_gam} | \\
-                samtools addreplacerg \\
-                    --threads ${task.cpus} \\
-                    -u \\
-                    --output-fmt BAM \\
-                    -r '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}' \\
-                    - | \\
-                samtools view \\
-                    ${args} \\
-                    --with-header \\
-                    --uncompressed \\
-                    - | \\
-                samtools sort \\
-                    --threads ${task.cpus} \\
-                    --output-fmt BAM \\
-                    - > \\
-                ${meta.read_group}.\$PREFIX.bam
-
-                # Get stats on what survived surjection
-                samtools flagstat ${meta.read_group}.\$PREFIX.bam > ${meta.read_group}.\$PREFIX.bam.flagstats
-            done
-        """
-
+    ${run_surject}
+    """
 }

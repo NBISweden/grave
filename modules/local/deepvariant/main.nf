@@ -17,8 +17,6 @@ process GRAPH_DEEPVARIANT {
     tuple val(task.process), val('pangenome_aware_deepvariant'), eval('/opt/deepvariant/bin/run_pangenome_aware_deepvariant --version --model_type=WGS --ref=dummy --reads=dummy --pangenome=dummy --output_vcf=dummy 2>/dev/null | sed "s/.*version //"'), topic: versions
 
     script:
-    def basename = graph.baseName - '.gbz'
-
     if (!params.multiple_references)	// Assume single reference sample
         """
         # Run DeepVariant

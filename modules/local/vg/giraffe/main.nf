@@ -25,202 +25,63 @@ process GIRAFFE {
     def memory = task.memory.toGiga()
     def basename = graph.baseName - '.gbz'
 
-    if (meta.type == "ancient" && params.reference_type == "unfiltered_graph") // Ancient samples arrive merged, thus output not interleaved
-        """
-        # Generate kff index of the reads
-        kmc -k${params.aDNAkmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
+    def ancient = meta.type == "ancient"
+    def paired = meta.type == "modern" && !meta.merged // Modern unmerged reads arrive paired, output interleaved. Ancient and merged reads are not interleaved
+    def unfiltered = params.reference_type == "unfiltered_graph"
+    def hap_set = ancient ? "adna" : "modern"
+    def kmer_length = ancient ? params.aDNAkmerLength : params.modernKmerLength
+    def window_length = ancient ? params.aDNAwindowLength : params.modernWindowLength
+    def mapping_args = ancient ? "--mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty}" : ''
+    def fastq_in = paired ? "--fastq-in ${reads[0]} --fastq-in ${reads[1]}" : "--fastq-in ${reads}"
+    def filter_interleaved = paired ? '--interleaved-all' : ''
 
-        # Generate the subsampled graph and index it
-        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.adna.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
-        vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.aDNAkmerLength} --window-length ${params.aDNAwindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
+    // Unfiltered graphs: subsample & index the graph per sample. Filtered graphs: use the provided indexes
+    def gbz = unfiltered ? "${basename}.${meta.read_group}.gbz" : "${graph}"
+    def dist = unfiltered ? "${basename}.${meta.read_group}.dist" : "*.dist"
+    def minimizer = unfiltered ? "${basename}.${meta.read_group}.withzip.min" : "*.${hap_set}.withzip.min"
+    def zipcodes = unfiltered ? "${basename}.${meta.read_group}.zipcodes" : "*.${hap_set}.zipcodes"
 
-        # Map reads to graph
-        vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
-
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
-        fi
-
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
-
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
-
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-
-        # Remove sample specific indexes
-        rm *.${meta.read_group}.* *.kff
-        """
-
-    else if (meta.type == "ancient" && params.reference_type == "filtered_graph") // Ancient samples arrive merged, thus output not interleaved
-        """
-        # Map merged reads
-        vg giraffe --progress --mismatch ${params.aDNA_mismatch_penalty} --gap-open ${params.aDNA_gap_open_penalty} --gap-extend ${params.aDNA_gap_extend_penalty} --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.adna.withzip.min --zipcode-name *.adna.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
-
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
-        fi
-
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
-
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
-
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-        """
-
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && !meta.merged) // Arrives paired, output interleaved
-        """
-        # Generate list of input read files
-        echo -e "./${reads[0]}\n./${reads[1]}" > readfiles
+    def read_list = paired ? "# Generate list of input read files\necho -e \"./${reads[0]}\n./${reads[1]}\" > readfiles" : ''
+    def index_graph = !unfiltered ? '' : """
+        ${read_list}
 
         # Generate kff index of the reads
-        kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff @readfiles ${meta.read_group} .
+        kmc -k${kmer_length} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${paired ? '@readfiles' : reads} ${meta.read_group} .
 
         # Generate the subsampled graph and index it
-        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
-        vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
-
-        # Map paired-end reads
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
-
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
-        fi
-
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
-
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
-
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-
+        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.${hap_set}.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${gbz} ${graph}
+        vg index --threads ${task.cpus} --dist-name ${dist} ${gbz}
+        vg minimizer --threads ${task.cpus} --kmer-length ${kmer_length} --window-length ${window_length} --distance-index ${dist} --output-name ${minimizer} --zipcode-name ${zipcodes} ${gbz}
+    """
+    def cleanup = !unfiltered ? '' : """
         # Remove sample specific indexes
-        rm *.${meta.read_group}.* *.kff readfiles
-        """
+        rm *.${meta.read_group}.* *.kff ${paired ? 'readfiles' : ''}
+    """
+    """
+    ${index_graph}
+    # Map reads to graph
+    vg giraffe --progress ${mapping_args} ${fastq_in} --gbz-name ${gbz} --dist-name ${dist} --minimizer-name ${minimizer} --zipcode-name ${zipcodes} --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
 
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && !meta.merged) // Arrives paired, output interleaved
-        """
-        # Map paired-end reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads[0]} --fastq-in ${reads[1]} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
+    # Report raw mapping statistics
+    if [ "${params.rawMapStats}" == "true" ]
+        then
+            vg stats --alignments ${meta.read_group}.gam ${gbz} > ${meta.read_group}.raw.gam.vg-stats
+    fi
 
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
-        fi
+    # Filter GAM
+    vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${gbz} ${filter_interleaved} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
 
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} --interleaved-all -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
+    # Remove raw GAM unless overridden
+    if [ "${params.keepRawGam}" != "true" ]
+        then
+            rm ${meta.read_group}.gam
+    fi
 
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
+    # Report filtered mapping statistics
+    vg stats --alignments ${meta.read_group}.filtered.gam ${gbz} > ${meta.read_group}.filtered.gam.vg-stats
 
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-        """
-
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged) // Arrives merged, output not interleaved
-        """
-        # Generate kff index of the reads
-        kmc -k${params.modernKmerLength} -ci${params.kffKmerMinimum} -t${task.cpus} -m${memory} -sm -fq -okff ${reads} ${meta.read_group} .
-
-        # Generate the subsampled graph and index it
-        vg haplotypes --threads ${task.cpus} --verbosity 2 --include-reference --diploid-sampling --haplotype-input *.modern.hapl --kmer-input ${meta.read_group}.kff --gbz-output ${basename}.${meta.read_group}.gbz ${graph}
-        vg index --threads ${task.cpus} --dist-name ${basename}.${meta.read_group}.dist ${basename}.${meta.read_group}.gbz
-        vg minimizer --threads ${task.cpus} --kmer-length ${params.modernKmerLength} --window-length ${params.modernWindowLength} --distance-index ${basename}.${meta.read_group}.dist --output-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes ${basename}.${meta.read_group}.gbz
-
-        # Map merged reads
-        vg giraffe --progress --fastq-in ${reads} --gbz-name ${basename}.${meta.read_group}.gbz --dist-name ${basename}.${meta.read_group}.dist --minimizer-name ${basename}.${meta.read_group}.withzip.min --zipcode-name ${basename}.${meta.read_group}.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
-
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.raw.gam.vg-stats
-        fi
-
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${basename}.${meta.read_group}.gbz -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
-
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
-
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${basename}.${meta.read_group}.gbz > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-
-        # Remove sample specific indexes
-        rm *.${meta.read_group}.* *.kff
-        """
-
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged) // Arrives merged, output not interleaved
-        """
-        # Map merged reads (default settings are equivalent to BWA mem)
-        vg giraffe --progress --fastq-in ${reads} --gbz-name ${graph} --dist-name *.dist --minimizer-name *.modern.withzip.min --zipcode-name *.modern.zipcodes --output-format GAM --threads ${task.cpus} > ${meta.read_group}.gam
-
-        # Report raw mapping statistics
-        if [ "${params.rawMapStats}" == "true" ]
-            then
-                vg stats --alignments ${meta.read_group}.gam ${graph} > ${meta.read_group}.raw.gam.vg-stats
-        fi
-
-        # Filter GAM
-        vg filter ${args} ${args2} ${args3} ${args4} -t ${task.cpus} -x ${graph} -v ${meta.read_group}.gam > ${meta.read_group}.filtered.gam
-
-        # Remove raw GAM unless overridden
-        if [ "${params.keepRawGam}" != "true" ]
-            then
-                rm ${meta.read_group}.gam
-        fi
-
-        # Report filtered mapping statistics
-        vg stats --alignments ${meta.read_group}.filtered.gam ${graph} > ${meta.read_group}.filtered.gam.vg-stats
-
-        # Get alignment count (to branch passed/failed samples)
-        ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
-        """
-
+    # Get alignment count (to branch passed/failed samples)
+    ALIGNMENT_COUNT=\$(grep "Total alignments:" ${meta.read_group}.filtered.gam.vg-stats | awk '{print \$3}')
+    ${cleanup}
+    """
 }

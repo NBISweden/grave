@@ -6,9 +6,13 @@
 
 - TODO: kraken2
 
-- nf-test should use `nft-bam` & more specific assertions
+- nf-test 
+    - should use `nft-bam`
+    - more specific assertions
+    - add md5sums
+    - shouldn't reuse cached indexing processes (inconsistent across systems)
 
-## [2.4.0] - Unreleased
+## [2.4.0] - 20261119
 
 ### Additions & updates
 

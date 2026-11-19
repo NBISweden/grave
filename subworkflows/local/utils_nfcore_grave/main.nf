@@ -60,6 +60,7 @@ workflow PIPELINE_INITIALISATION {
     ch_samplesheet = channel.empty()
     if ( params.input ) {
         def uniqueReadGroups = new HashSet<String>() // Initialise empty set for detecting duplicate read groups
+        def sampleTypes = [:] // Track the sample type seen for each sample_id
         ch_samplesheet = channel.fromPath(params.input, checkIfExists: true)
             .splitCsv(header: true, skip: 0)
             .map { row ->
@@ -72,7 +73,7 @@ workflow PIPELINE_INITIALISATION {
                     merged: row.merged.toLowerCase()
                 ]
                 // Check no duplicate "read group" combinations
-                def key = "${meta.id}${meta.library}${meta.repeat}"
+                def key = "${meta.id}.${meta.library}.${meta.repeat}"
                 if (!uniqueReadGroups.add(key)) {
                     error ("Error: found a duplicate for sample '${meta.id}' in the samplesheet. Each row should have a unique combination of 'sample_id', 'library_id' and 'repeat_number'.")
                 }
@@ -87,10 +88,15 @@ workflow PIPELINE_INITIALISATION {
                 if (!['ancient', 'modern'].contains(meta.type)) {
                     error ("Error: for '${meta.read_group}' found the phrase '${meta.type}' in the samplesheet 'type' column, accepts 'ancient' or 'modern' (case insensitive).")
                 }
+                // Check each sample_id has a single sample type (otherwise merged/deduplicated BAMs overwrite each other)
+                def firstType = sampleTypes.putIfAbsent(meta.id, meta.type)
+                if (firstType && firstType != meta.type) {
+                    error ("Error: sample '${meta.id}' has both '${firstType}' and '${meta.type}' libraries in the samplesheet. Each 'sample_id' must have a single 'sample_type', use different 'sample_id's.")
+                }
                 // Initial checks passed, add FASTQ paths
                 if (meta.merged) {
                     if (row.fastq_1 && !row.fastq_2) {
-                        return [meta, [file(row.fastq_1)]]
+                        return [meta, [resolveFastq(row.fastq_1)]]
                     } else if (!row.fastq_1) {
                         error ("Error caused by sample: '${meta.read_group}'. No path to the merged FASTQ file is provided in column 'fastq_1'.")
                     } else {
@@ -98,7 +104,7 @@ workflow PIPELINE_INITIALISATION {
                     }
                 } else if (!meta.merged) {
                     if (row.fastq_1 && row.fastq_2) {
-                        return [meta, [file(row.fastq_1), file(row.fastq_2)]]
+                        return [meta, [resolveFastq(row.fastq_1), resolveFastq(row.fastq_2)]]
                     } else {
                         error ("Error caused by sample: '${meta.read_group}'. The workflow is expecting two FASTQ files, received one or none.")
                     }
@@ -121,8 +127,9 @@ workflow PIPELINE_INITIALISATION {
         .map { meta, _fastqs -> meta.type }
         .unique()
         .collect()
+        .ifEmpty([]) // No samplesheet (index-only run): collect() emits nothing on an empty channel
         .map { uniqueTypes ->
-            uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign that type to "ch_types". Else assign "both".
+            uniqueTypes.size() == 1 ? uniqueTypes[0] : 'both' // If one type found, assign that type to "ch_types". Else (several types, or no samplesheet) assign "both".
         }
 
     emit:
@@ -148,7 +155,7 @@ def validateInputParameters() {
         'profile_pmd'     // post-mortem damage profiling (ancient samples only)
     ]
     // Parse requested steps
-    def requested_steps = params.steps.tokenize(",")
+    def requested_steps = parseSteps()
     // Check requested steps are valid
     def invalid_steps = requested_steps.findAll { step -> !(step in permitted_steps) }
     // Report invalid steps
@@ -192,9 +199,9 @@ def validateInputParameters() {
     if ( 'graph_genotype' in requested_steps && !params.reference ) {
         error "ERROR: Graph genotyping was requested but no reference file was provided with '--reference'"
     }
-    // Error if incompatible step requested
+    // Warn requested step will be ignored
     if ( requested_steps.any { step -> step in ['graph_genotype', 'reads_genotype'] } && params.reference_type == 'linear' ) {
-        println "WARN: Graph-based genotyping was requested but grave is running in linear mode."
+        log.warn("WARN: Graph-based genotyping was requested but grave is running in linear mode.")
     }
     // If reference is provided, enforce reference type also
     if ( params.reference && !params.reference_type ) {
@@ -242,4 +249,15 @@ def validateInputParameters() {
         error "ERROR: grave does not currently support GPU Giraffe in multi-reference mode. If this is a feature you need, please submit a GitHub issue."
     }
 
+}
+
+// Resolve a samplesheet path: relative to the launch directory, falling back to the project directory
+def resolveFastq(String path) {
+    def f = file(path)
+    return f.exists() ? f : file("${projectDir}/${path}")
+}
+
+// Parse the comma-separated 'steps' parameter, ignoring surrounding whitespace
+def parseSteps() {
+    return params.steps.tokenize(',')*.trim().findAll { step -> step }
 }

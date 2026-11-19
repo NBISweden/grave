@@ -1,0 +1,9 @@
+# Graph test params yml
+
+steps         : 'preprocess,index,align,merge,deduplicate'
+reference_type: 'unfiltered_graph'
+input         : 'tests/data/samplesheet.csv'
+reference     : 'tests/data/graph/additional_graphs/example-unfiltered.gbz'
+deepvariant   : true
+tracing       : true
+kffKmerMinimum: 2

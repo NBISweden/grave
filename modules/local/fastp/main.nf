@@ -18,7 +18,7 @@ process FASTP {
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
 
-    if (meta.type == "ancient" && meta.merged == false)
+    if (meta.type == "ancient" && !meta.merged)
         """
         # Merge and QC paired-end ancient DNA
         fastp \
@@ -41,7 +41,7 @@ process FASTP {
         gzip ${meta.read_group}.fastp.html
         """
 
-    else if (meta.type == "modern" && meta.merged == false)
+    else if (meta.type == "modern" && !meta.merged)
         """
         # QC paired-end modern DNA
         fastp \
@@ -63,7 +63,7 @@ process FASTP {
         gzip ${meta.read_group}.fastp.html
         """
 
-    else if (meta.merged == true) // Same settings for ancient and modern
+    else if (meta.merged) // Same settings for ancient and modern
         """
         # QC merged reads
         fastp \

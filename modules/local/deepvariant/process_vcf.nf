@@ -18,35 +18,28 @@ process PROCESS_DEEPVARIANT {
     tuple val(task.process), val('htslib'), eval('bgzip --version | head -n 1 | sed "s/.* //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
-    if (!params.multiple_references)	// Assume single reference sample
-        """
-        # Normalise and sort (no bubbles to pop in DeepVariant VC)
-        bcftools norm -f ${reference_fasta} ${deepvariant_vcf} | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
-
-        # Clean up
-        if [ "${params.keepRawVcf}" != "true" ]
-            then
-                rm ${deepvariant_vcf}
-        fi
-        """
-
-    else if (params.multiple_references)
+    def run_norm = params.multiple_references ?
         """
         # Loop through each reference sample
         for i in *.paths
             do
                 PREFIX=`echo \$i | sed 's/\\.paths//'`
-                # Normalise and sort (no bubbles to pop in DeepVariant VC)
-                bcftools norm -f \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.norm.vcf.gz
-
-                # Clean up
-                if [ "${params.keepRawVcf}" != "true" ]
-                    then
-                        rm ${meta.id}.\$PREFIX.raw.vcf.gz
-                fi
+                norm \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz ${meta.id}.\$PREFIX.norm.vcf.gz
             done
-        """
+        """ :
+        "norm ${reference_fasta} ${deepvariant_vcf} ${meta.id}.norm.vcf.gz" // Assume single reference sample
+    """
+    norm() {
+        # Normalise and sort (no bubbles to pop in DeepVariant VC)
+        bcftools norm -f \$1 \$2 | bcftools sort | bgzip --threads ${task.cpus} > \$3
 
+        # Clean up
+        if [ "${params.keepRawVcf}" != "true" ]
+            then
+                rm \$2
+        fi
+    }
+
+    ${run_norm}
+    """
 }

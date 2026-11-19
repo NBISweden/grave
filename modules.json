@@ -17,11 +17,17 @@
             "installed_by": ["modules"],
             "patch": "modules/nf-core/bwa/index/bwa-index.diff"
           },
-          "bwa/mem": {
+          "bwamem3/index": {
             "branch": "master",
-            "git_sha": "1c46359c837ef768b004519f535c30378e8289fc",
+            "git_sha": "d9d44fa4a5048f6af0d785ab973f5e49fb3ecb60",
             "installed_by": ["modules"],
-            "patch": "modules/nf-core/bwa/mem/bwa-mem.diff"
+            "patch": "modules/nf-core/bwamem3/index/bwamem3-index.diff"
+          },
+          "bwamem3/mem": {
+            "branch": "master",
+            "git_sha": "d9d44fa4a5048f6af0d785ab973f5e49fb3ecb60",
+            "installed_by": ["modules"],
+            "patch": "modules/nf-core/bwamem3/mem/bwamem3-mem.diff"
           },
           "freebayes": {
             "branch": "master",

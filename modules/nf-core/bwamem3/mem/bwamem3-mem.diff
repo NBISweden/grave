@@ -1,0 +1,116 @@
+Changes in component 'nf-core/bwamem3/mem'
+Changes in 'bwamem3/mem/main.nf':
+--- modules/nf-core/bwamem3/mem/main.nf
++++ modules/nf-core/bwamem3/mem/main.nf
+@@ -2,74 +2,49 @@
+ // See https://github.com/nf-core/modules for full license, file patching instructions and upstream contributing.
+ 
+ process BWAMEM3_MEM {
+-    tag "${meta.id}"
++
++    tag "${meta.read_group}"
+     label 'process_high'
+-
+     conda "${moduleDir}/environment.yml"
+     container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+         ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/ff/ffd9362ddd396e0eb431def1812e02a274552b162355b242d974af65fcf83167/data'
+         : 'community.wave.seqera.io/library/bwa-mem3_htslib_samtools_findutils:f271e572b6aa004b'}"
+ 
+     input:
+-    tuple val(meta), path(reads)
+-    tuple val(meta2), path(index)
+-    tuple val(meta3), path(fasta)
+-    val sort_bam
++    tuple val(meta)     , path(reads)
++    tuple val(reference), path(indexes)
+ 
+     output:
+-    tuple val(meta), path("*.{sam,bam,cram}"), emit: aligned
+-    tuple val(meta), path("*.{bai,csi,crai}"), emit: index, optional: true
+-    tuple val("${task.process}"), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), emit: versions_bwamem3, topic: versions
+-    tuple val("${task.process}"), val('samtools'), eval("samtools version | sed '1!d;s/.* //'"), emit: versions_samtools, topic: versions
+-
+-    when:
+-    task.ext.when == null || task.ext.when
++    tuple val(meta), path("*.bam"), emit: ch_bam
++    tuple val(meta), path("*_flagstat.txt"), emit: ch_flagstat
++    tuple val(task.process), val('bwamem3'), eval("bwa-mem3 version | sed -nE '1 s/^([0-9]+(\\.[0-9]+)+).*/\\1/p'"), topic: versions
++    tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
+ 
+     script:
+-    def args = task.ext.args ?: ''
+-    def args2 = task.ext.args2 ?: ''
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-    def samtools_command = sort_bam ? 'sort' : 'view'
++    def args       = task.ext.args   ?: ''
++    def prefix     = task.ext.prefix ?: "${meta.read_group}"
++    def read_group = meta.read_group ? "-R '@RG\\tID:${meta.read_group}\\tLB:${meta.library}\\tSM:${meta.id}'" : ""
+ 
+-    def extension_pattern = /(--output-fmt|-O)+\s+(\S+)/
+-    def extension_matcher = (args2 =~ extension_pattern)
+-    def extension = extension_matcher.getCount() > 0 ? extension_matcher[0][2].toLowerCase() : "bam"
+-    def reference = fasta && extension == "cram" ? "--reference ${fasta}" : ""
+-    if (!fasta && extension == "cram") {
+-        error("Fasta reference is required for CRAM output")
+-    }
+     """
+-    # Skip the `index --meth` seed index: `mem --meth` derives it from the plain prefix.
+-    INDEX=`find -L ./ -name "*.amb" ! -name "*.meth.amb" | sed 's/\\.amb\$//'`
++    INDEX_PREFIX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
+ 
+-    bwa-mem3 \\
+-        mem \\
++    bwa-mem3 mem \\
++        ${read_group} \\
++        -t ${task.cpus} \\
++        \$INDEX_PREFIX \\
++        ${reads} | \\
++    samtools view \\
++        --exclude-flags 4 \\
+         ${args} \\
+-        -t ${task.cpus} \\
+-        \$INDEX \\
+-        ${reads} \\
+-        | samtools ${samtools_command} ${args2} -@ ${task.cpus} ${reference} -o ${prefix}.${extension} -
++        --with-header \\
++        --uncompressed \\
++        - | \\
++    samtools sort \\
++        --threads ${task.cpus - 1} \\
++        -O bam \\
++        - > ${prefix}.bam
++
++    samtools flagstat ${prefix}.bam > ${prefix}_flagstat.txt
+     """
+ 
+-    stub:
+-    def args2 = task.ext.args2 ?: ''
+-    def prefix = task.ext.prefix ?: "${meta.id}"
+-    def extension_pattern = /(--output-fmt|-O)+\s+(\S+)/
+-    def extension_matcher = (args2 =~ extension_pattern)
+-    def extension = extension_matcher.getCount() > 0 ? extension_matcher[0][2].toLowerCase() : "bam"
+-    if (!fasta && extension == "cram") {
+-        error("Fasta reference is required for CRAM output")
+-    }
+-
+-    def create_index = ""
+-    if (extension == "cram") {
+-        create_index = "touch ${prefix}.crai"
+-    }
+-    else if (extension == "bam") {
+-        create_index = "touch ${prefix}.csi"
+-    }
+-    """
+-    touch ${prefix}.${extension}
+-    ${create_index}
+-    """
+ }
+
+'modules/nf-core/bwamem3/mem/environment.yml' is unchanged
+'modules/nf-core/bwamem3/mem/meta.yml' is unchanged
+'modules/nf-core/bwamem3/mem/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/bwamem3/mem/tests/main.nf.test' is unchanged
+'modules/nf-core/bwamem3/mem/tests/nextflow.config' is unchanged
+'modules/nf-core/bwamem3/mem/.conda-lock/linux_amd64-bd-f271e572b6aa004b_1.txt' is unchanged
+'modules/nf-core/bwamem3/mem/.conda-lock/linux_arm64-bd-e73cbc14b9a6cced_1.txt' is unchanged
+************************************************************

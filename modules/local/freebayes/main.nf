@@ -21,69 +21,45 @@ process FREEBAYES_PARALLEL {
     tuple val(task.process), val('bcftools'), eval('bcftools version | head -n 1 | sed "s/.* //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
-    if (!params.multiple_references) // Assume single reference sample (this setting forced in 'linear' mode).
-        """
-        # Generate equal coverage regions for parallelization
-        bamtools coverage -in ${bams} | coverage_to_regions.py ${fasta_index} 500 > ${reference_fasta}.regions
-
-        # Run FreeBayes against the single reference sample
-        freebayes-parallel ${reference_fasta}.regions \
-            ${task.cpus} \
-            --genotype-qualities \
-            --fasta-reference ${reference_fasta} \
-            --min-alternate-count ${params.minimumAlleleSupport} \
-            --min-alternate-fraction ${params.minFraction} \
-            --ploidy ${params.samplePloidy} \
-            --max-complex-gap ${params.maxComplexGap} \
-            ${bams} | \
-            bgzip --threads ${task.cpus} > \
-            ${meta.id}.raw.vcf.gz
-
-        # Norm and sort
-        bcftools norm -f ${reference_fasta} ${meta.id}.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.norm.vcf.gz
-
-        # Clean up
-        if [ "${params.keepRawVcf}" != "true" ]
-            then
-                rm ${meta.id}.raw.vcf.gz
-        fi
-        rm ${reference_fasta}.regions
-        """
-
-    else if (params.multiple_references)
+    def run_freebayes = params.multiple_references ?
         """
         # Run FreeBayes workflow against each reference sample
         for i in *.paths
             do
                 PREFIX=`echo \$i | sed 's/\\.paths//'`
-                # Generate equal coverage regions for parallelization
-                bamtools coverage -in ${meta.id}.\$PREFIX.dedup.bam | coverage_to_regions.py \$PREFIX.fasta.fai 500 > \$PREFIX.regions
-
-                # Run FreeBayes
-                freebayes-parallel \$PREFIX.regions \
-                    ${task.cpus} \
-                    --genotype-qualities \
-                    --fasta-reference \$PREFIX.fasta \
-                    --min-alternate-count ${params.minimumAlleleSupport} \
-                    --min-alternate-fraction ${params.minFraction} \
-                    --ploidy ${params.samplePloidy} \
-                    --max-complex-gap ${params.maxComplexGap} \
-                    ${meta.id}.\$PREFIX.dedup.bam | \
-                    bgzip --threads ${task.cpus} > \
-                    ${meta.id}.\$PREFIX.raw.vcf.gz
-
-                # Norm and sort
-                bcftools norm -f \$PREFIX.fasta ${meta.id}.\$PREFIX.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > ${meta.id}.\$PREFIX.norm.vcf.gz
-
-                # Clean up
-                if [ "${params.keepRawVcf}" != "true" ]
-                    then
-                        rm ${meta.id}.\$PREFIX.raw.vcf.gz
-                fi
-                rm \$PREFIX.regions
+                freebayes_workflow \$PREFIX.fasta \$PREFIX.fasta.fai ${meta.id}.\$PREFIX.dedup.bam ${meta.id}.\$PREFIX ${meta.id}.\$PREFIX.regions
             done
-        """
+        """ :
+        "freebayes_workflow ${reference_fasta} ${fasta_index} ${bams} ${meta.id} ${reference_fasta}.regions" // Assume single reference sample (this setting forced in 'linear' mode)
+    """
+    freebayes_workflow() {
+        # Generate equal coverage regions for parallelization
+        bamtools coverage -in \$3 | coverage_to_regions.py \$2 500 > \$5
 
+        # Run FreeBayes
+        freebayes-parallel \$5 \
+            ${task.cpus} \
+            --genotype-qualities \
+            --fasta-reference \$1 \
+            --min-alternate-count ${params.minimumAlleleSupport} \
+            --min-alternate-fraction ${params.minFraction} \
+            --ploidy ${params.samplePloidy} \
+            --max-complex-gap ${params.maxComplexGap} \
+            \$3 | \
+            bgzip --threads ${task.cpus} > \
+            \$4.raw.vcf.gz
+
+        # Norm and sort
+        bcftools norm -f \$1 \$4.raw.vcf.gz | bcftools sort | bgzip --threads ${task.cpus} > \$4.norm.vcf.gz
+
+        # Clean up
+        if [ "${params.keepRawVcf}" != "true" ]
+            then
+                rm \$4.raw.vcf.gz
+        fi
+        rm \$5
+    }
+
+    ${run_freebayes}
+    """
 }

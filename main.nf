@@ -1,14 +1,14 @@
 #!/usr/bin/env nextflow
 
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_grave/main'
-include { REFERENCE_UTILITIES     } from './subworkflows/local/utils_reference/main'
-include { PREPROCESS_READS        } from './subworkflows/local/01_preprocess_reads/main'
-include { ALIGN_READS             } from './subworkflows/local/02_align_reads/main'
-include { MERGE_BAMS              } from './subworkflows/local/03_merge_bams/main'
-include { DEDUPLICATE_BAM         } from './subworkflows/local/04_deduplicate_bam/main'
-include { PROFILE_PMD             } from './subworkflows/local/05_profile_pmd/main'
-include { GENOTYPE                } from './subworkflows/local/06_genotype/main'
-include { VARIANT_CALL            } from './subworkflows/local/07_variant_call/main'
+include { PIPELINE_INITIALISATION; parseSteps } from './subworkflows/local/utils_nfcore_grave/main'
+include { REFERENCE_UTILITIES                 } from './subworkflows/local/utils_reference/main'
+include { PREPROCESS_READS                    } from './subworkflows/local/01_preprocess_reads/main'
+include { ALIGN_READS                         } from './subworkflows/local/02_align_reads/main'
+include { MERGE_BAMS                          } from './subworkflows/local/03_merge_bams/main'
+include { DEDUPLICATE_BAM                     } from './subworkflows/local/04_deduplicate_bam/main'
+include { PROFILE_PMD                         } from './subworkflows/local/05_profile_pmd/main'
+include { GENOTYPE                            } from './subworkflows/local/06_genotype/main'
+include { VARIANT_CALL                        } from './subworkflows/local/07_variant_call/main'
 
 // Param types (defaults in nextflow.config)
 params {
@@ -22,7 +22,7 @@ params {
     input                      : String
     reference                  : String
     reference_type             : String
-    multiple_references        : String
+    multiple_references        : Boolean
     paths_dir                  : String
 
     // GPU acceleration
@@ -34,6 +34,7 @@ params {
     work_queue_capacity        : Integer
     minimizers_gpu             : Boolean
     gpu_write                  : Boolean
+    gpu_bwa_aln                : Boolean
 
     // Optional processes
     reference_stats            : Boolean
@@ -141,22 +142,24 @@ workflow {
     paths        = params.multiple_references ? channel.fromPath("${params.paths_dir}/*.paths").collect() : [] // Set up paths channel if multi-reference mode
 
     // Parse requested workflow steps
-    workflow_steps = params.steps.tokenize(",")
+    workflow_steps = parseSteps()
 
     // Run any required utility processes on the reference file
     REFERENCE_UTILITIES (
         workflow_steps,
         params.gpu_giraffe,
+        params.gpu_bwa_aln,
         params.reference_type,
         params.reference_stats,
         reference,
         sample_types,
         paths
     )
-    indexed_reference = REFERENCE_UTILITIES.out.indexed_reference   // Stored output
-    stats             = REFERENCE_UTILITIES.out.stats
-    reference_fastas  = REFERENCE_UTILITIES.out.reference_fastas
-    snarls            = REFERENCE_UTILITIES.out.snarls              // Stored output
+    indexed_reference      = REFERENCE_UTILITIES.out.indexed_reference   // Stored output
+    indexed_reference_mem3 = REFERENCE_UTILITIES.out.indexed_reference_mem3 // Stored output
+    stats                  = REFERENCE_UTILITIES.out.stats
+    reference_fastas       = REFERENCE_UTILITIES.out.reference_fastas
+    snarls                 = REFERENCE_UTILITIES.out.snarls              // Stored output
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~ Main grave workflow ~~~~~~
@@ -186,11 +189,13 @@ workflow {
     if ( 'align' in workflow_steps ) {
         ALIGN_READS (
             params.gpu_giraffe,
+            params.gpu_bwa_aln,
             params.reference_type,
             paths,
             fastp_reads,
             reference,
-            indexed_reference
+            indexed_reference,
+            indexed_reference_mem3
         )
         mapped_gam       = ALIGN_READS.out.mapped_gam
         failed_libraries = ALIGN_READS.out.failed_libraries
@@ -226,14 +231,13 @@ workflow {
     // Damage profile ancient samples if they are present
     damage_profiler = channel.empty()
     if ( 'profile_pmd' in workflow_steps ) {
-        if ( sample_types != "modern" ) {
-            PROFILE_PMD (
-                paths,
-                reference_fastas,
-                deduplicated_bams
-            )
-            damage_profiler = PROFILE_PMD.out.damage_profiler
-        }
+        ancient_bams = deduplicated_bams.filter { meta, _bams, _indexes -> meta.type == 'ancient' }
+        PROFILE_PMD (
+            paths,
+            reference_fastas,
+            ancient_bams
+        )
+        damage_profiler = PROFILE_PMD.out.damage_profiler
     }
 
     // Genotyping

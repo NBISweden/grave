@@ -181,7 +181,7 @@ Complete a `samplesheet.csv` file, detailing file system paths to your reads. Th
 - The default resource request is for 1 GPU. To specify GPU number and/or type, a config file can be provided on the command-line, e.g.:
 
 ```
-nextflow main.nf -profile gpu,<institution> -params-file params.yml -c gpu_configuration.config
+nextflow main.nf -profile <institution>,gpu -params-file params.yml -c gpu_configuration.config
 ```
 
 ```{gpu_configuration.config}
@@ -292,7 +292,9 @@ unknownSimian.1.gorilla.bam
 
 - `grave` can be run in linear reference mode, mapping reads against a single FASTA reference instead of a graph.
 
-- Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) and modern DNA with `BWA MEM` (default settings).
+- Ancient DNA alignment will be run with `BWA aln` (`-l 16500 -n 0.01 -o 2`) or [G-ALN](https://github.com/bilalbioinfo/galn) if GPU acceleration is requested via the `gpu_bwa_aln` parameter.
+
+- Modern DNA will be run with `BWA-MEM3`, a rust reimplementation of BWA-MEM2 (default settings).
 
 - To configure linear mode, set the parameter `reference_type` to `linear`, and provide a FASTA reference with the `reference` parameter.
 

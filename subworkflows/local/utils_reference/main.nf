@@ -1,8 +1,10 @@
-include { INDEX_UNFILTERED_GRAPH     } from '../../../modules/local/vg/index_unfiltered/main'
-include { INDEX_UNFILTERED_GRAPH_GPU } from '../../../modules/local/vg/index_unfiltered/gpu'
-include { INDEX_FILTERED_GRAPH       } from '../../../modules/local/vg/index_filtered/main'
-include { INDEX_FILTERED_GRAPH_GPU   } from '../../../modules/local/vg/index_filtered/gpu'
+include { INDEX_DIST                 } from '../../../modules/local/vg/index_dist/main'
+include { INDEX_RINDEX               } from '../../../modules/local/vg/index_ri/main'
+include { INDEX_MINIMIZER            } from '../../../modules/local/vg/minimizer/main'
+include { INDEX_HAPLOTYPES           } from '../../../modules/local/vg/haplotypes/main'
 include { BWA_INDEX                  } from '../../../modules/nf-core/bwa/index/main'
+include { GALN_INDEX                 } from '../../../modules/local/galn/index/main'
+include { BWAMEM3_INDEX              } from '../../../modules/nf-core/bwamem3/index/main'
 include { GRAPH_STATISTICS           } from '../../../modules/local/vg/stats/main'
 include { SAMTOOLS_FAIDX             } from '../../../modules/nf-core/samtools/faidx/main'
 include { GRAPH_EXTRACT              } from '../../../modules/local/vg/paths/main'
@@ -13,6 +15,7 @@ workflow REFERENCE_UTILITIES {
     take:
     workflow_steps
     gpu_giraffe
+    gpu_bwa_aln
     reference_type
     reference_stats
     reference
@@ -20,102 +23,109 @@ workflow REFERENCE_UTILITIES {
     paths
 
     main:
-    indexed_reference = channel.empty()
-    stats             = channel.empty()
-    reference_fastas  = channel.empty()
-    snarls            = channel.empty()
+    indexed_reference      = channel.empty()
+    indexed_reference_mem3 = channel.empty()
+    stats                  = channel.empty()
+    reference_fastas       = channel.empty()
+    snarls                 = channel.empty()
 
     // If indexing is requested, index appropriately based on the reference type
     if ( 'index' in workflow_steps) {
+        // One index per sample type present (keyed on that type's parameters in the store)
+        index_types = sample_types.flatMap { types -> types == 'both' ? ['ancient', 'modern'] : [types] }
         if ( reference_type == "unfiltered_graph" ) {
-            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
-            if ( gpu_giraffe ) {
-                INDEX_UNFILTERED_GRAPH_GPU (
-                    reference,
-                    sample_types
-                )
-                reference
-                    .combine(INDEX_UNFILTERED_GRAPH_GPU.out.ch_hapl_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            } else {
-                INDEX_UNFILTERED_GRAPH (
-                    reference,
-                    sample_types
-                )
-                reference
-                    .combine(INDEX_UNFILTERED_GRAPH.out.ch_hapl_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            }
-        } else if ( reference_type == "filtered_graph" ) {
-            // GPU accelerated giraffe version lags behind vg CPU baseline -> ensure compatible indexes by reverting vg to parabricks version
-            if ( gpu_giraffe ) {
-                INDEX_FILTERED_GRAPH_GPU (
-                    reference,
-                    sample_types
-                )
-                reference
-                    .combine(INDEX_FILTERED_GRAPH_GPU.out.ch_filter_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            } else {
-                INDEX_FILTERED_GRAPH (
-                    reference,
-                    sample_types
-                )
-                reference
-                    .combine(INDEX_FILTERED_GRAPH.out.ch_filter_indexes)
-                    .collect()
-                    .map { element ->
-                        [ref: element[0], indexes: element[1..-1]]
-                    }
-                    .set { indexed_reference }
-            }
-        } else if ( reference_type == "linear" ) {
-            // Index the reference
-            BWA_INDEX (
+            INDEX_DIST (
                 reference
             )
+            INDEX_RINDEX (
+                reference
+            )
+            INDEX_HAPLOTYPES (
+                reference
+                    .combine(INDEX_DIST.out.ch_dist)
+                    .combine(INDEX_RINDEX.out.ch_ri)
+                    .combine(index_types)
+            )
             reference
-                .combine(BWA_INDEX.out.ch_bwa_index)
+                .combine(INDEX_HAPLOTYPES.out.ch_hapl.collect())
+                .collect() // value channel so every library can reuse it
+                .map { element -> [ref: element[0], indexes: element[1..-1]] }
+                .set { indexed_reference }
+        } else if ( reference_type == "filtered_graph" ) {
+            INDEX_DIST (
+                reference
+            )
+            INDEX_MINIMIZER (
+                reference
+                    .combine(INDEX_DIST.out.ch_dist)
+                    .combine(index_types)
+            )
+            reference
+                .combine(INDEX_DIST.out.ch_dist.mix(INDEX_MINIMIZER.out.ch_minimizer).collect())
+                .collect() // value channel so every library can reuse it
+                .map { element -> [ref: element[0], indexes: element[1..-1]] }
+                .set { indexed_reference }
+        } else if ( reference_type == "linear" ) {
+            // Index for BWA aln only when ancient libraries are present
+            reference
+                .combine(sample_types)
+                .filter { _ref, types -> types in ['ancient', 'both'] }
+                .map { ref, _types -> ref }
+                .set { aln_reference }
+            if ( gpu_bwa_aln ) {
+                GALN_INDEX (
+                    aln_reference
+                )
+                bwa_index = GALN_INDEX.out.ch_bwa_index
+            } else {
+                BWA_INDEX (
+                    aln_reference
+                )
+                bwa_index = BWA_INDEX.out.ch_bwa_index
+            }
+            reference
+                .combine(bwa_index)
                 .collect()
                 .map { element ->
                     [ref: element[0], indexes: element[1..-1]]
                 }
                 .set { indexed_reference }
+            // Index for BWA-MEM3 only when modern libraries are present
+            reference
+                .combine(sample_types)
+                .filter { _ref, types -> types in ['modern', 'both'] }
+                .map { ref, _types -> ref }
+                .set { mem_reference }
+            BWAMEM3_INDEX (
+                mem_reference
+            )
+            reference
+                .combine(BWAMEM3_INDEX.out.ch_bwamem3_index)
+                .collect()
+                .map { element ->
+                    [ref: element[0], indexes: element[1..-1]]
+                }
+                .set { indexed_reference_mem3 }
         }
     }
 
     // When reference is a graph, produce statistics
-    if ( reference_type != "linear" && reference_stats == true ) {
+    if ( reference_type != "linear" && reference_stats ) {
         GRAPH_STATISTICS (
             reference
         )
         stats = GRAPH_STATISTICS.out.ch_graph_stats
     }
 
-    // When reference is linear, produce fai index & statistics
-    if ( reference_type == "linear" && reference_stats == true ) {
-        SAMTOOLS_FAIDX (
-            reference
-        )
-        stats   = SAMTOOLS_FAIDX.out.ch_fai
-        ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
-    } else if ( reference_type == "linear" && reference_stats == false ) {
+    // When reference is linear, produce fai index & statistics on request
+    if ( reference_type == "linear" ) {
         SAMTOOLS_FAIDX (
             reference
         )
         ref_fai = SAMTOOLS_FAIDX.out.ch_ref_fai
+        if ( reference_stats ) {
+            stats = SAMTOOLS_FAIDX.out.ch_fai
+        }
     }
 
     // Get and assign reference fasta channel if it's required
@@ -143,6 +153,7 @@ workflow REFERENCE_UTILITIES {
 
     emit:
     indexed_reference
+    indexed_reference_mem3
     stats
     reference_fastas
     snarls

@@ -16,8 +16,6 @@ process GRAPH_EXTRACT {
     tuple val(task.process), val('samtools'), eval('samtools version | head -n 1 | sed "s/samtools //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
     if (!params.multiple_references) // Single reference sample, extract all reference paths
     """
     # Extract reference sample paths as FASTA

@@ -14,8 +14,6 @@ process LINEAR_DEEPVARIANT {
     tuple val(task.process), val('deepvariant'), eval('/opt/deepvariant/bin/run_deepvariant --version 2>/dev/null | sed "s/.*version //"'), topic: versions
 
     script:
-    def args = task.ext.args ?: ''
-
     """
     # Run DeepVariant
     /opt/deepvariant/bin/run_deepvariant \

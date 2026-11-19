@@ -58,7 +58,7 @@ process GPU_GIRAFFE {
             --out-bam ${meta.read_group}.bam
         """
 
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == false) // Arrives paired
+    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && !meta.merged) // Arrives paired
         """
         pbrun giraffe \\
             ${args} \\
@@ -78,7 +78,7 @@ process GPU_GIRAFFE {
             --out-bam ${meta.read_group}.bam
         """
 
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == false) // Arrives paired
+    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && !meta.merged) // Arrives paired
         """
         pbrun giraffe \\
             ${args} \\
@@ -98,7 +98,7 @@ process GPU_GIRAFFE {
             --out-bam ${meta.read_group}.bam
         """
 
-    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged == true) // Arrives merged
+    else if (meta.type == "modern" && params.reference_type == "unfiltered_graph" && meta.merged) // Arrives merged
         """
         pbrun giraffe \\
             ${args} \\
@@ -118,7 +118,7 @@ process GPU_GIRAFFE {
             --out-bam ${meta.read_group}.bam
         """
 
-    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged == true) // Arrives merged
+    else if (meta.type == "modern" && params.reference_type == "filtered_graph" && meta.merged) // Arrives merged
         """
         pbrun giraffe \\
             ${args} \\

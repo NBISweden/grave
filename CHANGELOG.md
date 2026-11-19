@@ -1,10 +1,75 @@
 # Changelog
 
-## [2.4.0] - Unreleased
+## [2.?.0]
 
 ### Prefiltering, and any effects on default MAPQ
 
 - TODO: kraken2
+
+- nf-test should use `nft-bam` & more specific assertions
+
+## [2.4.0] - Unreleased
+
+### Additions & updates
+
+- Pixi toml tasks atomised & trimmed, osx support for basic docker test, schema build task added
+
+- Linear path:
+    - Removed the `nf-core/bwa/mem` module used for modern samples
+    - Replaced with the rust reimplementation, BWA-MEM3 (0.16.0)
+    - Patched the nf-core modules to otherwise replicate all prior behaviour
+    - Cost: additional indexing path to support, though it only runs if a modern sample is present (aln now also only indexes if an aDNA sample is present)
+
+- Added optional GPU aln implementation, `galn`. Controlled via `gpu_bwa_aln` param
+    - Bioconda release planned (pers. comm.), meanwhile use GHCR hosted image (see `Docker` dir)
+    - Indexing sheep genome took ~30 seconds, therefore time request shortened to 1 hr for faster queueing
+
+- Cleaned up `conf` file placeholders & added realistic dynamic resource adjustment for `giraffe` module
+
+### Bug fixes
+
+- `gpu` test profile order fixed: `docker,gpu,test` so that gpu overwrites docker
+
+- Addressed an issue with how indexes were generated and stored by name
+    - There were still existing caching issues not fully addressed by the addition of k and w params to the storedir
+    - The storedir name only depended on aDNA params, even when modern params were those being changed
+    - refactored indexing to split shared jobs into individual modules, and fix storedir naming
+
+- `nf-test` had drifted from current defaults and outputs. Updated & fixed bug with resolving input location.
+    - Additionally changed from raw process count to unique process names (count can be unstable if something is repeated)
+
+- Fixed bug with `multiple_reference` param type (string -> boolean)
+
+- A sample that passes the library uniqueness check was still allowed to progress even when it carried two types across libraries: `ancient` & `modern`
+    - They would have ended up clobbering each other after the MERGE step
+    - Added a guard to prevent this
+
+- Trailing whitespace in the steps string caused a failure, but the issue was hard to spot (e.g., `align` versus `align `)
+    - Fixed one affected test file
+    - Fixed the steps string parsing so that it will strip out whitespace
+
+- Hidden bug in the gating for profile PMD:
+    - Gating appeared to be due to this section in `main.nf`:
+        ```
+            if ( 'profile_pmd' in workflow_steps ) {
+                if ( sample_types != "modern" ) {
+        ```
+    - Gating was actually applied by `when` in the process:
+        ```
+            when:
+        meta.type == 'ancient'
+        ```
+    - issue is that `sample_types` is a channel compared to a string
+    - we now filter out modern samples from the channel input
+
+- Duplicate library detection lacked a separator:
+    - `sample1,2,11` could clash with `sample1,21,1`
+    - added separator
+
+- Nitpick: removed unused args declarations, these might imply to a user that args was available to edit in `conf`, but in fact they weren't wired up to the process commands.
+
+- Fixed a number of other small nitpicks.
+
 
 ## [2.3.0] - 20260902
 

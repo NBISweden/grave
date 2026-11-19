@@ -24,7 +24,7 @@ workflow VARIANT_CALL {
 
     // User info in case no variant caller was selected
     if ( !freebayes && !deepvariant ) {
-        println "WARNING: the variant calling subworkflow was requested, but no variant caller combination was specified."
+        log.warn("WARNING: the variant calling subworkflow was requested, but no variant caller was specified.")
     }
 
     // FreeBayes variant calling

@@ -38,7 +38,7 @@ workflow PIPELINE_INITIALISATION {
     after_text = """
     Log issues and questions at: \033[0;92m${workflow.manifest.homePage}/issues\033[0m
     """
-    command = "pixi run nextflow main.nf -profile singularity,test"
+    command = "pixi run nextflow main.nf -profile docker,test -params-file tests/test_graph.yml"
     // ~~~ END OF FIXED WHITESPACE ~~~
 
     UTILS_NFSCHEMA_PLUGIN (
